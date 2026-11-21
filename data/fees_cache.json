@@ -6,6 +6,7 @@
     "service_fee": 0.0,
     "purchase_fee_orig": 1.5,
     "purchase_fee": 0.0,
+    "scale": 58.17,
     "cached_at": "2026-11-21"
   },
   "017437": {
@@ -15,6 +16,7 @@
     "service_fee": 0.4,
     "purchase_fee_orig": 0.0,
     "purchase_fee": 0.0,
+    "scale": 67.0,
     "cached_at": "2026-11-21"
   },
   "000834": {
@@ -192,6 +194,7 @@
     "service_fee": 0.0,
     "purchase_fee_orig": 1.2,
     "purchase_fee": 0.0,
+    "scale": 67.32,
     "cached_at": "2026-11-21"
   },
   "016453": {
@@ -231,6 +234,7 @@
     "service_fee": 0.0,
     "purchase_fee_orig": 1.0,
     "purchase_fee": 0.0,
+    "scale": 1.27,
     "cached_at": "2026-11-21"
   },
   "017030": {
@@ -270,6 +274,7 @@
     "service_fee": 0.0,
     "purchase_fee_orig": 1.2,
     "purchase_fee": 0.0,
+    "scale": 59.31,
     "cached_at": "2026-11-21"
   },
   "017642": {
@@ -297,6 +302,7 @@
     "service_fee": 0.0,
     "purchase_fee_orig": 1.0,
     "purchase_fee": 0.0,
+    "scale": 32.44,
     "cached_at": "2026-11-21"
   },
   "018044": {
@@ -306,6 +312,7 @@
     "service_fee": 0.2,
     "purchase_fee_orig": 0.0,
     "purchase_fee": 0.0,
+    "scale": 31.7,
     "cached_at": "2026-11-21"
   },
   "018064": {
@@ -315,6 +322,7 @@
     "service_fee": 0.0,
     "purchase_fee_orig": 1.2,
     "purchase_fee": 0.0,
+    "scale": 3.27,
     "cached_at": "2026-11-21"
   },
   "018065": {
@@ -324,6 +332,7 @@
     "service_fee": 0.3,
     "purchase_fee_orig": 0.0,
     "purchase_fee": 0.0,
+    "scale": 1.65,
     "cached_at": "2026-11-21"
   },
   "018738": {
@@ -333,6 +342,7 @@
     "service_fee": 0.01,
     "purchase_fee_orig": 0.0,
     "purchase_fee": 0.0,
+    "scale": 24.43,
     "cached_at": "2026-11-21"
   },
   "018851": {
@@ -380,6 +390,7 @@
     "service_fee": 0.2,
     "purchase_fee_orig": 0.0,
     "purchase_fee": 0.0,
+    "scale": 11.24,
     "cached_at": "2026-11-21"
   },
   "019172": {
@@ -647,6 +658,7 @@
     "service_fee": 0.0,
     "purchase_fee_orig": 1.7,
     "purchase_fee": 1.7,
+    "scale": 25.94,
     "cached_at": "2026-11-21"
   },
   "539001": {
@@ -656,6 +668,7 @@
     "service_fee": 0.0,
     "purchase_fee_orig": 1.2,
     "purchase_fee": 0.0,
+    "scale": 43.74,
     "cached_at": "2026-11-21"
   },
   "023422": {
@@ -685,6 +698,7 @@
     "service_fee": 0.0,
     "purchase_fee_orig": 1.2,
     "purchase_fee": 0.0,
+    "scale": 17.41,
     "cached_at": "2026-11-21"
   },
   "__notices__": {
@@ -790,6 +804,46 @@
     "purchase_fee_orig": 0.0,
     "purchase_fee": 0.0,
     "scale": 87.11,
+    "cached_at": "2026-11-21"
+  },
+  "159509": {
+    "mgmt_fee": 0.8,
+    "custody_fee": 0.2,
+    "mgmt_custody_fee": 1.0,
+    "service_fee": 0.0,
+    "purchase_fee_orig": 0.0,
+    "purchase_fee": 0.0,
+    "scale": 160.83,
+    "cached_at": "2026-11-21"
+  },
+  "159501": {
+    "mgmt_fee": 0.5,
+    "custody_fee": 0.1,
+    "mgmt_custody_fee": 0.6,
+    "service_fee": 0.0,
+    "purchase_fee_orig": 0.0,
+    "purchase_fee": 0.0,
+    "scale": 133.68,
+    "cached_at": "2026-11-21"
+  },
+  "513100": {
+    "mgmt_fee": 0.6,
+    "custody_fee": 0.2,
+    "mgmt_custody_fee": 0.8,
+    "service_fee": 0.0,
+    "purchase_fee_orig": 0.0,
+    "purchase_fee": 0.0,
+    "scale": 197.66,
+    "cached_at": "2026-11-21"
+  },
+  "159659": {
+    "mgmt_fee": 0.5,
+    "custody_fee": 0.15,
+    "mgmt_custody_fee": 0.65,
+    "service_fee": 0.0,
+    "purchase_fee_orig": 0.0,
+    "purchase_fee": 0.0,
+    "scale": 102.74,
     "cached_at": "2026-11-21"
   }
 }
