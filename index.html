@@ -878,33 +878,36 @@
       el.className = `auth-msg ${type}`;
     }
 
-    document.querySelectorAll(".auth-tab").forEach(tab => {
-      tab.addEventListener("click", () => {
-        state.authMode = tab.dataset.authTab;
-        document.querySelectorAll(".auth-tab").forEach(t => t.classList.remove("active"));
-        tab.classList.add("active");
-        const isInvite = state.authMode === "invite";
-        document.getElementById("userFields").classList.toggle("hidden", isInvite);
-        document.getElementById("inviteFields").classList.toggle("hidden", !isInvite);
-        document.getElementById("authSubmit").textContent =
-          state.authMode === "register" ? "注册并登录" : (isInvite ? "验证邀请码" : "登录监控台");
-        document.getElementById("authMsg").className = "auth-msg";
-      });
-    });
+document.querySelectorAll(".auth-tab").forEach(tab => {
+   tab.addEventListener("click", () => {
+     state.authMode = tab.dataset.authTab;
+     document.querySelectorAll(".auth-tab").forEach(t => t.classList.remove("active"));
+     tab.classList.add("active");
+     const isInvite = state.authMode === "invite";
+     const isLogin = state.authMode === "login";
+     document.getElementById("userFields").classList.toggle("hidden", isInvite);
+     document.getElementById("inviteFields").classList.toggle("hidden", isLogin);
+     document.getElementById("authSubmit").textContent =
+       state.authMode === "register" ? "注册并登录" : (isInvite ? "验证邀请码" : "登录监控台");
+     document.getElementById("authMsg").className = "auth-msg";
+   });
+ });
 
-    document.getElementById("authForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const btn = document.getElementById("authSubmit");
-      btn.disabled = true;
-      document.getElementById("authMsg").className = "auth-msg";
+ document.getElementById("authForm").addEventListener("submit", async (e) => {
+   e.preventDefault();
+   const btn = document.getElementById("authSubmit");
+   btn.disabled = true;
+   document.getElementById("authMsg").className = "auth-msg";
 
-      const payload = state.authMode === "invite"
-        ? { action: "invite", code: document.getElementById("authInvite").value.trim() }
-        : {
-            action: state.authMode,
-            username: document.getElementById("authUser").value.trim(),
-            password: document.getElementById("authPass").value
-          };
+   const inviteCode = document.getElementById("authInvite").value.trim();
+   const payload = state.authMode === "invite"
+     ? { action: "invite", code: inviteCode }
+     : {
+         action: state.authMode,
+         username: document.getElementById("authUser").value.trim(),
+         password: document.getElementById("authPass").value,
+         ...(state.authMode === "register" ? { code: inviteCode } : {})
+       };
 
       try {
         const res = await fetch("/api/auth", {
