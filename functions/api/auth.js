@@ -100,16 +100,6 @@ export async function onRequestPost(context) {
   const action = body.action;
   const exp = Date.now() + 7 * 24 * 3600 * 1000; // 7 天有效期
 
-  // 1. 邀请码免密登录
-  if (action === "invite") {
-    const code = String(body.code || "").trim().toUpperCase();
-    if (!code || !validCodes.includes(code)) {
-      return jsonRes({ ok: false, message: "邀请码无效，请检查后重试" }, 403);
-    }
-    const user = { username: `邀请码 · ${code}`, role: "invite", exp };
-    const token = await signToken(user, secret);
-    return jsonRes({ ok: true, token, user });
-  }
 
   if (!env.AUTH_KV) {
     return jsonRes(
