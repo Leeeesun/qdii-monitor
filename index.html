@@ -388,6 +388,36 @@
     .cmp-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 14px; }
     .cmp-table th, .cmp-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); text-align: left; }
     .cmp-table th { width: 130px; color: var(--text-3); background: var(--surface-2); font-weight: 500; }
+    .user-menu-wrap { position: relative; }
+    .user-dropdown {
+      position: absolute; right: 0; top: calc(100% + 8px); min-width: 184px;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+      box-shadow: var(--shadow-md); padding: 6px; z-index: 95;
+      display: flex; flex-direction: column; gap: 2px;
+      animation: fadeUp 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .user-menu-item {
+      width: 100%; border: none; background: transparent; color: var(--text);
+      padding: 9px 11px; border-radius: 8px; font-size: 13px; font-weight: 500;
+      display: flex; align-items: center; gap: 8px; cursor: pointer; text-align: left;
+      transition: background 0.14s ease, color 0.14s ease;
+    }
+    .user-menu-item:hover { background: var(--surface-2); color: var(--accent); }
+    .user-menu-item.danger { color: var(--danger); }
+    .user-menu-item.danger:hover { background: var(--danger-bg); color: var(--danger); }
+    .user-menu-sep { height: 1px; background: var(--border); margin: 4px 2px; }
+    .fav-manage-list { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+    .fav-manage-row {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      padding: 10px 12px; border-radius: 10px; background: var(--surface-2);
+      border: 1px solid var(--border); font-size: 13px;
+    }
+    .fav-remove-btn {
+      border: 1px solid var(--border); background: var(--surface); color: var(--text-2);
+      padding: 4px 10px; border-radius: 7px; font-size: 12px; cursor: pointer;
+    }
+    .fav-remove-btn:hover { border-color: var(--danger); color: var(--danger); background: var(--danger-bg); }
+
     .copy-code-btn {
       display: inline-flex; align-items: center; gap: 4px; margin-top: 4px;
       padding: 2px 7px; border-radius: 6px; border: 1px solid var(--border);
@@ -479,10 +509,33 @@
           <button class="nav-btn" data-page="etf" type="button">场内 ETF <span id="navEtfCount" class="nav-count">0</span></button>
         </nav>
         <div class="nav-right">
-          <span class="chip-btn" style="cursor:default;"><svg viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span id="userNameText">--</span></span>
-          <button id="bindPasskeyBtn" class="chip-btn" type="button" title="绑定本机面容/指纹通行密钥"><svg viewBox="0 0 24 24"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/></svg><span>通行密钥</span></button>
+          <div class="user-menu-wrap">
+            <button id="userMenuBtn" class="chip-btn" type="button" aria-expanded="false">
+              <svg viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              <span id="userNameText">--</span>
+              <svg viewBox="0 0 24 24" style="width:13px;height:13px;opacity:0.7;"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+            <div id="userDropdown" class="user-dropdown hidden" role="menu">
+              <button id="menuSettingsBtn" class="user-menu-item" type="button" role="menuitem">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                <span>设置</span>
+              </button>
+              <button id="menuFavBtn" class="user-menu-item" type="button" role="menuitem">
+                <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <span>收藏夹管理</span>
+              </button>
+              <button id="bindPasskeyBtn" class="user-menu-item" type="button" role="menuitem">
+                <svg viewBox="0 0 24 24"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/></svg>
+                <span>通行密钥</span>
+              </button>
+              <div class="user-menu-sep"></div>
+              <button id="logoutBtn" class="user-menu-item danger" type="button" role="menuitem">
+                <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                <span>退出</span>
+              </button>
+            </div>
+          </div>
           <button id="themeToggle" class="chip-btn" type="button" title="切换深浅色"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></button>
-          <button id="logoutBtn" class="chip-btn" type="button">退出</button>
         </div>
       </header>
     </div>
@@ -946,6 +999,15 @@
       <div id="compareTableWrap"></div>
     </div>
   </div>
+  <div id="favModal" class="modal-backdrop hidden">
+    <div class="modal-box" style="max-width:620px;">
+      <div class="card-head" style="margin-bottom:0;">
+        <div class="card-title">收藏夹管理</div>
+        <button id="closeFavBtn" class="chip-btn" type="button">关闭</button>
+      </div>
+      <div id="favManageBody" class="fav-manage-list"></div>
+    </div>
+  </div>
 
   <script>
     const TOKEN_KEY = "qdii_auth_token";
@@ -1172,7 +1234,74 @@
       }
     });
 
+    const userMenuBtn = document.getElementById("userMenuBtn");
+    const userDropdown = document.getElementById("userDropdown");
+    function closeUserMenu() {
+      userDropdown.classList.add("hidden");
+      userMenuBtn.setAttribute("aria-expanded", "false");
+    }
+    userMenuBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const willOpen = userDropdown.classList.contains("hidden");
+      userDropdown.classList.toggle("hidden", !willOpen);
+      userMenuBtn.setAttribute("aria-expanded", String(willOpen));
+    });
+    document.addEventListener("click", (e) => {
+      if (!e.target.closest(".user-menu-wrap")) closeUserMenu();
+    });
+
+    document.getElementById("menuSettingsBtn").addEventListener("click", () => {
+      closeUserMenu();
+      const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+      const msg = [
+        `当前主题：${isDark ? "深色模式" : "浅色模式"}（可点右上角图标切换）`,
+        `自动推送：工作日 09:30 额度变化 Bark 提醒已启用`,
+        `登录有效期：7 天（支持通行密钥与账号密码）`
+      ].join("\n");
+      alert(msg);
+    });
+
+    function openFavManager() {
+      closeUserMenu();
+      const allItems = [...state.raw.nasdaq, ...state.raw.sp500, ...state.raw.etfs];
+      const byCode = new Map(allItems.map(x => [x.code, x]));
+      const codes = [...state.favs];
+      const wrap = document.getElementById("favManageBody");
+      if (!codes.length) {
+        wrap.innerHTML = `<div style="text-align:center;color:var(--text-3);padding:24px 0;">暂无收藏标的，可在基金或场内 ETF 列表中点击 ☆ 添加</div>`;
+      } else {
+        wrap.innerHTML = codes.map(code => {
+          const info = byCode.get(code);
+          const name = info ? info.name : "已收藏标的";
+          const extra = info && info.agency_limit_text
+            ? `代销 ${info.agency_limit_text} · 直销 ${info.direct_limit_text}`
+            : (info && info.premium != null ? `溢价 ${info.premium}%` : "");
+          return `<div class="fav-manage-row">
+            <div>
+              <div><span class="code-badge">${code}</span> <strong style="margin-left:6px;">${name}</strong></div>
+              ${extra ? `<div class="sub-line" style="margin-top:4px;">${extra}</div>` : ""}
+            </div>
+            <button class="fav-remove-btn" data-rm-fav="${code}" type="button">取消收藏</button>
+          </div>`;
+        }).join("");
+        wrap.querySelectorAll("[data-rm-fav]").forEach(btn => {
+          btn.addEventListener("click", () => {
+            toggleFav(btn.dataset.rmFav);
+            openFavManager();
+          });
+        });
+      }
+      document.getElementById("favModal").classList.remove("hidden");
+    }
+
+    document.getElementById("menuFavBtn").addEventListener("click", openFavManager);
+    document.getElementById("closeFavBtn").addEventListener("click", () => document.getElementById("favModal").classList.add("hidden"));
+    document.getElementById("favModal").addEventListener("click", (e) => {
+      if (e.target.id === "favModal") e.currentTarget.classList.add("hidden");
+    });
+
     document.getElementById("logoutBtn").addEventListener("click", () => {
+      closeUserMenu();
       localStorage.removeItem(TOKEN_KEY);
       document.getElementById("appShell").classList.add("hidden");
       document.getElementById("authScreen").classList.remove("hidden");
