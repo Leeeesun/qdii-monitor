@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-21 11:29:56",
+  "updated_at": "2026-11-21 23:35:20",
   "nasdaq": [
     {
       "code": "021000",
@@ -1496,7 +1496,7 @@
       "direct_limit_num": 0,
       "direct_source": "same_as_agency",
       "direct_note": "未见渠道区分公告，默认同代销",
-      "return_1y": null,
+      "return_1y": 2.27,
       "daily_chg": null,
       "scale": 17.84,
       "mgmt_fee": 0.6,
@@ -1637,8 +1637,8 @@
       "service_fee": 0.35,
       "first_year_cost": 1.35,
       "nav_date": "",
-      "notice_title": "关于旗下部分基金2026年4月3日暂停申购、赎回、转换、定期定额投资业务的提示性公告",
-      "notice_date": "2026-03-31",
+      "notice_title": "关于旗下部分基金2026年9月7日暂停申购、赎回、转换、定期定额投资业务的提示性公告",
+      "notice_date": "2026-09-02",
       "notice_url": "https://fundf10.eastmoney.com/jjgg_012860_5.html"
     }
   ],
