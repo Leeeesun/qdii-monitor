@@ -18,6 +18,26 @@ LIMIT_TITLE_KWS = [
     "金额限制", "限制申购", "申购上限", "限额"
 ]
 
+# 16 只主流纳指 / 标普场内 ETF
+TRACKED_ETFS = [
+    {"code": "159509", "name": "景顺长城纳斯达克科技ETF(QDII)", "index": "纳斯达克科技市值加权"},
+    {"code": "159501", "name": "嘉实纳斯达克100ETF(QDII)", "index": "纳斯达克100"},
+    {"code": "159696", "name": "易方达纳斯达克100ETF(QDII)", "index": "纳斯达克100"},
+    {"code": "513100", "name": "国泰纳斯达克100ETF", "index": "纳斯达克100"},
+    {"code": "159659", "name": "招商纳斯达克100ETF(QDII)", "index": "纳斯达克100"},
+    {"code": "159941", "name": "广发纳斯达克100ETF", "index": "纳斯达克100"},
+    {"code": "513870", "name": "富国纳斯达克100ETF(QDII)", "index": "纳斯达克100"},
+    {"code": "513300", "name": "华夏纳斯达克100ETF(QDII)", "index": "纳斯达克100"},
+    {"code": "513390", "name": "博时纳斯达克100ETF(QDII)", "index": "纳斯达克100"},
+    {"code": "159660", "name": "汇添富纳斯达克100ETF(QDII)", "index": "纳斯达克100"},
+    {"code": "159632", "name": "华安纳斯达克100ETF(QDII)", "index": "纳斯达克100"},
+    {"code": "513110", "name": "华泰柏瑞纳斯达克100ETF", "index": "纳斯达克100"},
+    {"code": "159513", "name": "大成纳斯达克100ETF(QDII)", "index": "纳斯达克100"},
+    {"code": "513500", "name": "博时标普500ETF", "index": "标普500"},
+    {"code": "159612", "name": "国泰标普500ETF(QDII)", "index": "标普500"},
+    {"code": "513650", "name": "南方标普500ETF(QDII)", "index": "标普500"},
+]
+
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
     "Referer": "https://fundf10.eastmoney.com/"
@@ -52,8 +72,17 @@ def load_json(path, default):
 def parse_percent(val):
     if val is None or pd.isna(val):
         return 0.0
-    m = re.search(r"(\d+(?:\.\d+)?)", str(val))
+    m = re.search(r"([+-]?\d+(?:\.\d+)?)", str(val))
     return round(float(m.group(1)), 4) if m else 0.0
+
+
+def safe_float(val, digits=2):
+    if val is None or pd.isna(val) or str(val).strip() in ("", "--", "-"):
+        return None
+    try:
+        return round(float(str(val).replace("%", "").replace(",", "")), digits)
+    except Exception:
+        return None
 
 
 def detect_share_class(name):
@@ -95,12 +124,9 @@ def parse_cn_amount(num_str, unit):
 
 
 def extract_limit_from_text(text, share_class=""):
-    """从东方财富官方限购公告正文中提取人民币单日限额"""
     if not text:
         return None
     clean = re.sub(r"\s+", "", text)
-
-    # 先判断是否为取消限购/恢复大额不限额公告
     if re.search(r"(?:取消|恢复)[^。；]{0,20}(?:大额申购|金额限制|申购限额)", clean) and not re.search(
         r"(?:不超过|不得超过|上限为|调整为|调整至|限制为|限定为|限额为|设定为)(?:人民币)?[\d,]+(?:\.\d+)?(?:万|千)?元", clean
     ):
@@ -127,7 +153,6 @@ def extract_limit_from_text(text, share_class=""):
 
 
 def fetch_notice_content(art_code, notices_cache):
-    """拉取东方财富公告正文，按公告 ID 缓存"""
     if not art_code:
         return ""
     if art_code in notices_cache:
@@ -141,8 +166,7 @@ def fetch_notice_content(art_code, notices_cache):
             timeout=10
         )
         data = res.json().get("data") or {}
-        content = data.get("notice_content") or data.get("attach_content") or ""
-        content = content[:3500]
+        content = (data.get("notice_content") or data.get("attach_content") or "")[:3500]
         if content:
             notices_cache[art_code] = content
         return content
@@ -151,7 +175,6 @@ def fetch_notice_content(art_code, notices_cache):
 
 
 def fetch_latest_limit_notice(code, share_class, notices_cache, need_body=False):
-    """直接查询东方财富【基金销售(type=5)】最新20条公告，避免被季报挤出"""
     url = "https://api.fund.eastmoney.com/f10/JJGG"
     for notice_type in (5, 0):
         params = {"fundcode": code, "pageIndex": 1, "pageSize": 20, "type": notice_type}
@@ -181,21 +204,31 @@ def fetch_latest_limit_notice(code, share_class, notices_cache, need_body=False)
     return {"title": "", "date": "", "has_channel_diff": False, "parsed_limit": None}
 
 
-def fetch_return_1y_fallback(code):
-    """通过 pingzhongdata 补全暂停申购或未入榜基金的近1年收益"""
+def fetch_pingzhong_extra(code):
+    """通过 pingzhongdata 补全近1年收益与最新基金规模(亿元)"""
     url = f"https://fund.eastmoney.com/pingzhongdata/{code}.js"
+    ret_1y, scale_yi = None, None
     try:
         res = requests.get(url, headers=HEADERS, timeout=8)
-        m = re.search(r'var\s+syl_1n\s*=\s*"([^"]+)"', res.text)
-        if m and m.group(1).strip() != "":
-            return round(float(m.group(1)), 2)
+        txt = res.text
+        m_1y = re.search(r'var\s+syl_1n\s*=\s*"([^"]+)"', txt)
+        if m_1y and m_1y.group(1).strip() != "":
+            ret_1y = round(float(m_1y.group(1)), 2)
+        m_sc = re.search(r"var\s+Data_fluctuationScale\s*=\s*(\{.*?\});", txt)
+        if m_sc:
+            sc_obj = json.loads(m_sc.group(1))
+            series = sc_obj.get("series") or []
+            if series:
+                last_y = series[-1].get("y")
+                if last_y is not None:
+                    scale_yi = round(float(last_y), 2)
     except Exception:
         pass
-    return None
+    return ret_1y, scale_yi
 
 
 def fetch_fund_fees(code):
-    """抓取天天基金费率页：管理费、托管费、销售服务费与申购费率"""
+    """抓取天天基金费率页及规模：管理费、托管费、销售服务费、申购费率与规模"""
     url = f"https://fundf10.eastmoney.com/jjfl_{code}.html"
     res = requests.get(url, headers=HEADERS, timeout=12)
     res.encoding = "utf-8"
@@ -228,6 +261,8 @@ def fetch_fund_fees(code):
                         purchase_disc = float(rates[0])
             break
 
+    _, scale_yi = fetch_pingzhong_extra(code)
+
     return {
         "mgmt_fee": round(mgmt, 4),
         "custody_fee": round(cust, 4),
@@ -235,8 +270,135 @@ def fetch_fund_fees(code):
         "service_fee": round(serv, 4),
         "purchase_fee_orig": round(purchase_orig, 4),
         "purchase_fee": round(purchase_disc, 4),
+        "scale": scale_yi,
         "cached_at": datetime.now(timezone.utc).strftime("%Y-%m-%d")
     }
+
+
+def fetch_etf_list(fees_cache, today_utc):
+    """抓取 16 只主流纳指/标普场内 ETF 行情、溢价率与近 90 日溢价走势"""
+    spot_map = {}
+    try:
+        spot_df = fetch_with_retry(ak.fund_etf_spot_em)
+        spot_df["代码"] = spot_df["代码"].astype(str).str.zfill(6)
+        for _, r in spot_df.iterrows():
+            spot_map[r["代码"]] = r
+    except Exception:
+        pass
+
+    etf_results = []
+    start_str = (datetime.now() - timedelta(days=150)).strftime("%Y%m%d")
+    end_str = datetime.now().strftime("%Y%m%d")
+
+    for meta in TRACKED_ETFS:
+        code = meta["code"]
+        spot = spot_map.get(code)
+        price = safe_float(spot.get("最新价"), 3) if spot is not None else None
+        chg_pct = safe_float(spot.get("涨跌幅"), 2) if spot is not None else None
+        turnover_yi = None
+        if spot is not None and pd.notna(spot.get("成交额")):
+            try:
+                turnover_yi = round(float(spot.get("成交额")) / 1e8, 2)
+            except Exception:
+                pass
+
+        # 费率与规模（复用 7 天缓存）
+        fee_info = fees_cache.get(code)
+        need_refresh = True
+        if isinstance(fee_info, dict) and "cached_at" in fee_info and fee_info.get("mgmt_custody_fee", 0) > 0:
+            try:
+                cached_dt = datetime.strptime(fee_info["cached_at"], "%Y-%m-%d").replace(tzinfo=timezone.utc)
+                if (today_utc - cached_dt).days < CACHE_TTL_DAYS and fee_info.get("scale") is not None:
+                    need_refresh = False
+            except Exception:
+                pass
+
+        if need_refresh:
+            try:
+                fee_info = fetch_fund_fees(code)
+                if fee_info["mgmt_custody_fee"] > 0:
+                    fees_cache[code] = fee_info
+                time.sleep(0.15)
+            except Exception:
+                fee_info = fee_info or {"mgmt_custody_fee": 0.6, "scale": None}
+
+        # 近1年收益
+        ret_1y, scale_fallback = fetch_pingzhong_extra(code)
+        scale_val = fee_info.get("scale") if fee_info.get("scale") is not None else scale_fallback
+
+        # 近 90 日溢价率历史（收盘价 vs 同日净值）
+        prem_dates, prem_vals = [], []
+        latest_nav, nav_date, price_date = None, "", ""
+        try:
+            hist_df = ak.fund_etf_hist_em(symbol=code, period="daily", start_date=start_str, end_date=end_str, adjust="")
+            nav_df = ak.fund_open_fund_info_em(symbol=code, indicator="单位净值走势")
+            if not hist_df.empty and not nav_df.empty:
+                hist_df["日期"] = pd.to_datetime(hist_df["日期"]).dt.strftime("%Y-%m-%d")
+                nav_df["净值日期"] = pd.to_datetime(nav_df["净值日期"]).dt.strftime("%Y-%m-%d")
+                nav_df["单位净值"] = pd.to_numeric(nav_df["单位净值"], errors="coerce")
+                hist_df["收盘"] = pd.to_numeric(hist_df["收盘"], errors="coerce")
+
+                latest_nav = round(float(nav_df["单位净值"].dropna().iloc[-1]), 4)
+                nav_date = str(nav_df["净值日期"].iloc[-1])
+                price_date = str(hist_df["日期"].iloc[-1])
+                if price is None:
+                    price = round(float(hist_df["收盘"].dropna().iloc[-1]), 3)
+
+                merged = pd.merge(
+                    hist_df[["日期", "收盘"]],
+                    nav_df[["净值日期", "单位净值"]],
+                    left_on="日期",
+                    right_on="净值日期",
+                    how="inner"
+                ).tail(90)
+                for _, mr in merged.iterrows():
+                    if mr["单位净值"] and mr["单位净值"] > 0:
+                        p = round((float(mr["收盘"]) - float(mr["单位净值"])) / float(mr["单位净值"]) * 100, 2)
+                        prem_dates.append(mr["日期"])
+                        prem_vals.append(p)
+            time.sleep(0.15)
+        except Exception:
+            pass
+
+        # 计算当前溢价率（最新场内价相对最新公布净值）
+        premium = None
+        if price and latest_nav and latest_nav > 0:
+            premium = round((price - latest_nav) / latest_nav * 100, 2)
+        elif prem_vals:
+            premium = prem_vals[-1]
+
+        # 溢价历史分位
+        prem_stats = {"min": None, "max": None, "percentile": None}
+        if prem_vals and premium is not None:
+            prem_stats["min"] = min(prem_vals)
+            prem_stats["max"] = max(prem_vals)
+            below = sum(1 for v in prem_vals if v <= premium)
+            prem_stats["percentile"] = int(round(below / len(prem_vals) * 100))
+
+        etf_results.append({
+            "code": code,
+            "name": meta["name"],
+            "index": meta["index"],
+            "price": price,
+            "price_date": price_date,
+            "nav": latest_nav,
+            "nav_date": nav_date,
+            "chg_pct": chg_pct,
+            "premium": premium,
+            "scale": scale_val,
+            "return_1y": ret_1y,
+            "mgmt_custody_fee": fee_info.get("mgmt_custody_fee", 0.0),
+            "turnover": turnover_yi,
+            "detail_url": f"https://fund.eastmoney.com/{code}.html",
+            "premium_history": {
+                "dates": prem_dates,
+                "values": prem_vals,
+                "stats": prem_stats
+            }
+        })
+
+    etf_results.sort(key=lambda x: (x["premium"] if x["premium"] is not None else -999), reverse=True)
+    return etf_results
 
 
 def main():
@@ -251,9 +413,13 @@ def main():
     purchase_df["基金代码"] = purchase_df["基金代码"].astype(str).str.zfill(6)
     rank_df["基金代码"] = rank_df["基金代码"].astype(str).str.zfill(6)
 
+    rank_cols = ["基金代码", "近1年", "日期", "单位净值"]
+    if "日增长率" in rank_df.columns:
+        rank_cols.append("日增长率")
+
     df = pd.merge(
         purchase_df[["基金代码", "基金简称", "申购状态", "日累计限定金额", "手续费"]],
-        rank_df[["基金代码", "近1年", "日期", "单位净值"]].drop_duplicates(subset=["基金代码"]),
+        rank_df[rank_cols].drop_duplicates(subset=["基金代码"]),
         on="基金代码",
         how="left"
     )
@@ -279,13 +445,12 @@ def main():
         category = "nasdaq" if re.search(NASDAQ_KW, name) else "sp500"
         share_class = detect_share_class(name)
 
-        # 1. 代销额度初判
         status_str = str(row["申购状态"])
         agency_text, agency_num = format_limit(row["日累计限定金额"], status_str)
 
         need_notice_body = (agency_num == -1 and "限大额" in status_str)
         notice = fetch_latest_limit_notice(code, share_class, notices_cache, need_body=need_notice_body)
-        time.sleep(0.08)
+        time.sleep(0.06)
 
         if need_notice_body:
             if notice["parsed_limit"] == 999999999:
@@ -300,13 +465,12 @@ def main():
                 agency_text = "限大额(见公告)"
                 status_str = "天天未代销·其他平台可买"
 
-        # 2. 费率抓取（7天缓存）
         fee_info = fees_cache.get(code)
         need_refresh = True
         if isinstance(fee_info, dict) and "cached_at" in fee_info and fee_info.get("mgmt_custody_fee", 0) > 0:
             try:
                 cached_dt = datetime.strptime(fee_info["cached_at"], "%Y-%m-%d").replace(tzinfo=timezone.utc)
-                if (today_utc - cached_dt).days < CACHE_TTL_DAYS:
+                if (today_utc - cached_dt).days < CACHE_TTL_DAYS and "scale" in fee_info:
                     need_refresh = False
             except Exception:
                 pass
@@ -316,12 +480,12 @@ def main():
                 fee_info = fetch_fund_fees(code)
                 if fee_info["mgmt_custody_fee"] > 0:
                     fees_cache[code] = fee_info
-                time.sleep(0.2)
+                time.sleep(0.18)
             except Exception:
                 fee_info = fee_info or {
                     "mgmt_fee": 0.0, "custody_fee": 0.0, "mgmt_custody_fee": 0.0,
                     "service_fee": 0.0, "purchase_fee_orig": 0.0,
-                    "purchase_fee": parse_percent(row["手续费"])
+                    "purchase_fee": parse_percent(row["手续费"]), "scale": None
                 }
 
         purchase_fee = fee_info["purchase_fee"]
@@ -332,7 +496,6 @@ def main():
                 if fee_info.get("purchase_fee_orig", 0) == 0:
                     fee_info["purchase_fee_orig"] = round(fallback_fee * 10, 2)
 
-        # 3. 直销额度判定（手动校准 > 公告渠道差异 > 同代销）
         if code in direct_overrides:
             ov = direct_overrides[code]
             direct_num = ov["limit_num"]
@@ -352,12 +515,17 @@ def main():
             direct_source = "same_as_agency"
             direct_note = "未见渠道区分公告，默认同代销"
 
-        # 4. 近 1 年收益兜底补全
-        y1 = row["近1年"]
-        y1_val = round(float(y1), 2) if pd.notna(y1) and str(y1).strip() != "" else None
-        if y1_val is None:
-            y1_val = fetch_return_1y_fallback(code)
-            time.sleep(0.08)
+        y1_val = safe_float(row.get("近1年"), 2)
+        daily_chg = safe_float(row.get("日增长率"), 2) if "日增长率" in row else None
+        scale_val = fee_info.get("scale")
+
+        if y1_val is None or scale_val is None:
+            fb_1y, fb_scale = fetch_pingzhong_extra(code)
+            if y1_val is None:
+                y1_val = fb_1y
+            if scale_val is None:
+                scale_val = fb_scale
+            time.sleep(0.06)
 
         first_year_cost = round(
             purchase_fee + fee_info["mgmt_custody_fee"] + fee_info["service_fee"], 4
@@ -375,6 +543,8 @@ def main():
             "direct_source": direct_source,
             "direct_note": direct_note,
             "return_1y": y1_val,
+            "daily_chg": daily_chg,
+            "scale": scale_val,
             "mgmt_fee": fee_info["mgmt_fee"],
             "custody_fee": fee_info["custody_fee"],
             "mgmt_custody_fee": fee_info["mgmt_custody_fee"],
@@ -393,10 +563,12 @@ def main():
         else:
             sp500_list.append(record)
 
-    # 排序时让“可买但未解析出数字(-1)”排在“暂停申购(0)”前面
     sort_fn = lambda x: (-(0.5 if x["agency_limit_num"] == -1 else x["agency_limit_num"]), x["first_year_cost"])
     nasdaq_list.sort(key=sort_fn)
     sp500_list.sort(key=sort_fn)
+
+    # 抓取 16 只场内 ETF 溢价与 90 日历史
+    etf_list = fetch_etf_list(fees_cache, today_utc)
 
     fees_cache["__notices__"] = notices_cache
     with open(CACHE_FILE, "w", encoding="utf-8") as f:
@@ -406,7 +578,8 @@ def main():
     output = {
         "updated_at": datetime.now(tz_bj).strftime("%Y-%m-%d %H:%M:%S"),
         "nasdaq": nasdaq_list,
-        "sp500": sp500_list
+        "sp500": sp500_list,
+        "etfs": etf_list
     }
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
         json.dump(output, f, ensure_ascii=False, indent=2)
