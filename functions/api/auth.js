@@ -100,7 +100,7 @@ export async function onRequestPost(context) {
   const action = body.action;
   const exp = Date.now() + 7 * 24 * 3600 * 1000; // 7 天有效期
 
-  // 1. 邀请码免密登录（无需 KV 也可直接运行）
+  // 1. 邀请码免密登录
   if (action === "invite") {
     const code = String(body.code || "").trim().toUpperCase();
     if (!code || !validCodes.includes(code)) {
@@ -111,7 +111,6 @@ export async function onRequestPost(context) {
     return jsonRes({ ok: true, token, user });
   }
 
-  // 以下注册与账号登录依赖 Cloudflare KV
   if (!env.AUTH_KV) {
     return jsonRes(
       { ok: false, message: "尚未在 Cloudflare 后台绑定 AUTH_KV 数据库（当前可先使用邀请码登录）" },
@@ -122,7 +121,12 @@ export async function onRequestPost(context) {
   const username = String(body.username || "").trim();
   const password = String(body.password || "");
 
+  // 2. 新用户注册（强制校验邀请码）
   if (action === "register") {
+    const inviteCode = String(body.code || "").trim().toUpperCase();
+    if (!inviteCode || !validCodes.includes(inviteCode)) {
+      return jsonRes({ ok: false, message: "注册失败：请输入有效的邀请码" }, 403);
+    }
     if (username.length < 2 || username.length > 20) {
       return jsonRes({ ok: false, message: "用户名长度需在 2 到 20 位之间" }, 400);
     }
@@ -138,13 +142,14 @@ export async function onRequestPost(context) {
     const hash = await hashPassword(password, salt);
     await env.AUTH_KV.put(
       key,
-      JSON.stringify({ username, salt, hash, created_at: new Date().toISOString() })
+      JSON.stringify({ username, salt, hash, invite_code: inviteCode, created_at: new Date().toISOString() })
     );
     const user = { username, role: "user", exp };
     const token = await signToken(user, secret);
     return jsonRes({ ok: true, token, user });
   }
 
+  // 3. 账号密码登录
   if (action === "login") {
     if (!username || !password) {
       return jsonRes({ ok: false, message: "请输入用户名和密码" }, 400);
