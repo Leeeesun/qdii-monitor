@@ -104,6 +104,16 @@
     .btn-primary:disabled { opacity: 0.55; cursor: not-allowed; }
     .auth-msg { margin-top: 12px; font-size: 12px; padding: 9px 12px; border-radius: 8px; display: none; }
     .auth-msg.error { display: block; background: var(--danger-bg); color: var(--danger); }
+    .auth-msg.ok { display: block; background: var(--ok-bg); color: var(--ok); }
+    .auth-divider { display: flex; align-items: center; gap: 10px; margin: 16px 0 12px; font-size: 12px; color: var(--text-3); }
+    .auth-divider::before, .auth-divider::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+    .btn-passkey {
+      width: 100%; height: 40px; border-radius: var(--radius-sm); border: 1px solid var(--border-strong);
+      background: var(--surface); color: var(--text); font-size: 13.5px; font-weight: 500;
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .btn-passkey:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
 
     /* ===== 悬浮胶囊导航 ===== */
     .nav-wrapper { position: sticky; top: 12px; z-index: 60; max-width: 1280px; margin: 0 auto; padding: 0 16px; }
@@ -375,8 +385,8 @@
 </head>
 <body>
 
-  <!-- ===== 登录 / 注册 / 邀请码视图 ===== -->
-<div id="authScreen" class="auth-screen hidden">
+  <!-- ===== 登录 / 注册 / 通行密钥视图（默认隐藏防闪烁） ===== -->
+  <div id="authScreen" class="auth-screen hidden">
     <div class="auth-card">
       <div class="auth-brand">
         <div class="brand-icon"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg></div>
@@ -389,15 +399,22 @@
       </div>
       <form id="authForm">
         <div id="userFields">
-          <div class="field"><label for="authUser">用户名</label><input id="authUser" class="input" type="text" placeholder="请输入 2-20 位用户名" autocomplete="username" /></div>
+          <div class="field"><label for="authUser">用户名</label><input id="authUser" class="input" type="text" placeholder="请输入 2-20 位用户名" autocomplete="username webauthn" /></div>
           <div class="field"><label for="authPass">密码</label><input id="authPass" class="input" type="password" placeholder="请输入至少 6 位密码" autocomplete="current-password" /></div>
         </div>
         <div id="inviteFields" class="hidden">
-          <div class="field"><label for="authInvite">邀请码</label><input id="authInvite" class="input" type="text" placeholder="请输入有效邀请码" /></div>
+          <div class="field"><label for="authInvite">邀请码（注册必填）</label><input id="authInvite" class="input" type="text" placeholder="请输入有效邀请码" /></div>
         </div>
         <button id="authSubmit" class="btn-primary" type="submit">登录监控台</button>
-        <div id="authMsg" class="auth-msg"></div>
       </form>
+      <div id="passkeyLoginWrap">
+        <div class="auth-divider">或使用设备生物识别</div>
+        <button id="passkeyLoginBtn" class="btn-passkey" type="button">
+          <svg viewBox="0 0 24 24"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/></svg>
+          <span>通行密钥一键登录</span>
+        </button>
+      </div>
+      <div id="authMsg" class="auth-msg"></div>
     </div>
   </div>
 
@@ -418,6 +435,7 @@
         </nav>
         <div class="nav-right">
           <span class="chip-btn" style="cursor:default;"><svg viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span id="userNameText">--</span></span>
+          <button id="bindPasskeyBtn" class="chip-btn" type="button" title="绑定本机面容/指纹通行密钥"><svg viewBox="0 0 24 24"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/></svg><span>通行密钥</span></button>
           <button id="themeToggle" class="chip-btn" type="button" title="切换深浅色"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></button>
           <button id="logoutBtn" class="chip-btn" type="button">退出</button>
         </div>
@@ -958,17 +976,37 @@
       }
     }
 
-    // ===== 鉴权 =====
-    function showAuthMsg(t) { const el = document.getElementById("authMsg"); el.textContent = t; el.className = "auth-msg error"; }
+    // ===== 鉴权与通行密钥 (WebAuthn) =====
+    function showAuthMsg(t, type = "error") {
+      const el = document.getElementById("authMsg");
+      el.textContent = t;
+      el.className = `auth-msg ${type}`;
+    }
+    function b64uToBuf(b64u) {
+      const pad = b64u.replace(/-/g, "+").replace(/_/g, "/") + "=".repeat((4 - (b64u.length % 4)) % 4);
+      const bin = atob(pad);
+      const bytes = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      return bytes.buffer;
+    }
+    function bufToB64u(buf) {
+      const bytes = new Uint8Array(buf);
+      let bin = "";
+      for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+      return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+    }
+
     document.querySelectorAll(".auth-tab").forEach(tab => tab.addEventListener("click", () => {
       state.authMode = tab.dataset.authTab;
       document.querySelectorAll(".auth-tab").forEach(t => t.classList.remove("active"));
       tab.classList.add("active");
       const isRegister = state.authMode === "register";
       document.getElementById("inviteFields").classList.toggle("hidden", !isRegister);
+      document.getElementById("passkeyLoginWrap").classList.toggle("hidden", isRegister);
       document.getElementById("authSubmit").textContent = isRegister ? "注册并登录" : "登录监控台";
       document.getElementById("authMsg").className = "auth-msg";
     }));
+
     document.getElementById("authForm").addEventListener("submit", async (e) => {
       e.preventDefault();
       const btn = document.getElementById("authSubmit"); btn.disabled = true;
@@ -988,11 +1026,97 @@
       } catch { showAuthMsg("无法连接鉴权接口"); }
       finally { btn.disabled = false; }
     });
+
+    // 通行密钥一键登录
+    document.getElementById("passkeyLoginBtn").addEventListener("click", async () => {
+      if (!window.PublicKeyCredential) { showAuthMsg("当前浏览器不支持通行密钥，请使用账号密码登录"); return; }
+      const btn = document.getElementById("passkeyLoginBtn");
+      btn.disabled = true;
+      document.getElementById("authMsg").className = "auth-msg";
+      try {
+        const optRes = await fetch("/api/auth", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "passkey_auth_options" })
+        });
+        const optData = await optRes.json();
+        if (!optRes.ok || !optData.ok) throw new Error(optData.message || "获取登录挑战失败");
+
+        const cred = await navigator.credentials.get({
+          publicKey: {
+            challenge: b64uToBuf(optData.options.challenge),
+            rpId: optData.options.rpId,
+            userVerification: "preferred"
+          }
+        });
+        const verRes = await fetch("/api/auth", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "passkey_auth_verify",
+            id: cred.id,
+            clientDataJSON: bufToB64u(cred.response.clientDataJSON),
+            authenticatorData: bufToB64u(cred.response.authenticatorData),
+            signature: bufToB64u(cred.response.signature)
+          })
+        });
+        const verData = await verRes.json();
+        if (!verRes.ok || !verData.ok) showAuthMsg(verData.message || "通行密钥验证失败");
+        else { localStorage.setItem(TOKEN_KEY, verData.token); enterApp(verData.user); }
+      } catch (e) {
+        if (e.name !== "NotAllowedError") showAuthMsg(e.message || "通行密钥登录已取消或失败");
+      } finally { btn.disabled = false; }
+    });
+
+    // 登录后绑定通行密钥
+    document.getElementById("bindPasskeyBtn").addEventListener("click", async () => {
+      if (!window.PublicKeyCredential) { alert("当前浏览器不支持通行密钥"); return; }
+      const token = localStorage.getItem(TOKEN_KEY);
+      if (!token) return;
+      try {
+        const optRes = await fetch("/api/auth", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ action: "passkey_reg_options" })
+        });
+        const optData = await optRes.json();
+        if (!optRes.ok || !optData.ok) { alert(optData.message || "获取绑定参数失败"); return; }
+        const o = optData.options;
+        const cred = await navigator.credentials.create({
+          publicKey: {
+            challenge: b64uToBuf(o.challenge),
+            rp: o.rp,
+            user: { id: b64uToBuf(o.user.id), name: o.user.name, displayName: o.user.displayName },
+            pubKeyCredParams: [{ type: "public-key", alg: -7 }],
+            authenticatorSelection: { residentKey: "required", userVerification: "preferred" },
+            excludeCredentials: (o.excludeCredentials || []).map(c => ({ id: b64uToBuf(c.id), type: "public-key" }))
+          }
+        });
+        const pubKeyBuf = cred.response.getPublicKey ? cred.response.getPublicKey() : null;
+        if (!pubKeyBuf) { alert("当前浏览器版本过旧，无法导出通行密钥公钥，请升级浏览器"); return; }
+
+        const verRes = await fetch("/api/auth", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          body: JSON.stringify({
+            action: "passkey_reg_verify",
+            id: cred.id,
+            clientDataJSON: bufToB64u(cred.response.clientDataJSON),
+            authenticatorData: bufToB64u(cred.response.getAuthenticatorData()),
+            publicKeySpki: bufToB64u(pubKeyBuf)
+          })
+        });
+        const verData = await verRes.json();
+        alert(verData.message || (verData.ok ? "通行密钥绑定成功" : "绑定失败"));
+      } catch (e) {
+        if (e.name !== "NotAllowedError") alert("绑定未完成：" + (e.message || e.name));
+      }
+    });
+
     document.getElementById("logoutBtn").addEventListener("click", () => {
       localStorage.removeItem(TOKEN_KEY);
       document.getElementById("appShell").classList.add("hidden");
       document.getElementById("authScreen").classList.remove("hidden");
     });
+
     async function checkSession() {
       const token = localStorage.getItem(TOKEN_KEY);
       if (!token) {
