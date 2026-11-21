@@ -740,3 +740,588 @@
             </div>
           </div>
           <div class="chart-box">
+            <canvas id="drawdownChart"></canvas>
+          </div>
+        </section>
+      </div>
+
+      <!-- ===== 页面 2：纳斯达克基金分页列表 ===== -->
+      <div id="page-nasdaq" class="view-pane hidden">
+        <section class="card">
+          <div class="filter-bar">
+            <div class="filter-left">
+              <div class="search-box">
+                <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                <input class="search-input" data-search="nasdaq" type="text" placeholder="搜索纳指基金名称或代码..." />
+              </div>
+              <button class="ctrl-btn" data-avail="nasdaq" type="button">仅看可申购</button>
+              <select class="ctrl-select" data-class="nasdaq" aria-label="纳指份额筛选">
+                <option value="ALL">全部份额</option>
+                <option value="A">仅看 A 类</option>
+                <option value="C">仅看 C 类</option>
+                <option value="OTHER">D / E / F / I 类</option>
+              </select>
+            </div>
+            <div class="filter-right" data-sortbar="nasdaq"></div>
+          </div>
+          <div class="table-wrap">
+            <table class="fund-table">
+              <thead>
+                <tr>
+                  <th>基金名称 / 代码</th>
+                  <th>代销额度</th>
+                  <th>直销额度</th>
+                  <th>管理+托管费(年)</th>
+                  <th>申购费率(1折)</th>
+                  <th>销售服务费(年)</th>
+                  <th>首年综合成本</th>
+                  <th>近1年收益</th>
+                </tr>
+              </thead>
+              <tbody id="nasdaqBody"></tbody>
+            </table>
+          </div>
+          <div id="nasdaqPager" class="pagination"></div>
+        </section>
+      </div>
+
+      <!-- ===== 页面 3：标普基金分页列表 ===== -->
+      <div id="page-sp500" class="view-pane hidden">
+        <section class="card">
+          <div class="filter-bar">
+            <div class="filter-left">
+              <div class="search-box">
+                <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                <input class="search-input" data-search="sp500" type="text" placeholder="搜索标普基金名称或代码..." />
+              </div>
+              <button class="ctrl-btn" data-avail="sp500" type="button">仅看可申购</button>
+              <select class="ctrl-select" data-class="sp500" aria-label="标普份额筛选">
+                <option value="ALL">全部份额</option>
+                <option value="A">仅看 A 类</option>
+                <option value="C">仅看 C 类</option>
+                <option value="OTHER">D / E / F / I 类</option>
+              </select>
+            </div>
+            <div class="filter-right" data-sortbar="sp500"></div>
+          </div>
+          <div class="table-wrap">
+            <table class="fund-table">
+              <thead>
+                <tr>
+                  <th>基金名称 / 代码</th>
+                  <th>代销额度</th>
+                  <th>直销额度</th>
+                  <th>管理+托管费(年)</th>
+                  <th>申购费率(1折)</th>
+                  <th>销售服务费(年)</th>
+                  <th>首年综合成本</th>
+                  <th>近1年收益</th>
+                </tr>
+              </thead>
+              <tbody id="sp500Body"></tbody>
+            </table>
+          </div>
+          <div id="sp500Pager" class="pagination"></div>
+        </section>
+      </div>
+
+      <div class="footnote">
+        口径说明：1. 代销额度综合天天基金实时数据与东方财富最新基金销售公告解析；直销额度优先展示人工校准值与差异公告提示，点击基金名称可直接核对官方公告原文。
+        2. 首年综合成本 = 1折优惠申购费率 + 管理费 + 托管费 + 销售服务费，用于横向对比不同份额首年持有成本。
+        3. 红绿灯情绪表从逆向定投视角设定，绿灯代表市场恐慌或深度回调，红灯代表情绪偏热，不构成具体投资建议。
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const TOKEN_KEY = "qdii_auth_token";
+    const PAGE_SIZE = 10;
+
+    const SORT_OPTIONS = [
+      { key: "agency_limit_num", label: "代销额度", defaultDir: "desc" },
+      { key: "direct_limit_num", label: "直销额度", defaultDir: "desc" },
+      { key: "first_year_cost", label: "综合成本", defaultDir: "asc" },
+      { key: "purchase_fee", label: "申购费率", defaultDir: "asc" },
+      { key: "return_1y", label: "近1年收益", defaultDir: "desc" }
+    ];
+
+    const state = {
+      authMode: "login",
+      currentPage: "home",
+      raw: { nasdaq: [], sp500: [] },
+      market: null,
+      ddChart: null,
+      activeDdKey: "ndx",
+      loaded: false,
+      sec: {
+        nasdaq: { search: "", onlyAvail: false, shareClass: "ALL", sortKey: "agency_limit_num", sortDir: "desc", page: 1 },
+        sp500: { search: "", onlyAvail: false, shareClass: "ALL", sortKey: "agency_limit_num", sortDir: "desc", page: 1 }
+      }
+    };
+
+    // ===== 主题初始化 =====
+    if (localStorage.getItem("qdii-theme") === "dark") {
+      document.documentElement.setAttribute("data-theme", "dark");
+    }
+
+    document.getElementById("themeToggle").addEventListener("click", () => {
+      const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+      document.documentElement.setAttribute("data-theme", isDark ? "light" : "dark");
+      localStorage.setItem("qdii-theme", isDark ? "light" : "dark");
+      if (state.market) setTimeout(() => renderDrawdownChart(state.activeDdKey), 50);
+    });
+
+    // ===== 鉴权逻辑 =====
+    function showAuthMsg(text, type = "error") {
+      const el = document.getElementById("authMsg");
+      el.textContent = text;
+      el.className = `auth-msg ${type}`;
+    }
+
+    document.querySelectorAll(".auth-tab").forEach(tab => {
+      tab.addEventListener("click", () => {
+        state.authMode = tab.dataset.authTab;
+        document.querySelectorAll(".auth-tab").forEach(t => t.classList.remove("active"));
+        tab.classList.add("active");
+        const isInvite = state.authMode === "invite";
+        document.getElementById("userFields").classList.toggle("hidden", isInvite);
+        document.getElementById("inviteFields").classList.toggle("hidden", !isInvite);
+        document.getElementById("authSubmit").textContent =
+          state.authMode === "register" ? "注册并登录" : (isInvite ? "验证邀请码" : "登录监控台");
+        document.getElementById("authMsg").className = "auth-msg";
+      });
+    });
+
+    document.getElementById("authForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById("authSubmit");
+      btn.disabled = true;
+      document.getElementById("authMsg").className = "auth-msg";
+
+      const payload = state.authMode === "invite"
+        ? { action: "invite", code: document.getElementById("authInvite").value.trim() }
+        : {
+            action: state.authMode,
+            username: document.getElementById("authUser").value.trim(),
+            password: document.getElementById("authPass").value
+          };
+
+      try {
+        const res = await fetch("/api/auth", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok || !data.ok) {
+          showAuthMsg(data.message || "验证失败，请重试", "error");
+        } else {
+          localStorage.setItem(TOKEN_KEY, data.token);
+          enterApp(data.user);
+        }
+      } catch {
+        showAuthMsg("无法连接鉴权接口，请确认已部署 functions/api/auth.js", "error");
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      localStorage.removeItem(TOKEN_KEY);
+      document.getElementById("appShell").classList.add("hidden");
+      document.getElementById("authScreen").classList.remove("hidden");
+    });
+
+    async function checkSession() {
+      const token = localStorage.getItem(TOKEN_KEY);
+      if (!token) return;
+      try {
+        const res = await fetch("/api/auth", {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.ok && data.user) {
+            enterApp(data.user);
+            return;
+          }
+        }
+      } catch {}
+      localStorage.removeItem(TOKEN_KEY);
+    }
+
+    function enterApp(user) {
+      document.getElementById("userNameText").textContent = user.username;
+      document.getElementById("authScreen").classList.add("hidden");
+      document.getElementById("appShell").classList.remove("hidden");
+      if (!state.loaded) {
+        state.loaded = true;
+        initFunds();
+        initMarket();
+      }
+    }
+
+    // ===== 页面切换导航 =====
+    function switchPage(page) {
+      state.currentPage = page;
+      document.querySelectorAll(".nav-pill").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.page === page);
+      });
+      ["home", "nasdaq", "sp500"].forEach(p => {
+        document.getElementById(`page-${p}`).classList.toggle("hidden", p !== page);
+      });
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      if (page === "home" && state.market) {
+        setTimeout(() => renderDrawdownChart(state.activeDdKey), 50);
+      }
+    }
+
+    document.querySelectorAll(".nav-pill").forEach(btn => {
+      btn.addEventListener("click", () => switchPage(btn.dataset.page));
+    });
+    document.querySelectorAll("[data-jump]").forEach(card => {
+      card.addEventListener("click", () => switchPage(card.dataset.jump));
+    });
+
+    // ===== 工具函数 =====
+    function fmtPct(val) {
+      if (val === null || val === undefined) return "--";
+      return `${Number(val).toFixed(2)}%`;
+    }
+
+    function fmtSigned(val, suffix = "%", decimals = 2) {
+      const num = Number(val);
+      const cls = num > 0 ? "pos" : (num < 0 ? "neg" : "");
+      return `<span class="${cls}">${num > 0 ? "+" : ""}${num.toFixed(decimals)}${suffix}</span>`;
+    }
+
+    function limitBadge(text, num, source) {
+      if (source === "notice_diff") return `<span class="tag tag-warn">${text}</span>`;
+      if (num === 0) return `<span class="tag tag-stop">${text}</span>`;
+      if (num >= 10000) return `<span class="tag tag-ok">${text}</span>`;
+      return `<span class="tag tag-warn">${text}</span>`;
+    }
+
+    // ===== 基金筛选、排序与分页 =====
+    function bindFundControls() {
+      document.querySelectorAll("[data-search]").forEach(inp => {
+        inp.addEventListener("input", () => {
+          const s = inp.dataset.search;
+          state.sec[s].search = inp.value.trim().toLowerCase();
+          state.sec[s].page = 1;
+          renderFundSection(s);
+        });
+      });
+
+      document.querySelectorAll("[data-avail]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const s = btn.dataset.avail;
+          state.sec[s].onlyAvail = !state.sec[s].onlyAvail;
+          btn.classList.toggle("active", state.sec[s].onlyAvail);
+          state.sec[s].page = 1;
+          renderFundSection(s);
+        });
+      });
+
+      document.querySelectorAll("[data-class]").forEach(sel => {
+        sel.addEventListener("change", () => {
+          const s = sel.dataset.class;
+          state.sec[s].shareClass = sel.value;
+          state.sec[s].page = 1;
+          renderFundSection(s);
+        });
+      });
+    }
+
+    function renderSortBar(sec) {
+      const bar = document.querySelector(`[data-sortbar="${sec}"]`);
+      const cfg = state.sec[sec];
+      bar.innerHTML = SORT_OPTIONS.map(opt => {
+        const active = cfg.sortKey === opt.key;
+        const arrow = active ? (cfg.sortDir === "asc" ? " ↑" : " ↓") : "";
+        return `<button class="ctrl-btn ${active ? "active" : ""}" data-k="${opt.key}" data-d="${opt.defaultDir}" type="button">${opt.label}${arrow}</button>`;
+      }).join("");
+
+      bar.querySelectorAll("button").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const k = btn.dataset.k;
+          if (cfg.sortKey === k) {
+            cfg.sortDir = cfg.sortDir === "asc" ? "desc" : "asc";
+          } else {
+            cfg.sortKey = k;
+            cfg.sortDir = btn.dataset.d;
+          }
+          cfg.page = 1;
+          renderSortBar(sec);
+          renderFundSection(sec);
+        });
+      });
+    }
+
+    function normalizeSortVal(item, key, dir) {
+      const v = item[key];
+      if (key === "agency_limit_num" || key === "direct_limit_num") {
+        if (v === -1) return 0.5; // 天天未代销但其他平台可买，排在暂停申购(0)之前
+      }
+      if (v === null || v === undefined) return dir === "asc" ? 999999 : -999999;
+      return v;
+    }
+
+    function renderFundSection(sec) {
+      const cfg = state.sec[sec];
+      const all = state.raw[sec] || [];
+      const filtered = all.filter(item => {
+        if (cfg.onlyAvail && item.agency_limit_num === 0 && item.direct_limit_num === 0) return false;
+        if (cfg.shareClass === "A" && item.share_class !== "A") return false;
+        if (cfg.shareClass === "C" && item.share_class !== "C") return false;
+        if (cfg.shareClass === "OTHER" && (item.share_class === "A" || item.share_class === "C")) return false;
+        if (cfg.search) {
+          const hit = item.name.toLowerCase().includes(cfg.search) || item.code.includes(cfg.search);
+          if (!hit) return false;
+        }
+        return true;
+      });
+
+      filtered.sort((a, b) => {
+        const va = normalizeSortVal(a, cfg.sortKey, cfg.sortDir);
+        const vb = normalizeSortVal(b, cfg.sortKey, cfg.sortDir);
+        return cfg.sortDir === "asc" ? va - vb : vb - va;
+      });
+
+      const total = filtered.length;
+      const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+      if (cfg.page > totalPages) cfg.page = totalPages;
+      const start = (cfg.page - 1) * PAGE_SIZE;
+      const pageItems = filtered.slice(start, start + PAGE_SIZE);
+
+      const tbody = document.getElementById(`${sec}Body`);
+      if (!pageItems.length) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:var(--text-3);padding:36px;">暂无符合筛选条件的基金</td></tr>`;
+      } else {
+        tbody.innerHTML = pageItems.map(item => {
+          const retClass = item.return_1y > 0 ? "pos" : (item.return_1y < 0 ? "neg" : "");
+          const retText = item.return_1y !== null ? `${item.return_1y > 0 ? "+" : ""}${item.return_1y.toFixed(2)}%` : "--";
+          const directSub = item.direct_source === "manual"
+            ? `已校准 · ${item.direct_note}`
+            : (item.direct_source === "notice_diff" ? "公告提及渠道差异" : "同代销");
+
+          return `
+            <tr>
+              <td>
+                <a class="fund-link" href="${item.notice_url}" target="_blank" rel="noopener">
+                  ${item.name}
+                  <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                </a>
+                <span class="sub-line num">${item.code}${item.notice_date ? " · 公告 " + item.notice_date : ""}</span>
+              </td>
+              <td class="num">
+                ${limitBadge(item.agency_limit_text, item.agency_limit_num, "agency")}
+                <span class="sub-line">${item.status}</span>
+              </td>
+              <td class="num">
+                ${limitBadge(item.direct_limit_text, item.direct_limit_num, item.direct_source)}
+                <span class="sub-line" title="${item.direct_note}">${directSub}</span>
+              </td>
+              <td class="num">
+                <strong>${fmtPct(item.mgmt_custody_fee)}</strong>
+                <span class="sub-line">管 ${fmtPct(item.mgmt_fee)} + 托 ${fmtPct(item.custody_fee)}</span>
+              </td>
+              <td class="num">
+                ${fmtPct(item.purchase_fee)}
+                <span class="sub-line">原费率 ${fmtPct(item.purchase_fee_orig)}</span>
+              </td>
+              <td class="num">${fmtPct(item.service_fee)}</td>
+              <td class="num"><strong>${fmtPct(item.first_year_cost)}</strong></td>
+              <td class="num ${retClass}">${retText}</td>
+            </tr>
+          `;
+        }).join("");
+      }
+
+      // 渲染分页栏
+      const pager = document.getElementById(`${sec}Pager`);
+      let pageButtons = `<button class="page-btn" data-p="${cfg.page - 1}" ${cfg.page <= 1 ? "disabled" : ""}>上一页</button>`;
+      for (let i = 1; i <= totalPages; i++) {
+        pageButtons += `<button class="page-btn ${i === cfg.page ? "active" : ""}" data-p="${i}">${i}</button>`;
+      }
+      pageButtons += `<button class="page-btn" data-p="${cfg.page + 1}" ${cfg.page >= totalPages ? "disabled" : ""}>下一页</button>`;
+
+      pager.innerHTML = `
+        <span>共 ${total} 只基金 · 第 ${cfg.page} / ${totalPages} 页</span>
+        <div class="page-btns">${pageButtons}</div>
+      `;
+      pager.querySelectorAll(".page-btn").forEach(b => {
+        b.addEventListener("click", () => {
+          const p = Number(b.dataset.p);
+          if (p >= 1 && p <= totalPages) {
+            cfg.page = p;
+            renderFundSection(sec);
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }
+        });
+      });
+    }
+
+    // ===== 回撤图谱 =====
+    function renderDrawdownChart(key) {
+      if (!state.market || !state.market.drawdown[key]) return;
+      state.activeDdKey = key;
+      const d = state.market.drawdown[key];
+
+      document.getElementById("ddStats").innerHTML = `
+        <span>当前回撤：<strong>${d.current_dd.toFixed(2)}%</strong></span>
+        <span>近一年最大回撤：<strong>${d.max_dd.toFixed(2)}%</strong>（${d.max_dd_date}）</span>
+        <span>阶段峰值：<strong>${d.peak_price.toLocaleString()}</strong></span>
+      `;
+
+      const styles = getComputedStyle(document.documentElement);
+      const textColor = styles.getPropertyValue("--text-3").trim();
+      const gridColor = styles.getPropertyValue("--border").trim();
+      const accentColor = styles.getPropertyValue("--accent").trim();
+
+      const ctx = document.getElementById("drawdownChart").getContext("2d");
+      if (state.ddChart) state.ddChart.destroy();
+
+      state.ddChart = new Chart(ctx, {
+        type: "line",
+        data: {
+          labels: d.dates,
+          datasets: [
+            {
+              label: "动态回撤 (%)",
+              data: d.drawdowns,
+              borderColor: accentColor,
+              backgroundColor: accentColor + "1f",
+              borderWidth: 2,
+              fill: "origin",
+              pointRadius: 0,
+              pointHoverRadius: 4,
+              tension: 0.18
+            },
+            {
+              label: "-5% 回踩线",
+              data: d.dates.map(() => -5),
+              borderColor: "#a1620780",
+              borderWidth: 1,
+              borderDash: [4, 4],
+              pointRadius: 0,
+              fill: false
+            },
+            {
+              label: "-10% 深度线",
+              data: d.dates.map(() => -10),
+              borderColor: "#15803d80",
+              borderWidth: 1,
+              borderDash: [4, 4],
+              pointRadius: 0,
+              fill: false
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: "index", intersect: false },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                label: (c) => c.datasetIndex === 0
+                  ? `回撤：${c.parsed.y.toFixed(2)}% | 收盘：${d.prices[c.dataIndex].toLocaleString()}`
+                  : null
+              }
+            }
+          },
+          scales: {
+            x: { grid: { display: false }, ticks: { color: textColor, maxTicksLimit: 8, font: { size: 11 } } },
+            y: { max: 0, grid: { color: gridColor }, ticks: { color: textColor, font: { size: 11 }, callback: v => v + "%" } }
+          }
+        }
+      });
+    }
+
+    // ===== 拉取数据 =====
+    async function initFunds() {
+      try {
+        const res = await fetch(`./data/funds.json?t=${Date.now()}`);
+        if (!res.ok) throw new Error();
+        const json = await res.json();
+        state.raw = { nasdaq: json.nasdaq || [], sp500: json.sp500 || [] };
+
+        const nOpen = state.raw.nasdaq.filter(i => i.agency_limit_num !== 0 || i.direct_limit_num !== 0).length;
+        const sOpen = state.raw.sp500.filter(i => i.agency_limit_num !== 0 || i.direct_limit_num !== 0).length;
+
+        document.getElementById("updatedAt").textContent = `基金额度更新：${json.updated_at}`;
+        document.getElementById("navNasdaqCount").textContent = state.raw.nasdaq.length;
+        document.getElementById("navSp500Count").textContent = state.raw.sp500.length;
+        document.getElementById("kpiNasdaqOpen").textContent = `${nOpen} / ${state.raw.nasdaq.length} 只`;
+        document.getElementById("kpiSp500Open").textContent = `${sOpen} / ${state.raw.sp500.length} 只`;
+
+        renderSortBar("nasdaq");
+        renderSortBar("sp500");
+        renderFundSection("nasdaq");
+        renderFundSection("sp500");
+      } catch {
+        document.getElementById("updatedAt").textContent = "基金数据加载失败，请稍后刷新";
+      }
+    }
+
+    async function initMarket() {
+      try {
+        const res = await fetch(`./data/market.json?t=${Date.now()}`);
+        if (!res.ok) throw new Error();
+        state.market = await res.json();
+
+        const { summary, sentiment, commentary, mag7, trade_date } = state.market;
+        document.getElementById("marketDate").textContent = `美股收盘交易日：${trade_date}`;
+        document.getElementById("recapSource").textContent = commentary.source === "ai" ? "AI 复盘" : "自动复盘";
+
+        document.getElementById("kpiNdx").textContent = summary.ndx.close.toLocaleString();
+        document.getElementById("kpiNdxChg").innerHTML = fmtSigned(summary.ndx.chg_pct);
+        document.getElementById("kpiSpx").textContent = summary.spx.close.toLocaleString();
+        document.getElementById("kpiSpxChg").innerHTML = fmtSigned(summary.spx.chg_pct);
+        document.getElementById("kpiTnx").textContent = `${summary.tnx.close.toFixed(2)}%`;
+        document.getElementById("kpiTnxChg").innerHTML = fmtSigned(summary.tnx.chg_bp, " bp", 1);
+
+        document.getElementById("recapHeadline").textContent = commentary.headline;
+        document.getElementById("recapBody").innerHTML = commentary.paragraphs.map(p => `<p>${p}</p>`).join("");
+        document.getElementById("mag7Row").innerHTML = mag7.map(m =>
+          `<span class="mag7-chip">${m.name} ${fmtSigned(m.chg_pct)}</span>`
+        ).join("");
+
+        const banner = document.getElementById("overallLight");
+        banner.className = `light-banner ${sentiment.overall_light}`;
+        banner.innerHTML = `<span class="dot ${sentiment.overall_light}"></span><span>${sentiment.overall_label}</span>`;
+
+        document.getElementById("sentimentList").innerHTML = sentiment.indicators.map(ind => `
+          <div class="sentiment-row">
+            <div>
+              <div class="s-name">${ind.name}</div>
+              <div class="s-desc" title="${ind.rule}">${ind.detail}</div>
+            </div>
+            <div class="s-right">
+              <span class="s-val">${ind.value_text}</span>
+              <span class="s-badge"><span class="dot ${ind.light}"></span>${ind.status_text}</span>
+            </div>
+          </div>
+        `).join("");
+
+        document.querySelectorAll("[data-dd-target]").forEach(btn => {
+          btn.addEventListener("click", () => {
+            document.querySelectorAll("[data-dd-target]").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            renderDrawdownChart(btn.dataset.ddTarget);
+          });
+        });
+
+        renderDrawdownChart("ndx");
+      } catch {
+        document.getElementById("marketDate").textContent = "美股盘后数据加载失败";
+      }
+    }
+
+    bindFundControls();
+    checkSession();
+  </script>
+</body>
+</html>
