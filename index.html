@@ -416,7 +416,14 @@
     .pref-switch-lbl { display: inline-flex; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 600; cursor: pointer; }
     .pref-switch-lbl input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; }
     .pref-row-2 { display: grid; grid-template-columns: 150px 1fr; gap: 10px; align-items: end; }
-    @media (max-width: 560px) { .pref-row-2 { grid-template-columns: 1fr; } }
+    .pref-row-2 > div { min-width: 0; max-width: 100%; }
+    .pref-item-card input[type="time"] {
+      display: block; width: 100%; min-width: 0; max-width: 100%;
+      box-sizing: border-box; -webkit-appearance: none; appearance: none;
+    }
+    @media (max-width: 560px) {
+      .pref-row-2 { grid-template-columns: minmax(0, 1fr); }
+    }
     .pref-mini-lbl { display: block; font-size: 11.5px; color: var(--text-3); margin-bottom: 4px; }
     .pref-tpl-ta {
       width: 100%; min-height: 64px; padding: 8px 10px; font-size: 12.5px; line-height: 1.5;
