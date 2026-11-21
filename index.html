@@ -381,6 +381,44 @@
     .cmp-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 14px; }
     .cmp-table th, .cmp-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); text-align: left; }
     .cmp-table th { width: 130px; color: var(--text-3); background: var(--surface-2); font-weight: 500; }
+    .copy-code-btn {
+      display: inline-flex; align-items: center; gap: 4px; margin-top: 4px;
+      padding: 2px 7px; border-radius: 6px; border: 1px solid var(--border);
+      background: var(--surface-2); color: var(--text-2);
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11.5px; font-weight: 600;
+      cursor: pointer; transition: all 0.14s ease;
+    }
+    .copy-code-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+    .copy-code-btn.copied { border-color: var(--ok); color: var(--ok); background: var(--ok-bg); }
+    .mobile-quota-stack { display: flex; flex-direction: column; gap: 5px; }
+    .mobile-quota-line { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+    .mobile-quota-lbl { color: var(--text-3); font-size: 11px; min-width: 28px; }
+
+    @media (max-width: 768px) {
+      .toolbar-wrap { padding: 12px 14px; gap: 10px; }
+      .search-input { width: 100%; }
+      .search-box { width: 100%; }
+      .main { padding: 16px 12px 84px; }
+      .card-pad { padding: 15px 16px; }
+      table.data-table.compact-mode { min-width: 0; width: 100%; }
+      table.data-table.compact-mode th,
+      table.data-table.compact-mode td { padding: 11px 10px; }
+      table.data-table.compact-mode .col-opt,
+      table.data-table.compact-mode .col-code-a,
+      table.data-table.compact-mode .col-code-c,
+      table.data-table.compact-mode .col-scale,
+      table.data-table.compact-mode .col-ret1y,
+      table.data-table.compact-mode .col-daily,
+      table.data-table.compact-mode .col-opfee,
+      table.data-table.compact-mode .col-1ycost,
+      table.data-table.compact-mode .col-agency,
+      table.data-table.compact-mode .col-direct { display: none; }
+      table.data-table.compact-mode .col-mobile-quota { display: table-cell; }
+    }
+    @media (min-width: 769px) {
+      .col-mobile-quota { display: none; }
+    }
+
   </style>
 </head>
 <body>
@@ -764,6 +802,7 @@
             <div class="toolbar-row">
               <div class="search-box"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><input class="search-input" data-search="nasdaq" type="text" placeholder="搜索基金名称、A/C 类代码..." /></div>
               <div class="pill-group">
+                <button class="filter-pill" data-detail="nasdaq" type="button">详细信息</button>
                 <button class="filter-pill active" data-merge="nasdaq" type="button">A/C 合并一行</button>
                 <button class="filter-pill" data-export="nasdaq" type="button">导出 CSV</button>
               </div>
@@ -780,11 +819,18 @@
           <div class="table-wrap">
             <table class="data-table">
               <thead><tr>
-                <th style="width:94px;">操作</th><th class="sortable" data-sort="nasdaq:code">主代码 ↕</th><th>C类代码</th>
-                <th class="sortable" data-sort="nasdaq:name">基金名称 ↕</th><th class="sortable" data-sort="nasdaq:scale">规模(亿) ↕</th>
-                <th class="sortable" data-sort="nasdaq:return_1y">近1年收益 ↕</th><th class="sortable" data-sort="nasdaq:daily_chg">昨日涨跌 ↕</th>
-                <th class="sortable" data-sort="nasdaq:mgmt_custody_fee">运作费率 ↕</th><th class="sortable" data-sort="nasdaq:first_year_cost">首年成本 ↕</th>
-                <th class="sortable sorted" data-sort="nasdaq:agency_limit_num">代销额度 ↓</th><th class="sortable" data-sort="nasdaq:direct_limit_num">直销额度 ↕</th>
+                <th class="col-opt" style="width:94px;">操作</th>
+                <th class="col-code-a sortable" data-sort="nasdaq:code">主代码 ↕</th>
+                <th class="col-code-c">C类代码</th>
+                <th class="col-name sortable" data-sort="nasdaq:name">基金名称 / 代码 ↕</th>
+                <th class="col-mobile-quota">额度 (代销 / 直销)</th>
+                <th class="col-scale sortable" data-sort="nasdaq:scale">规模(亿) ↕</th>
+                <th class="col-ret1y sortable" data-sort="nasdaq:return_1y">近1年收益 ↕</th>
+                <th class="col-daily sortable" data-sort="nasdaq:daily_chg">昨日涨跌 ↕</th>
+                <th class="col-opfee sortable" data-sort="nasdaq:mgmt_custody_fee">运作费率 ↕</th>
+                <th class="col-1ycost sortable" data-sort="nasdaq:first_year_cost">首年成本 ↕</th>
+                <th class="col-agency sortable sorted" data-sort="nasdaq:agency_limit_num">代销额度 ↓</th>
+                <th class="col-direct sortable" data-sort="nasdaq:direct_limit_num">直销额度 ↕</th>
               </tr></thead>
               <tbody id="nasdaqBody"></tbody>
             </table>
@@ -804,6 +850,7 @@
             <div class="toolbar-row">
               <div class="search-box"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><input class="search-input" data-search="sp500" type="text" placeholder="搜索基金名称、A/C 类代码..." /></div>
               <div class="pill-group">
+                <button class="filter-pill" data-detail="sp500" type="button">详细信息</button>
                 <button class="filter-pill active" data-merge="sp500" type="button">A/C 合并一行</button>
                 <button class="filter-pill" data-export="sp500" type="button">导出 CSV</button>
               </div>
@@ -820,11 +867,18 @@
           <div class="table-wrap">
             <table class="data-table">
               <thead><tr>
-                <th style="width:94px;">操作</th><th class="sortable" data-sort="sp500:code">主代码 ↕</th><th>C类代码</th>
-                <th class="sortable" data-sort="sp500:name">基金名称 ↕</th><th class="sortable" data-sort="sp500:scale">规模(亿) ↕</th>
-                <th class="sortable" data-sort="sp500:return_1y">近1年收益 ↕</th><th class="sortable" data-sort="sp500:daily_chg">昨日涨跌 ↕</th>
-                <th class="sortable" data-sort="sp500:mgmt_custody_fee">运作费率 ↕</th><th class="sortable" data-sort="sp500:first_year_cost">首年成本 ↕</th>
-                <th class="sortable sorted" data-sort="sp500:agency_limit_num">代销额度 ↓</th><th class="sortable" data-sort="sp500:direct_limit_num">直销额度 ↕</th>
+                <th class="col-opt" style="width:94px;">操作</th>
+                <th class="col-code-a sortable" data-sort="sp500:code">主代码 ↕</th>
+                <th class="col-code-c">C类代码</th>
+                <th class="col-name sortable" data-sort="sp500:name">基金名称 / 代码 ↕</th>
+                <th class="col-mobile-quota">额度 (代销 / 直销)</th>
+                <th class="col-scale sortable" data-sort="sp500:scale">规模(亿) ↕</th>
+                <th class="col-ret1y sortable" data-sort="sp500:return_1y">近1年收益 ↕</th>
+                <th class="col-daily sortable" data-sort="sp500:daily_chg">昨日涨跌 ↕</th>
+                <th class="col-opfee sortable" data-sort="sp500:mgmt_custody_fee">运作费率 ↕</th>
+                <th class="col-1ycost sortable" data-sort="sp500:first_year_cost">首年成本 ↕</th>
+                <th class="col-agency sortable sorted" data-sort="sp500:agency_limit_num">代销额度 ↓</th>
+                <th class="col-direct sortable" data-sort="sp500:direct_limit_num">直销额度 ↕</th>
               </tr></thead>
               <tbody id="sp500Body"></tbody>
             </table>
@@ -941,8 +995,8 @@
       favs: new Set(JSON.parse(localStorage.getItem(FAV_KEY) || "[]")),
       compare: [],
       sec: {
-        nasdaq: { search: "", quick: "all", mergeAC: true, sortKey: "agency_limit_num", sortDir: "desc", page: 1 },
-        sp500: { search: "", quick: "all", mergeAC: true, sortKey: "agency_limit_num", sortDir: "desc", page: 1 }
+        nasdaq: { search: "", quick: "all", mergeAC: true, showDetail: window.innerWidth > 768, sortKey: "agency_limit_num", sortDir: "desc", page: 1 },
+        sp500: { search: "", quick: "all", mergeAC: true, showDetail: window.innerWidth > 768, sortKey: "agency_limit_num", sortDir: "desc", page: 1 }
       },
       etf: { search: "", idx: "ALL", sortKey: "premium", sortDir: "desc" }
     };
@@ -1493,8 +1547,43 @@
       return [...res, ...others];
     }
 
+    function copyText(text, btnEl) {
+      const done = () => {
+        if (!btnEl) return;
+        const orig = btnEl.dataset.rawLabel || btnEl.textContent;
+        btnEl.dataset.rawLabel = orig;
+        btnEl.classList.add("copied");
+        btnEl.textContent = `已复制 ${text}`;
+        setTimeout(() => { btnEl.classList.remove("copied"); btnEl.textContent = orig; }, 1200);
+      };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done).catch(() => fallbackCopy(text, done));
+      } else {
+        fallbackCopy(text, done);
+      }
+    }
+    function fallbackCopy(text, done) {
+      const ta = document.createElement("textarea");
+      ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand("copy"); } catch {}
+      document.body.removeChild(ta); done();
+    }
+
+    function syncDetailBtn(sec) {
+      const btn = document.querySelector(`[data-detail="${sec}"]`);
+      const table = document.querySelector(`#page-${sec} table.data-table`);
+      const isDetail = state.sec[sec].showDetail;
+      if (btn) {
+        btn.classList.toggle("active", isDetail);
+        btn.textContent = isDetail ? "简略信息" : "详细信息";
+      }
+      if (table) table.classList.toggle("compact-mode", !isDetail);
+    }
+
     function renderFundSection(sec) {
       const cfg = state.sec[sec];
+      syncDetailBtn(sec);
       const source = cfg.mergeAC ? buildMergedList(state.raw[sec]) : state.raw[sec].map(x => ({ ...x, c_code: x.share_class === "C" ? x.code : "--" }));
       const filtered = source.filter(item => {
         if (cfg.quick === "open" && item.agency_limit_num === 0 && item.direct_limit_num === 0) return false;
@@ -1525,23 +1614,41 @@
       tbody.innerHTML = items.length ? items.map(item => {
         const isFav = state.favs.has(item.code), isCmp = state.compare.some(x => x.code === item.code);
         const directSub = item.direct_source === "manual" ? `已校准·${item.direct_note}` : (item.direct_source === "notice_diff" ? "渠道有差异" : "同代销");
+        const cCopyBtn = item.c_code && item.c_code !== "--"
+          ? `<button class="copy-code-btn" data-copy="${item.c_code}" type="button" title="点击复制C类代码">C: ${item.c_code}</button>`
+          : "";
         return `<tr>
-          <td><div class="row-actions">
+          <td class="col-opt"><div class="row-actions">
             <button class="star-btn ${isFav ? "starred" : ""}" data-fav="${item.code}" type="button"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button>
             <button class="cmp-btn ${isCmp ? "active" : ""}" data-cmp-sec="${sec}" data-cmp-code="${item.code}" type="button">${isCmp ? "已选" : "+对比"}</button>
           </div></td>
-          <td class="num"><a class="code-badge" href="${item.notice_url}" target="_blank" rel="noopener">${item.code}</a></td>
-          <td class="num">${item.c_code !== "--" ? `<span class="code-c">${item.c_code}</span>` : `<span style="color:var(--text-3)">--</span>`}</td>
-          <td><a class="fund-link" href="${item.notice_url}" target="_blank" rel="noopener">${item.name}</a><span class="sub-line">${item.notice_date ? "最新公告 " + item.notice_date : "点击查看销售公告"}</span></td>
-          <td class="num">${item.scale != null ? item.scale.toFixed(2) : "--"}</td>
-          <td class="num">${miniRetHtml(item.return_1y)}</td>
-          <td class="num">${fmtSigned(item.daily_chg)}</td>
-          <td class="num"><strong>${fmtPct(item.mgmt_custody_fee)}</strong><span class="sub-line">管${fmtPct(item.mgmt_fee)}+托${fmtPct(item.custody_fee)}</span></td>
-          <td class="num"><strong>${fmtPct(item.first_year_cost)}</strong><span class="sub-line">申${fmtPct(item.purchase_fee)}·服${fmtPct(item.service_fee)}</span></td>
-          <td class="num">${limitBadge(item.agency_limit_text, item.agency_limit_num, "agency")}<span class="sub-line">${item.status}</span></td>
-          <td class="num">${limitBadge(item.direct_limit_text, item.direct_limit_num, item.direct_source)}<span class="sub-line">${directSub}</span></td>
+          <td class="col-code-a num"><a class="code-badge" href="${item.notice_url}" target="_blank" rel="noopener">${item.code}</a></td>
+          <td class="col-code-c num">${item.c_code !== "--" ? `<span class="code-c">${item.c_code}</span>` : `<span style="color:var(--text-3)">--</span>`}</td>
+          <td class="col-name">
+            <a class="fund-link" href="${item.notice_url}" target="_blank" rel="noopener">${item.name}</a>
+            <div style="display:flex;align-items:center;flex-wrap:wrap;gap:6px;">
+              <button class="copy-code-btn" data-copy="${item.code}" type="button" title="点击复制基金代码">${item.code}</button>
+              ${cCopyBtn}
+            </div>
+            ${cfg.showDetail && item.notice_date ? `<span class="sub-line">最新公告 ${item.notice_date}</span>` : ""}
+          </td>
+          <td class="col-mobile-quota">
+            <div class="mobile-quota-stack">
+              <div class="mobile-quota-line"><span class="mobile-quota-lbl">代销</span>${limitBadge(item.agency_limit_text, item.agency_limit_num, "agency")}</div>
+              <div class="mobile-quota-line"><span class="mobile-quota-lbl">直销</span>${limitBadge(item.direct_limit_text, item.direct_limit_num, item.direct_source)}</div>
+            </div>
+          </td>
+          <td class="col-scale num">${item.scale != null ? item.scale.toFixed(2) : "--"}</td>
+          <td class="col-ret1y num">${miniRetHtml(item.return_1y)}</td>
+          <td class="col-daily num">${fmtSigned(item.daily_chg)}</td>
+          <td class="col-opfee num"><strong>${fmtPct(item.mgmt_custody_fee)}</strong><span class="sub-line">管${fmtPct(item.mgmt_fee)}+托${fmtPct(item.custody_fee)}</span></td>
+          <td class="col-1ycost num"><strong>${fmtPct(item.first_year_cost)}</strong><span class="sub-line">申${fmtPct(item.purchase_fee)}·服${fmtPct(item.service_fee)}</span></td>
+          <td class="col-agency num">${limitBadge(item.agency_limit_text, item.agency_limit_num, "agency")}<span class="sub-line">${item.status}</span></td>
+          <td class="col-direct num">${limitBadge(item.direct_limit_text, item.direct_limit_num, item.direct_source)}<span class="sub-line">${directSub}</span></td>
         </tr>`;
-      }).join("") : `<tr><td colspan="11" style="text-align:center;color:var(--text-3);padding:36px;">暂无符合条件的基金</td></tr>`;
+      }).join("") : `<tr><td colspan="12" style="text-align:center;color:var(--text-3);padding:36px;">暂无符合条件的基金</td></tr>`;
+
+      tbody.querySelectorAll("[data-copy]").forEach(b => b.addEventListener("click", () => copyText(b.dataset.copy, b)));
 
       tbody.querySelectorAll("[data-fav]").forEach(b => b.addEventListener("click", () => toggleFav(b.dataset.fav)));
       tbody.querySelectorAll("[data-cmp-code]").forEach(b => b.addEventListener("click", () => {
@@ -1643,6 +1750,7 @@
     function bindControls() {
       document.querySelectorAll("[data-search]").forEach(i => i.addEventListener("input", () => { state.sec[i.dataset.search].search = i.value.trim().toLowerCase(); state.sec[i.dataset.search].page = 1; renderFundSection(i.dataset.search); }));
       document.querySelectorAll("[data-merge]").forEach(b => b.addEventListener("click", () => { const s = b.dataset.merge; state.sec[s].mergeAC = !state.sec[s].mergeAC; b.classList.toggle("active", state.sec[s].mergeAC); state.sec[s].page = 1; renderFundSection(s); }));
+      document.querySelectorAll("[data-detail]").forEach(b => b.addEventListener("click", () => { const s = b.dataset.detail; state.sec[s].showDetail = !state.sec[s].showDetail; renderFundSection(s); }));
       document.querySelectorAll("[data-quick]").forEach(g => g.querySelectorAll("button").forEach(b => b.addEventListener("click", () => { g.querySelectorAll("button").forEach(x => x.classList.remove("active")); b.classList.add("active"); state.sec[g.dataset.quick].quick = b.dataset.q; state.sec[g.dataset.quick].page = 1; renderFundSection(g.dataset.quick); })));
       document.querySelectorAll("[data-sort]").forEach(th => th.addEventListener("click", () => {
         const [s, k] = th.dataset.sort.split(":"), cfg = state.sec[s];

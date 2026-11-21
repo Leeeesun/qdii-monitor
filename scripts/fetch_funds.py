@@ -17,7 +17,6 @@ LIMIT_TITLE_KWS = [
     "金额限制", "限制申购", "申购上限", "限额"
 ]
 
-# 16 只主流纳指 / 标普场内 ETF（带交易所前缀，直接走腾讯极速行情接口，避免 akshare 挂起）
 TRACKED_ETFS = [
     {"code": "159509", "mkt": "sz", "name": "景顺长城纳斯达克科技ETF(QDII)", "index": "纳斯达克科技市值加权"},
     {"code": "159501", "mkt": "sz", "name": "嘉实纳斯达克100ETF(QDII)", "index": "纳斯达克100"},
@@ -42,6 +41,7 @@ HEADERS = {
     "Referer": "https://fundf10.eastmoney.com/"
 }
 
+DEFAULT_BARK_URL = "https://bark.youranzi.de/3cdh5mj7wiRryZWuPAf84u"
 CACHE_FILE = "data/fees_cache.json"
 OVERRIDE_FILE = "data/direct_overrides.json"
 OUTPUT_FILE = "data/funds.json"
@@ -199,7 +199,6 @@ def fetch_latest_limit_notice(code, share_class, notices_cache, need_body=False)
 
 
 def fetch_pingzhong_extra(code):
-    """通过 pingzhongdata 一次获取：近1年收益、最新规模(亿)与近期净值序列"""
     url = f"https://fund.eastmoney.com/pingzhongdata/{code}.js"
     ret_1y, scale_yi, nav_map = None, None, {}
     try:
@@ -270,7 +269,6 @@ def fetch_fund_fees(code):
 
 
 def fetch_etf_quotes_fast():
-    """通过腾讯极速行情接口一次性拉取 16 只场内 ETF 现价/涨跌/成交额（<0.5秒，绝不超时）"""
     syms = ",".join(f"{e['mkt']}{e['code']}" for e in TRACKED_ETFS)
     quotes = {}
     try:
@@ -284,7 +282,6 @@ def fetch_etf_quotes_fast():
             if len(parts) > 38:
                 price = safe_float(parts[3], 3)
                 chg_pct = safe_float(parts[32], 2)
-                # parts[37] 为成交额(万元)
                 amt_wan = safe_float(parts[37], 2)
                 turnover_yi = round(amt_wan / 10000, 2) if amt_wan is not None else None
                 quotes[code] = {"price": price, "chg_pct": chg_pct, "turnover": turnover_yi}
@@ -294,7 +291,6 @@ def fetch_etf_quotes_fast():
 
 
 def fetch_etf_kline_fast(mkt, code):
-    """通过腾讯日K接口拉取近 100 个交易日收盘价（带严格 6 秒超时）"""
     url = f"https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param={mkt}{code},day,,,100,"
     kline = []
     try:
@@ -363,19 +359,11 @@ def fetch_etf_list(fees_cache, today_utc):
             prem_stats["percentile"] = int(round(sum(1 for v in prem_vals if v <= premium) / len(prem_vals) * 100))
 
         etf_results.append({
-            "code": code,
-            "name": meta["name"],
-            "index": meta["index"],
-            "price": price,
-            "nav": latest_nav,
-            "nav_date": latest_nav_date,
-            "chg_pct": chg_pct,
-            "premium": premium,
-            "scale": scale_val,
-            "return_1y": ret_1y,
-            "mgmt_custody_fee": fee_info.get("mgmt_custody_fee", 0.0),
-            "turnover": turnover,
-            "detail_url": f"https://fund.eastmoney.com/{code}.html",
+            "code": code, "name": meta["name"], "index": meta["index"],
+            "price": price, "nav": latest_nav, "nav_date": latest_nav_date,
+            "chg_pct": chg_pct, "premium": premium, "scale": scale_val,
+            "return_1y": ret_1y, "mgmt_custody_fee": fee_info.get("mgmt_custody_fee", 0.0),
+            "turnover": turnover, "detail_url": f"https://fund.eastmoney.com/{code}.html",
             "premium_history": {"dates": prem_dates[-90:], "values": prem_vals[-90:], "stats": prem_stats}
         })
 
@@ -384,7 +372,6 @@ def fetch_etf_list(fees_cache, today_utc):
 
 
 def build_active_top5(purchase_df, rank_df):
-    """筛选近一年涨幅 TOP 5 主动型 QDII 基金（排除被动指数/联接/债基/美元份额）"""
     try:
         qdii_rank = fetch_with_retry(ak.fund_open_fund_rank_em, symbol="QDII")
         qdii_rank["基金代码"] = qdii_rank["基金代码"].astype(str).str.zfill(6)
@@ -393,10 +380,8 @@ def build_active_top5(purchase_df, rank_df):
             purchase_df[["基金代码", "申购状态", "日累计限定金额"]],
             on="基金代码", how="left"
         )
-        # 仅保留 A 类或无后缀人民币主动权益/混合 QDII
         exclude_passive = r"指数|ETF|联接|债|美元|美钞|美汇|现汇|现钞|港币|原油|黄金|商品|REIT|C$|D$|E$|I$"
-        mask = ~m["基金简称"].str.contains(exclude_passive, regex=True, na=False)
-        m = m[mask].copy()
+        m = m[~m["基金简称"].str.contains(exclude_passive, regex=True, na=False)].copy()
         m["y1_num"] = pd.to_numeric(m["近1年"], errors="coerce")
         m = m.dropna(subset=["y1_num"]).sort_values("y1_num", ascending=False).head(5)
 
@@ -406,13 +391,9 @@ def build_active_top5(purchase_df, rank_df):
             limit_text, _ = format_limit(r["日累计限定金额"], r["申购状态"])
             _, scale_yi, _ = fetch_pingzhong_extra(code)
             top5.append({
-                "rank": idx,
-                "code": code,
-                "name": str(r["基金简称"]),
-                "return_1y": round(float(r["y1_num"]), 2),
-                "nav_date": str(r["日期"]),
-                "scale": scale_yi,
-                "limit_text": limit_text,
+                "rank": idx, "code": code, "name": str(r["基金简称"]),
+                "return_1y": round(float(r["y1_num"]), 2), "nav_date": str(r["日期"]),
+                "scale": scale_yi, "limit_text": limit_text,
                 "url": f"https://fundf10.eastmoney.com/jjgg_{code}_5.html"
             })
         return top5
@@ -420,10 +401,48 @@ def build_active_top5(purchase_df, rank_df):
         return []
 
 
+def send_bark_quota_alert(changes, now_bj):
+    """在 09:30 窗口发现额度变化时通过 Bark 推送"""
+    if not changes:
+        return
+    bark_base = (os.getenv("BARK_URL") or DEFAULT_BARK_URL).strip().rstrip("/")
+    if not bark_base:
+        return
+
+    force = os.getenv("FORCE_BARK", "").strip() == "1"
+    in_window = (now_bj.hour == 9 and 20 <= now_bj.minute <= 50)
+    if not (force or in_window):
+        return
+
+    title = f"QDII 限额变化提醒（{len(changes)}项）"
+    lines = [
+        f"{c['name']}({c['code']}) {c['channel']}：{c['old']} -> {c['new']}"
+        for c in changes[:12]
+    ]
+    if len(changes) > 12:
+        lines.append(f"...另有 {len(changes) - 12} 项变化，请打开监控台查看")
+    body = "\n".join(lines)
+
+    try:
+        requests.post(
+            f"{bark_base}/",
+            json={
+                "title": title,
+                "body": body,
+                "group": "QDII限额",
+                "url": "https://qdii.youranzi.de/"
+            },
+            timeout=10
+        )
+    except Exception:
+        pass
+
+
 def main():
     os.makedirs("data", exist_ok=True)
     fees_cache = load_json(CACHE_FILE, {})
     notices_cache = fees_cache.get("__notices__", {})
+    prev_limits = fees_cache.get("__last_limits__", {})
     direct_overrides = load_json(OVERRIDE_FILE, {})
 
     purchase_df = fetch_with_retry(ak.fund_purchase_em)
@@ -454,6 +473,8 @@ def main():
     today_utc = datetime.now(timezone.utc)
 
     nasdaq_list, sp500_list = [], []
+    new_limits = {}
+    changes = []
 
     for _, row in filtered.iterrows():
         code = row["基金代码"]
@@ -520,6 +541,16 @@ def main():
             direct_num, direct_text = agency_num, agency_text
             direct_source, direct_note = "same_as_agency", "未见渠道区分公告，默认同代销"
 
+        cur_pair = {"agency": agency_text, "direct": direct_text}
+        new_limits[code] = cur_pair
+        if prev_limits:
+            old_pair = prev_limits.get(code)
+            if old_pair:
+                if old_pair.get("agency") != agency_text:
+                    changes.append({"code": code, "name": name, "channel": "代销", "old": old_pair.get("agency"), "new": agency_text})
+                if old_pair.get("direct") != direct_text:
+                    changes.append({"code": code, "name": name, "channel": "直销", "old": old_pair.get("direct"), "new": direct_text})
+
         y1_val = safe_float(row.get("近1年"), 2)
         daily_chg = safe_float(row.get("日增长率"), 2) if "日增长率" in row else None
         scale_val = fee_info.get("scale")
@@ -555,13 +586,17 @@ def main():
     etf_list = fetch_etf_list(fees_cache, today_utc)
     active_top5 = build_active_top5(purchase_df, rank_df)
 
+    tz_bj = timezone(timedelta(hours=8))
+    now_bj = datetime.now(tz_bj)
+    send_bark_quota_alert(changes, now_bj)
+
     fees_cache["__notices__"] = notices_cache
+    fees_cache["__last_limits__"] = new_limits
     with open(CACHE_FILE, "w", encoding="utf-8") as f:
         json.dump(fees_cache, f, ensure_ascii=False, indent=2)
 
-    tz_bj = timezone(timedelta(hours=8))
     output = {
-        "updated_at": datetime.now(tz_bj).strftime("%Y-%m-%d %H:%M:%S"),
+        "updated_at": now_bj.strftime("%Y-%m-%d %H:%M:%S"),
         "nasdaq": nasdaq_list,
         "sp500": sp500_list,
         "etfs": etf_list,
