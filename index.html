@@ -5,6 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>QDII 监控台 · 美股纳指/标普基金与ETF溢价追踪</title>
   <script src="https://cdn.staticfile.net/chart.js/4.4.3/chart.umd.min.js"></script>
+  <script>
+    if (!window.Chart) {
+      var s = document.createElement("script");
+      s.src = "https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js";
+      document.head.appendChild(s);
+    }
+  </script>
   <style>
     :root {
       --bg: #f5f7fb;
@@ -1190,8 +1197,9 @@
       document.getElementById("appShell").classList.remove("hidden");
       if (!state.loaded) {
         state.loaded = true;
-        renderPeHighTable("spx"); renderPeRefChart(10); renderYearlyChart("both"); renderGrowthChart(); renderHoldings("ndx");
-        initFunds(); initMarket();
+        renderPeHighTable("spx");
+        initFunds();
+        initMarket();
       }
     }
 
@@ -1804,8 +1812,11 @@
 
         renderFundSection("nasdaq"); renderFundSection("sp500"); renderEtfTable(); renderHomeExtras();
         if (state.raw.etfs.length) {
-          renderEtfPremChart(state.raw.etfs[0].code, "homeEtfChart", "homeEtfStats", "homeEtf");
-          renderEtfPremChart(state.raw.etfs[0].code, "etfPremChart", "etfPremStats", "etfPrem");
+          const idleF = window.requestIdleCallback || ((fn) => setTimeout(fn, 180));
+          idleF(() => {
+            if (state.page === "home") renderEtfPremChart(state.raw.etfs[0].code, "homeEtfChart", "homeEtfStats", "homeEtf");
+            if (state.page === "etf") renderEtfPremChart(state.raw.etfs[0].code, "etfPremChart", "etfPremStats", "etfPrem");
+          });
         }
       } catch { document.getElementById("updatedAt").textContent = "基金数据加载失败"; }
     }
@@ -1891,7 +1902,18 @@
         `).join("");
 
         renderPeHighTable("spx");
-        render15dChart(); renderMonthlyChart(); renderDrawdownChart("ndx"); renderFxChart("ndx");
+        render15dChart();
+        renderDrawdownChart("ndx");
+        const idle = window.requestIdleCallback || ((fn) => setTimeout(fn, 120));
+        idle(() => {
+          if (state.page === "home") {
+            renderMonthlyChart();
+            renderFxChart("ndx");
+            renderPeRefChart(state.activePeRange);
+            renderYearlyChart(state.activeYr);
+            renderGrowthChart();
+          }
+        });
       } catch { document.getElementById("marketDate").textContent = "请先运行 Update US Market 生成新版大盘数据"; }
     }
 
