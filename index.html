@@ -630,6 +630,14 @@
       cursor: pointer; padding: 0; text-decoration: underline;
     }
 
+    .quota-banner {
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;
+      gap: 10px; padding: 11px 16px; border-radius: 11px;
+      background: var(--accent-soft); border: 1px solid var(--border);
+      font-size: 12.5px; color: var(--text-2);
+    }
+    .quota-banner strong { color: var(--text); }
+
     .pk-add-box {
       display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
       padding: 12px; border-radius: 10px; background: var(--surface-2); border: 1px dashed var(--border-strong);
@@ -1144,8 +1152,10 @@
               <button class="filter-pill" data-q="limit" type="button">限额</button>
               <button class="filter-pill" data-q="stop" type="button">暂停</button>
               <button class="filter-pill" data-q="lowfee" type="button">运作费率 ≤ 0.8%</button>
+              <button class="filter-pill" data-q="buy1k" type="button">额度 ≥ 1,000 元</button>
               <button class="filter-pill" data-q="fav" type="button">仅看收藏</button>
             </div>
+            <div id="nasdaqBuyBanner" class="quota-banner"></div>
           </div>
           <div class="table-wrap">
             <table class="data-table">
@@ -1192,8 +1202,10 @@
               <button class="filter-pill" data-q="limit" type="button">限额</button>
               <button class="filter-pill" data-q="stop" type="button">暂停</button>
               <button class="filter-pill" data-q="lowfee" type="button">运作费率 ≤ 0.8%</button>
+              <button class="filter-pill" data-q="buy1k" type="button">额度 ≥ 1,000 元</button>
               <button class="filter-pill" data-q="fav" type="button">仅看收藏</button>
             </div>
+            <div id="sp500BuyBanner" class="quota-banner"></div>
           </div>
           <div class="table-wrap">
             <table class="data-table">
@@ -1232,6 +1244,7 @@
                 <button class="filter-pill active" data-etf-idx="ALL" type="button">全部指数</button>
                 <button class="filter-pill" data-etf-idx="纳斯达克" type="button">纳斯达克</button>
                 <button class="filter-pill" data-etf-idx="标普" type="button">标普 500</button>
+                <button id="etfLowPremBtn" class="filter-pill" type="button">低溢价/折价 (&lt;1%)</button>
               </div>
             </div>
           </div>
@@ -1408,7 +1421,7 @@
         nasdaq: { search: "", quick: "all", mergeAC: true, showDetail: window.innerWidth > 768, sortKey: "agency_limit_num", sortDir: "desc", page: 1 },
         sp500: { search: "", quick: "all", mergeAC: true, showDetail: window.innerWidth > 768, sortKey: "agency_limit_num", sortDir: "desc", page: 1 }
       },
-      etf: { search: "", idx: "ALL", sortKey: "premium", sortDir: "desc" }
+      etf: { search: "", idx: "ALL", lowPremOnly: false, sortKey: "premium", sortDir: "desc" }
     };
 
     const themeCheckbox = document.getElementById("themeCheckbox");
@@ -1696,6 +1709,7 @@
         }
       };
       localStorage.setItem(PREF_KEY, JSON.stringify(next));
+      syncToCloud({ prefs: next });
       const st = document.getElementById("settingsStatus");
       st.style.display = "block";
       st.style.color = "var(--ok)";
@@ -1851,15 +1865,52 @@
       localStorage.removeItem(TOKEN_KEY);
       document.getElementById("authScreen").classList.remove("hidden");
     }
+    async function syncFromCloud() {
+      const token = localStorage.getItem(TOKEN_KEY);
+      if (!token) return;
+      try {
+        const res = await fetch("/api/auth", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ action: "sync_get" })
+        });
+        const data = await res.json();
+        if (!res.ok || !data.ok) return;
+        if (Array.isArray(data.favorites)) {
+          state.favs = new Set(data.favorites);
+          localStorage.setItem(FAV_KEY, JSON.stringify([...state.favs]));
+        }
+        if (data.prefs && typeof data.prefs === "object") {
+          localStorage.setItem(PREF_KEY, JSON.stringify(data.prefs));
+        }
+      } catch {}
+    }
+
+    async function syncToCloud(partial = {}) {
+      const token = localStorage.getItem(TOKEN_KEY);
+      if (!token) return;
+      try {
+        await fetch("/api/auth", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ action: "sync_set", ...partial })
+        });
+      } catch {}
+    }
+
     function enterApp(user) {
       document.getElementById("userNameText").textContent = user.username;
       document.getElementById("authScreen").classList.add("hidden");
       document.getElementById("appShell").classList.remove("hidden");
+      syncFromCloud().then(() => {
+        renderFundSection("nasdaq");
+        renderFundSection("sp500");
+        renderEtfTable();
+      });
       if (!state.loaded) {
         state.loaded = true;
-        renderPeHighTable("spx");
-        initFunds();
-        initMarket();
+        renderPeHighTable("spx"); renderPeRefChart(10); renderYearlyChart("both"); renderGrowthChart(); renderHoldings("ndx");
+        initFunds(); initMarket();
       }
     }
 
@@ -2096,7 +2147,8 @@
           datasets: [
             { label: "动态回撤 (%)", data: d.drawdowns, borderColor: t.accent, backgroundColor: t.accent + "20", borderWidth: 2, fill: "origin", pointRadius: 0, tension: 0.18 },
             { label: "-5%", data: d.dates.map(() => -5), borderColor: "#b4530980", borderWidth: 1, borderDash: [4, 4], pointRadius: 0, fill: false },
-            { label: "-10%", data: d.dates.map(() => -10), borderColor: "#15803d80", borderWidth: 1, borderDash: [4, 4], pointRadius: 0, fill: false }
+            { label: "-10%", data: d.dates.map(() => -10), borderColor: "#15803d80", borderWidth: 1, borderDash: [4, 4], pointRadius: 0, fill: false },
+            { label: "-20%", data: d.dates.map(() => -20), borderColor: "#dc262699", borderWidth: 1.2, borderDash: [4, 4], pointRadius: 0, fill: false }
           ]
         },
         options: {
@@ -2160,7 +2212,9 @@
     // ===== 收藏与对比 =====
     function toggleFav(code) {
       if (state.favs.has(code)) state.favs.delete(code); else state.favs.add(code);
-      localStorage.setItem(FAV_KEY, JSON.stringify([...state.favs]));
+      const arr = [...state.favs];
+      localStorage.setItem(FAV_KEY, JSON.stringify(arr));
+      syncToCloud({ favorites: arr });
       renderFundSection("nasdaq"); renderFundSection("sp500"); renderEtfTable();
     }
     function toggleCompare(item) {
@@ -2258,6 +2312,11 @@
         if (cfg.quick === "limit" && !(item.agency_limit_num > 0 && item.agency_limit_num < 999999999 || item.agency_limit_num === -1)) return false;
         if (cfg.quick === "stop" && item.agency_limit_num !== 0) return false;
         if (cfg.quick === "lowfee" && item.mgmt_custody_fee > 0.8) return false;
+        if (cfg.quick === "buy1k") {
+          const okA = item.agency_limit_num >= 1000 || item.agency_limit_num === -1;
+          const okD = item.direct_limit_num >= 1000 || item.direct_limit_num === -1;
+          if (!okA && !okD) return false;
+        }
         if (cfg.quick === "fav" && !state.favs.has(item.code)) return false;
         if (cfg.search && !item.name.toLowerCase().includes(cfg.search) && !item.code.includes(cfg.search) && !String(item.c_code).includes(cfg.search)) return false;
         return true;
@@ -2275,6 +2334,13 @@
       });
 
       document.getElementById(`${sec}Badge`).textContent = `${filtered.length} 只`;
+      const buy1kCnt = source.filter(x => (x.agency_limit_num >= 1000 || x.agency_limit_num === -1 || x.direct_limit_num >= 1000 || x.direct_limit_num === -1)).length;
+      const cheapBuyCnt = source.filter(x => (x.agency_limit_num >= 1000 || x.agency_limit_num === -1) && x.mgmt_custody_fee <= 0.8).length;
+      const bannerEl = document.getElementById(`${sec}BuyBanner`);
+      if (bannerEl) {
+        const sigText = state.market && state.market.sentiment ? state.market.sentiment.overall_label : "情绪中性";
+        bannerEl.innerHTML = `<span><strong>今日可买参考：</strong>共 <strong>${buy1kCnt}</strong> 只单日额度 ≥ 1,000 元，其中 <strong>${cheapBuyCnt}</strong> 只同时满足运作费率 ≤ 0.80%。当前信号：<strong>${sigText}</strong></span><span>点击“额度 ≥ 1,000 元”可快速过滤</span>`;
+      }
       const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
       if (cfg.page > totalPages) cfg.page = totalPages;
       const items = filtered.slice((cfg.page - 1) * PAGE_SIZE, cfg.page * PAGE_SIZE);
@@ -2338,6 +2404,7 @@
       const cfg = state.etf;
       const filtered = state.raw.etfs.filter(e => {
         if (cfg.idx !== "ALL" && !e.index.includes(cfg.idx)) return false;
+        if (cfg.lowPremOnly && (e.premium === null || e.premium === undefined || e.premium >= 1)) return false;
         if (cfg.search && !e.name.toLowerCase().includes(cfg.search) && !e.code.includes(cfg.search)) return false;
         return true;
       });
@@ -2436,6 +2503,11 @@
 
       document.getElementById("etfSearch").addEventListener("input", e => { state.etf.search = e.target.value.trim().toLowerCase(); renderEtfTable(); });
       document.querySelectorAll("[data-etf-idx]").forEach(b => b.addEventListener("click", () => { document.querySelectorAll("[data-etf-idx]").forEach(x => x.classList.remove("active")); b.classList.add("active"); state.etf.idx = b.dataset.etfIdx; renderEtfTable(); }));
+      document.getElementById("etfLowPremBtn").addEventListener("click", (e) => {
+        state.etf.lowPremOnly = !state.etf.lowPremOnly;
+        e.currentTarget.classList.toggle("active", state.etf.lowPremOnly);
+        renderEtfTable();
+      });
       document.querySelectorAll("[data-etf-sort]").forEach(th => th.addEventListener("click", () => {
         const k = th.dataset.etfSort;
         if (state.etf.sortKey === k) state.etf.sortDir = state.etf.sortDir === "asc" ? "desc" : "asc";

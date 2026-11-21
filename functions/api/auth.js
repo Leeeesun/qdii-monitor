@@ -1,5 +1,5 @@
 // Cloudflare Pages Function: /api/auth
-// 支持：账号密码登录、带邀请码注册、通行密钥 (WebAuthn/Passkey ES256) 绑定与免密登录
+// 支持：账号密码登录、带邀请码注册、通行密钥 (WebAuthn/Passkey ES256) 列表、绑定、删除与免密登录
 // 依赖绑定：KV 命名空间 AUTH_KV；环境变量 INVITE_CODES（逗号分隔）、JWT_SECRET
 
 const encoder = new TextEncoder();
@@ -73,7 +73,6 @@ async function verifyToken(token, secret) {
   }
 }
 
-// 将 WebAuthn 返回的 ASN.1 DER ECDSA 签名转换为 Web Crypto 所需的 64 字节 P1363 (r || s)
 function derToP1363(der) {
   const bytes = new Uint8Array(der);
   if (bytes[0] !== 0x30) throw new Error("Invalid DER signature");
@@ -105,12 +104,16 @@ function bytesEqual(a, b) {
   return true;
 }
 
-export async function onRequestGet(context) {
-  const { request, env } = context;
+async function getAuthedUser(request, env) {
   const secret = env.JWT_SECRET || "qdii-monitor-default-secret-change-me";
   const auth = request.headers.get("Authorization") || "";
   const token = auth.startsWith("Bearer ") ? auth.slice(7).trim() : "";
-  const user = await verifyToken(token, secret);
+  return await verifyToken(token, secret);
+}
+
+export async function onRequestGet(context) {
+  const { request, env } = context;
+  const user = await getAuthedUser(request, env);
   if (!user) return jsonRes({ ok: false, message: "登录已失效" }, 401);
   return jsonRes({ ok: true, user });
 }
@@ -136,9 +139,9 @@ export async function onRequestPost(context) {
   const url = new URL(request.url);
   const rpId = url.hostname;
   const expectedOrigin = url.origin;
-  const exp = Date.now() + 7 * 24 * 3600 * 1000; // 7 天有效期
+  const exp = Date.now() + 7 * 24 * 3600 * 1000;
 
-  // ===== 1. 新用户注册（强制校验邀请码） =====
+  // 1. 新用户注册
   if (action === "register") {
     const username = String(body.username || "").trim();
     const password = String(body.password || "");
@@ -167,13 +170,11 @@ export async function onRequestPost(context) {
     return jsonRes({ ok: true, token, user });
   }
 
-  // ===== 2. 账号密码登录 =====
+  // 2. 账号密码登录
   if (action === "login") {
     const username = String(body.username || "").trim();
     const password = String(body.password || "");
-    if (!username || !password) {
-      return jsonRes({ ok: false, message: "请输入用户名和密码" }, 400);
-    }
+    if (!username || !password) return jsonRes({ ok: false, message: "请输入用户名和密码" }, 400);
     const key = `user:${username.toLowerCase()}`;
     const recordRaw = await env.AUTH_KV.get(key);
     if (!recordRaw) return jsonRes({ ok: false, message: "账号不存在或密码错误" }, 401);
@@ -185,17 +186,67 @@ export async function onRequestPost(context) {
     return jsonRes({ ok: true, token, user });
   }
 
-  // ===== 3. 通行密钥：获取绑定参数（需已登录） =====
+  // 3. 通行密钥列表（需已登录）
+  if (action === "passkey_list") {
+    const curUser = await getAuthedUser(request, env);
+    if (!curUser) return jsonRes({ ok: false, message: "登录已失效" }, 401);
+
+    const uKey = `user:${curUser.username.toLowerCase()}`;
+    const uRaw = await env.AUTH_KV.get(uKey);
+    const uRec = uRaw ? JSON.parse(uRaw) : {};
+    const ids = Array.isArray(uRec.passkeys) ? uRec.passkeys : [];
+    const list = [];
+
+    for (const id of ids) {
+      const pkRaw = await env.AUTH_KV.get(`passkey:${id}`);
+      if (pkRaw) {
+        const pk = JSON.parse(pkRaw);
+        list.push({
+          id: pk.id,
+          label: pk.label || "设备通行密钥",
+          created_at: pk.created_at || ""
+        });
+      }
+    }
+    return jsonRes({ ok: true, passkeys: list });
+  }
+
+  // 4. 删除指定通行密钥（需已登录）
+  if (action === "passkey_delete") {
+    const curUser = await getAuthedUser(request, env);
+    if (!curUser) return jsonRes({ ok: false, message: "登录已失效" }, 401);
+
+    const targetId = String(body.id || "").trim();
+    if (!targetId) return jsonRes({ ok: false, message: "缺少通行密钥 ID" }, 400);
+
+    const pkRaw = await env.AUTH_KV.get(`passkey:${targetId}`);
+    if (pkRaw) {
+      const pk = JSON.parse(pkRaw);
+      if (pk.username !== curUser.username) {
+        return jsonRes({ ok: false, message: "无权删除他人的通行密钥" }, 403);
+      }
+      await env.AUTH_KV.delete(`passkey:${targetId}`);
+    }
+
+    const uKey = `user:${curUser.username.toLowerCase()}`;
+    const uRaw = await env.AUTH_KV.get(uKey);
+    if (uRaw) {
+      const uRec = JSON.parse(uRaw);
+      uRec.passkeys = (uRec.passkeys || []).filter(x => x !== targetId);
+      await env.AUTH_KV.put(uKey, JSON.stringify(uRec));
+    }
+    return jsonRes({ ok: true, message: "已删除通行密钥" });
+  }
+
+  // 5. 通行密钥：获取绑定参数（需已登录）
   if (action === "passkey_reg_options") {
-    const auth = request.headers.get("Authorization") || "";
-    const token = auth.startsWith("Bearer ") ? auth.slice(7).trim() : "";
-    const curUser = await verifyToken(token, secret);
+    const curUser = await getAuthedUser(request, env);
     if (!curUser) return jsonRes({ ok: false, message: "请先登录后再绑定通行密钥" }, 401);
 
     const challenge = bytesToBase64Url(crypto.getRandomValues(new Uint8Array(32)));
     await env.AUTH_KV.put(
       `chal:${challenge}`,
-      JSON.stringify({ type: "reg", username: curUser.username }),
+      JSON.stringify({ type: "reg", username: curUser.username, label: String(body.label || "").trim() }),
       { expirationTtl: 300 }
     );
 
@@ -216,15 +267,13 @@ export async function onRequestPost(context) {
     });
   }
 
-  // ===== 4. 通行密钥：验证并保存绑定 =====
+  // 6. 通行密钥：验证并保存绑定
   if (action === "passkey_reg_verify") {
-    const auth = request.headers.get("Authorization") || "";
-    const token = auth.startsWith("Bearer ") ? auth.slice(7).trim() : "";
-    const curUser = await verifyToken(token, secret);
+    const curUser = await getAuthedUser(request, env);
     if (!curUser) return jsonRes({ ok: false, message: "登录状态已失效" }, 401);
 
     try {
-      const { id, clientDataJSON, authenticatorData, publicKeySpki } = body;
+      const { id, clientDataJSON, authenticatorData, publicKeySpki, label } = body;
       if (!id || !clientDataJSON || !authenticatorData || !publicKeySpki) {
         return jsonRes({ ok: false, message: "通行密钥参数不完整" }, 400);
       }
@@ -249,16 +298,15 @@ export async function onRequestPost(context) {
         return jsonRes({ ok: false, message: "设备验证数据校验失败" }, 400);
       }
 
-      // 校验公钥可正常导入为 P-256
       await crypto.subtle.importKey(
         "spki", base64UrlToBytes(publicKeySpki),
         { name: "ECDSA", namedCurve: "P-256" }, false, ["verify"]
       );
 
-      // 存入 KV
+      const finalLabel = String(label || chalObj.label || "").trim() || "本机通行密钥";
       await env.AUTH_KV.put(
         `passkey:${id}`,
-        JSON.stringify({ id, username: curUser.username, publicKeySpki, created_at: new Date().toISOString() })
+        JSON.stringify({ id, username: curUser.username, label: finalLabel, publicKeySpki, created_at: new Date().toISOString() })
       );
 
       const uKey = `user:${curUser.username.toLowerCase()}`;
@@ -269,20 +317,20 @@ export async function onRequestPost(context) {
         await env.AUTH_KV.put(uKey, JSON.stringify(uRec));
       }
 
-      return jsonRes({ ok: true, message: "通行密钥绑定成功，下次可直接免密登录" });
+      return jsonRes({ ok: true, message: "通行密钥已添加，下次可直接免密登录" });
     } catch (e) {
-      return jsonRes({ ok: false, message: "通行密钥绑定失败：" + e.message }, 400);
+      return jsonRes({ ok: false, message: "通行密钥添加失败：" + e.message }, 400);
     }
   }
 
-  // ===== 5. 通行密钥：获取登录挑战 =====
+  // 7. 通行密钥：获取登录挑战
   if (action === "passkey_auth_options") {
     const challenge = bytesToBase64Url(crypto.getRandomValues(new Uint8Array(32)));
     await env.AUTH_KV.put(`chal:${challenge}`, JSON.stringify({ type: "auth" }), { expirationTtl: 300 });
     return jsonRes({ ok: true, options: { challenge, rpId } });
   }
 
-  // ===== 6. 通行密钥：验证签名并签发登录凭证 =====
+  // 8. 通行密钥：验证签名并签发登录凭证
   if (action === "passkey_auth_verify") {
     try {
       const { id, clientDataJSON, authenticatorData, signature } = body;
@@ -302,7 +350,7 @@ export async function onRequestPost(context) {
       await env.AUTH_KV.delete(chalKey);
 
       const pkRaw = await env.AUTH_KV.get(`passkey:${id}`);
-      if (!pkRaw) return jsonRes({ ok: false, message: "未找到该通行密钥，请先用密码登录后绑定" }, 401);
+      if (!pkRaw) return jsonRes({ ok: false, message: "该通行密钥已被移除或未绑定" }, 401);
       const pkRec = JSON.parse(pkRaw);
 
       const authDataBytes = base64UrlToBytes(authenticatorData);
@@ -332,6 +380,38 @@ export async function onRequestPost(context) {
     } catch (e) {
       return jsonRes({ ok: false, message: "通行密钥登录失败：" + e.message }, 401);
     }
+  }
+
+  // 9. 云端同步：读取当前用户的推送设置与收藏夹
+  if (action === "sync_get") {
+    const curUser = await getAuthedUser(request, env);
+    if (!curUser) return jsonRes({ ok: false, message: "登录已失效" }, 401);
+    const uKey = `user:${curUser.username.toLowerCase()}`;
+    const uRaw = await env.AUTH_KV.get(uKey);
+    const uRec = uRaw ? JSON.parse(uRaw) : {};
+    return jsonRes({
+      ok: true,
+      prefs: uRec.prefs || null,
+      favorites: Array.isArray(uRec.favorites) ? uRec.favorites : null
+    });
+  }
+
+  // 10. 云端同步：保存当前用户的推送设置与/或收藏夹
+  if (action === "sync_set") {
+    const curUser = await getAuthedUser(request, env);
+    if (!curUser) return jsonRes({ ok: false, message: "登录已失效" }, 401);
+    const uKey = `user:${curUser.username.toLowerCase()}`;
+    const uRaw = await env.AUTH_KV.get(uKey);
+    if (!uRaw) return jsonRes({ ok: false, message: "用户记录不存在" }, 404);
+    const uRec = JSON.parse(uRaw);
+    if (body.prefs && typeof body.prefs === "object") {
+      uRec.prefs = body.prefs;
+    }
+    if (Array.isArray(body.favorites)) {
+      uRec.favorites = body.favorites.slice(0, 200);
+    }
+    await env.AUTH_KV.put(uKey, JSON.stringify(uRec));
+    return jsonRes({ ok: true, message: "已同步至云端" });
   }
 
   return jsonRes({ ok: false, message: "未知操作" }, 400);
