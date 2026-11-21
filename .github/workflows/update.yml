@@ -1,0 +1,40 @@
+name: Update QDII Fund Data
+
+on:
+  schedule:
+    # 周一至周五 北京时间 09:15、10:30、14:15、21:15（避开整点排队）
+    - cron: '15 1 * * 1-5'
+    - cron: '30 2 * * 1-5'
+    - cron: '15 6 * * 1-5'
+    - cron: '15 13 * * 1-5'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install akshare pandas requests beautifulsoup4
+
+      - name: Fetch fund data
+        run: python scripts/fetch_funds.py
+
+      - name: Commit and push if changed
+        run: |
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/funds.json data/fees_cache.json
+          git diff --staged --quiet || (git commit -m "chore: update QDII quota and fees" && git pull --rebase && git push)
