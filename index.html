@@ -388,6 +388,232 @@
     .cmp-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 14px; }
     .cmp-table th, .cmp-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); text-align: left; }
     .cmp-table th { width: 130px; color: var(--text-3); background: var(--surface-2); font-weight: 500; }
+    /* From Uiverse.io by Galahhad - 适配顶部导航栏高度 */
+    .theme-switch {
+      --toggle-size: 12.2px;
+      --container-width: 5.625em;
+      --container-height: 2.5em;
+      --container-radius: 6.25em;
+      --container-light-bg: #3D7EAE;
+      --container-night-bg: #1D1F2C;
+      --circle-container-diameter: 3.375em;
+      --sun-moon-diameter: 2.125em;
+      --sun-bg: #ECCA2F;
+      --moon-bg: #C4C9D1;
+      --spot-color: #959DB1;
+      --circle-container-offset: calc((var(--circle-container-diameter) - var(--container-height)) / 2 * -1);
+      --stars-color: #fff;
+      --clouds-color: #F3FDFF;
+      --back-clouds-color: #AACADF;
+      --transition: .5s cubic-bezier(0, -0.02, 0.4, 1.25);
+      --circle-transition: .3s cubic-bezier(0, -0.02, 0.35, 1.17);
+      display: inline-flex;
+      align-items: center;
+      vertical-align: middle;
+      user-select: none;
+    }
+
+    .theme-switch, .theme-switch *, .theme-switch *::before, .theme-switch *::after {
+      -webkit-box-sizing: border-box;
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-size: var(--toggle-size);
+    }
+
+    .theme-switch__container {
+      width: var(--container-width);
+      height: var(--container-height);
+      background-color: var(--container-light-bg);
+      border-radius: var(--container-radius);
+      overflow: hidden;
+      cursor: pointer;
+      -webkit-box-shadow: 0em -0.062em 0.062em rgba(0, 0, 0, 0.25), 0em 0.062em 0.125em rgba(255, 255, 255, 0.94);
+      box-shadow: 0em -0.062em 0.062em rgba(0, 0, 0, 0.25), 0em 0.062em 0.125em rgba(255, 255, 255, 0.94);
+      -webkit-transition: var(--transition);
+      -o-transition: var(--transition);
+      transition: var(--transition);
+      position: relative;
+    }
+
+    .theme-switch__container::before {
+      content: "";
+      position: absolute;
+      z-index: 1;
+      inset: 0;
+      -webkit-box-shadow: 0em 0.05em 0.187em rgba(0, 0, 0, 0.25) inset, 0em 0.05em 0.187em rgba(0, 0, 0, 0.25) inset;
+      box-shadow: 0em 0.05em 0.187em rgba(0, 0, 0, 0.25) inset, 0em 0.05em 0.187em rgba(0, 0, 0, 0.25) inset;
+      border-radius: var(--container-radius);
+    }
+
+    .theme-switch__checkbox {
+      display: none;
+    }
+
+    .theme-switch__circle-container {
+      width: var(--circle-container-diameter);
+      height: var(--circle-container-diameter);
+      background-color: rgba(255, 255, 255, 0.1);
+      position: absolute;
+      left: var(--circle-container-offset);
+      top: var(--circle-container-offset);
+      border-radius: var(--container-radius);
+      -webkit-box-shadow: inset 0 0 0 3.375em rgba(255, 255, 255, 0.1), inset 0 0 0 3.375em rgba(255, 255, 255, 0.1), 0 0 0 0.625em rgba(255, 255, 255, 0.1), 0 0 0 1.25em rgba(255, 255, 255, 0.1);
+      box-shadow: inset 0 0 0 3.375em rgba(255, 255, 255, 0.1), inset 0 0 0 3.375em rgba(255, 255, 255, 0.1), 0 0 0 0.625em rgba(255, 255, 255, 0.1), 0 0 0 1.25em rgba(255, 255, 255, 0.1);
+      display: -webkit-box;
+      display: -ms-flexbox;
+      display: flex;
+      -webkit-transition: var(--circle-transition);
+      -o-transition: var(--circle-transition);
+      transition: var(--circle-transition);
+      pointer-events: none;
+    }
+
+    .theme-switch__sun-moon-container {
+      pointer-events: auto;
+      position: relative;
+      z-index: 2;
+      width: var(--sun-moon-diameter);
+      height: var(--sun-moon-diameter);
+      margin: auto;
+      border-radius: var(--container-radius);
+      background-color: var(--sun-bg);
+      -webkit-box-shadow: 0.062em 0.062em 0.062em 0em rgba(254, 255, 239, 0.61) inset, 0em -0.062em 0.062em 0em #a1872a inset;
+      box-shadow: 0.062em 0.062em 0.062em 0em rgba(254, 255, 239, 0.61) inset, 0em -0.062em 0.062em 0em #a1872a inset;
+      -webkit-filter: drop-shadow(0.062em 0.125em 0.125em rgba(0, 0, 0, 0.25)) drop-shadow(0em 0.062em 0.125em rgba(0, 0, 0, 0.25));
+      filter: drop-shadow(0.062em 0.125em 0.125em rgba(0, 0, 0, 0.25)) drop-shadow(0em 0.062em 0.125em rgba(0, 0, 0, 0.25));
+      overflow: hidden;
+      -webkit-transition: var(--transition);
+      -o-transition: var(--transition);
+      transition: var(--transition);
+    }
+
+    .theme-switch__moon {
+      -webkit-transform: translateX(100%);
+      -ms-transform: translateX(100%);
+      transform: translateX(100%);
+      width: 100%;
+      height: 100%;
+      background-color: var(--moon-bg);
+      border-radius: inherit;
+      -webkit-box-shadow: 0.062em 0.062em 0.062em 0em rgba(254, 255, 239, 0.61) inset, 0em -0.062em 0.062em 0em #969696 inset;
+      box-shadow: 0.062em 0.062em 0.062em 0em rgba(254, 255, 239, 0.61) inset, 0em -0.062em 0.062em 0em #969696 inset;
+      -webkit-transition: var(--transition);
+      -o-transition: var(--transition);
+      transition: var(--transition);
+      position: relative;
+    }
+
+    .theme-switch__spot {
+      position: absolute;
+      top: 0.75em;
+      left: 0.312em;
+      width: 0.75em;
+      height: 0.75em;
+      border-radius: var(--container-radius);
+      background-color: var(--spot-color);
+      -webkit-box-shadow: 0em 0.0312em 0.062em rgba(0, 0, 0, 0.25) inset;
+      box-shadow: 0em 0.0312em 0.062em rgba(0, 0, 0, 0.25) inset;
+    }
+
+    .theme-switch__spot:nth-of-type(2) {
+      width: 0.375em;
+      height: 0.375em;
+      top: 0.937em;
+      left: 1.375em;
+    }
+
+    .theme-switch__spot:nth-last-of-type(3) {
+      width: 0.25em;
+      height: 0.25em;
+      top: 0.312em;
+      left: 0.812em;
+    }
+
+    .theme-switch__clouds {
+      width: 1.25em;
+      height: 1.25em;
+      background-color: var(--clouds-color);
+      border-radius: var(--container-radius);
+      position: absolute;
+      bottom: -0.625em;
+      left: 0.312em;
+      -webkit-box-shadow: 0.937em 0.312em var(--clouds-color), -0.312em -0.312em var(--back-clouds-color), 1.437em 0.375em var(--clouds-color), 0.5em -0.125em var(--back-clouds-color), 2.187em 0 var(--clouds-color), 1.25em -0.062em var(--back-clouds-color), 2.937em 0.312em var(--clouds-color), 2em -0.312em var(--back-clouds-color), 3.625em -0.062em var(--clouds-color), 2.625em 0em var(--back-clouds-color), 4.5em -0.312em var(--clouds-color), 3.375em -0.437em var(--back-clouds-color), 4.625em -1.75em 0 0.437em var(--clouds-color), 4em -0.625em var(--back-clouds-color), 4.125em -2.125em 0 0.437em var(--clouds-color);
+      box-shadow: 0.937em 0.312em var(--clouds-color), -0.312em -0.312em var(--back-clouds-color), 1.437em 0.375em var(--clouds-color), 0.5em -0.125em var(--back-clouds-color), 2.187em 0 var(--clouds-color), 1.25em -0.062em var(--back-clouds-color), 2.937em 0.312em var(--clouds-color), 2em -0.312em var(--back-clouds-color), 3.625em -0.062em var(--clouds-color), 2.625em 0em var(--back-clouds-color), 4.5em -0.312em var(--clouds-color), 3.375em -0.437em var(--back-clouds-color), 4.625em -1.75em 0 0.437em var(--clouds-color), 4em -0.625em var(--back-clouds-color), 4.125em -2.125em 0 0.437em var(--back-clouds-color);
+      -webkit-transition: 0.5s cubic-bezier(0, -0.02, 0.4, 1.25);
+      -o-transition: 0.5s cubic-bezier(0, -0.02, 0.4, 1.25);
+      transition: 0.5s cubic-bezier(0, -0.02, 0.4, 1.25);
+    }
+
+    .theme-switch__stars-container {
+      position: absolute;
+      color: var(--stars-color);
+      top: -100%;
+      left: 0.312em;
+      width: 2.75em;
+      height: auto;
+      -webkit-transition: var(--transition);
+      -o-transition: var(--transition);
+      transition: var(--transition);
+    }
+
+    .theme-switch__checkbox:checked + .theme-switch__container {
+      background-color: var(--container-night-bg);
+    }
+
+    .theme-switch__checkbox:checked + .theme-switch__container .theme-switch__circle-container {
+      left: calc(100% - var(--circle-container-offset) - var(--circle-container-diameter));
+    }
+
+    .theme-switch__checkbox:checked + .theme-switch__container .theme-switch__circle-container:hover {
+      left: calc(100% - var(--circle-container-offset) - var(--circle-container-diameter) - 0.187em);
+    }
+
+    .theme-switch__circle-container:hover {
+      left: calc(var(--circle-container-offset) + 0.187em);
+    }
+
+    .theme-switch__checkbox:checked + .theme-switch__container .theme-switch__moon {
+      -webkit-transform: translate(0);
+      -ms-transform: translate(0);
+      transform: translate(0);
+    }
+
+    .theme-switch__checkbox:checked + .theme-switch__container .theme-switch__clouds {
+      bottom: -4.062em;
+    }
+
+    .theme-switch__checkbox:checked + .theme-switch__container .theme-switch__stars-container {
+      top: 50%;
+      -webkit-transform: translateY(-50%);
+      -ms-transform: translateY(-50%);
+      transform: translateY(-50%);
+    }
+
+    .modal-section { display: flex; flex-direction: column; gap: 14px; margin-top: 14px; }
+    .modal-hint { font-size: 12px; color: var(--text-3); line-height: 1.65; }
+    .modal-actions { display: flex; align-items: center; justify-content: flex-end; gap: 10px; margin-top: 6px; flex-wrap: wrap; }
+    .btn-secondary {
+      height: 36px; padding: 0 14px; border-radius: var(--radius-sm);
+      border: 1px solid var(--border-strong); background: var(--surface-2); color: var(--text);
+      font-size: 13px; font-weight: 500; cursor: pointer;
+    }
+    .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-solid-sm {
+      height: 36px; padding: 0 16px; border-radius: var(--radius-sm); border: none;
+      background: var(--accent); color: #fff; font-size: 13px; font-weight: 500; cursor: pointer;
+    }
+    .pk-item {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      padding: 12px 14px; border-radius: 10px; background: var(--surface-2); border: 1px solid var(--border);
+    }
+    .pk-title { font-size: 13.5px; font-weight: 600; }
+    .pk-meta { font-size: 11.5px; color: var(--text-3); margin-top: 3px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .pk-add-box {
+      display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+      padding: 12px; border-radius: 10px; background: var(--surface-2); border: 1px dashed var(--border-strong);
+    }
+
     .user-menu-wrap { position: relative; }
     .user-dropdown {
       position: absolute; right: 0; top: calc(100% + 8px); min-width: 184px;
@@ -535,7 +761,31 @@
               </button>
             </div>
           </div>
-          <button id="themeToggle" class="chip-btn" type="button" title="切换深浅色"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></button>
+          <label class="theme-switch" title="切换日间 / 夜间模式">
+            <input id="themeCheckbox" type="checkbox" class="theme-switch__checkbox" aria-label="切换日间 / 夜间模式" />
+            <div class="theme-switch__container">
+              <div class="theme-switch__clouds"></div>
+              <div class="theme-switch__stars-container">
+                <svg viewBox="0 0 44 20" fill="currentColor" style="width:100%;height:auto;stroke:none;">
+                  <circle cx="6" cy="5" r="1.4" />
+                  <circle cx="16" cy="14" r="1.1" />
+                  <circle cx="24" cy="4" r="1.6" />
+                  <circle cx="33" cy="13" r="1.2" />
+                  <circle cx="39" cy="6" r="1.0" />
+                  <circle cx="11" cy="11" r="0.8" />
+                </svg>
+              </div>
+              <div class="theme-switch__circle-container">
+                <div class="theme-switch__sun-moon-container">
+                  <div class="theme-switch__moon">
+                    <div class="theme-switch__spot"></div>
+                    <div class="theme-switch__spot"></div>
+                    <div class="theme-switch__spot"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </label>
         </div>
       </header>
     </div>
@@ -1008,6 +1258,48 @@
       <div id="favManageBody" class="fav-manage-list"></div>
     </div>
   </div>
+  <div id="settingsModal" class="modal-backdrop hidden">
+    <div class="modal-box" style="max-width:540px;">
+      <div class="card-head" style="margin-bottom:0;">
+        <div class="card-title">推送与偏好设置</div>
+        <button id="closeSettingsBtn" class="chip-btn" type="button">关闭</button>
+      </div>
+      <div class="modal-section">
+        <div class="field" style="margin-bottom:0;">
+          <label for="cfgBarkUrl">Bark 推送链接</label>
+          <input id="cfgBarkUrl" class="input" type="url" placeholder="https://bark.youranzi.de/你的Key" />
+          <div class="modal-hint" style="margin-top:5px;">填写完整的 Bark 推送地址（含推送 Key），检测到额度变化时将推送至该地址。</div>
+        </div>
+        <div class="field" style="margin-bottom:0;">
+          <label for="cfgPushTime">每日推送时间（北京时间）</label>
+          <input id="cfgPushTime" class="input" type="time" style="max-width:180px;" />
+          <div class="modal-hint" style="margin-top:5px;">默认 09:30；也可在下方点“测试推送”验证 Bark 连通性。</div>
+        </div>
+        <div id="settingsStatus" class="modal-hint" style="color:var(--ok);display:none;"></div>
+        <div class="modal-actions">
+          <button id="testBarkBtn" class="btn-secondary" type="button">测试推送</button>
+          <button id="saveSettingsBtn" class="btn-solid-sm" type="button">保存设置</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="passkeyModal" class="modal-backdrop hidden">
+    <div class="modal-box" style="max-width:580px;">
+      <div class="card-head" style="margin-bottom:0;">
+        <div class="card-title">通行密钥管理</div>
+        <button id="closePasskeyBtn" class="chip-btn" type="button">关闭</button>
+      </div>
+      <div class="modal-section">
+        <div class="pk-add-box">
+          <input id="passkeyLabelInput" class="input" type="text" placeholder="备注名称（如 iPhone / MacBook / Bitwarden）" style="flex:1;min-width:180px;height:36px;background:var(--surface);" />
+          <button id="bindPasskeyBtn" class="btn-solid-sm" type="button">+ 新增通行密钥</button>
+        </div>
+        <div id="passkeyStatus" class="modal-hint"></div>
+        <div id="passkeyList" class="fav-manage-list" style="margin-top:0;"></div>
+      </div>
+    </div>
+  </div>
 
   <script>
     const TOKEN_KEY = "qdii_auth_token";
@@ -1070,11 +1362,14 @@
       etf: { search: "", idx: "ALL", sortKey: "premium", sortDir: "desc" }
     };
 
-    if (localStorage.getItem("qdii-theme") === "dark") document.documentElement.setAttribute("data-theme", "dark");
-    document.getElementById("themeToggle").addEventListener("click", () => {
-      const dark = document.documentElement.getAttribute("data-theme") === "dark";
-      document.documentElement.setAttribute("data-theme", dark ? "light" : "dark");
-      localStorage.setItem("qdii-theme", dark ? "light" : "dark");
+    const themeCheckbox = document.getElementById("themeCheckbox");
+    const initDark = localStorage.getItem("qdii-theme") === "dark";
+    if (initDark) document.documentElement.setAttribute("data-theme", "dark");
+    if (themeCheckbox) themeCheckbox.checked = initDark;
+    themeCheckbox.addEventListener("change", () => {
+      const toDark = themeCheckbox.checked;
+      document.documentElement.setAttribute("data-theme", toDark ? "dark" : "light");
+      localStorage.setItem("qdii-theme", toDark ? "dark" : "light");
       setTimeout(rerenderVisibleCharts, 40);
     });
 
@@ -1189,16 +1484,24 @@
       } finally { btn.disabled = false; }
     });
 
-    // 登录后绑定通行密钥
+    // 新增通行密钥（在通行密钥管理弹窗中触发）
     document.getElementById("bindPasskeyBtn").addEventListener("click", async () => {
-      if (!window.PublicKeyCredential) { alert("当前浏览器不支持通行密钥"); return; }
+      const stEl = document.getElementById("passkeyStatus");
+      if (!window.PublicKeyCredential) {
+        stEl.style.color = "var(--danger)";
+        stEl.textContent = "当前浏览器不支持通行密钥（建议在 Safari 或桌面现代浏览器中使用）";
+        return;
+      }
       const token = localStorage.getItem(TOKEN_KEY);
       if (!token) return;
+      const label = document.getElementById("passkeyLabelInput").value.trim() || "设备通行密钥";
+      stEl.style.color = "var(--text-2)";
+      stEl.textContent = "请在系统弹窗中完成生物识别或密钥验证...";
       try {
         const optRes = await fetch("/api/auth", {
           method: "POST",
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-          body: JSON.stringify({ action: "passkey_reg_options" })
+          body: JSON.stringify({ action: "passkey_reg_options", label })
         });
         const optData = await optRes.json();
         if (!optRes.ok || !optData.ok) { alert(optData.message || "获取绑定参数失败"); return; }
@@ -1228,9 +1531,15 @@
           })
         });
         const verData = await verRes.json();
-        alert(verData.message || (verData.ok ? "通行密钥绑定成功" : "绑定失败"));
+        stEl.style.color = verData.ok ? "var(--ok)" : "var(--danger)";
+        stEl.textContent = verData.message || (verData.ok ? "通行密钥已添加" : "添加失败");
+        if (verData.ok) {
+          document.getElementById("passkeyLabelInput").value = "";
+          await loadPasskeys();
+        }
       } catch (e) {
-        if (e.name !== "NotAllowedError") alert("绑定未完成：" + (e.message || e.name));
+        stEl.style.color = "var(--danger)";
+        stEl.textContent = e.name === "NotAllowedError" ? "已取消通行密钥验证" : ("添加未完成：" + (e.message || e.name));
       }
     });
 
@@ -1250,16 +1559,124 @@
       if (!e.target.closest(".user-menu-wrap")) closeUserMenu();
     });
 
+    const PREF_KEY = "qdii_user_prefs_v1";
+    const DEFAULT_BARK = "https://bark.youranzi.de/3cdh5mj7wiRryZWuPAf84u";
+    function getPrefs() {
+      try {
+        const p = JSON.parse(localStorage.getItem(PREF_KEY) || "{}");
+        return { barkUrl: p.barkUrl || DEFAULT_BARK, pushTime: p.pushTime || "09:30" };
+      } catch {
+        return { barkUrl: DEFAULT_BARK, pushTime: "09:30" };
+      }
+    }
+
     document.getElementById("menuSettingsBtn").addEventListener("click", () => {
       closeUserMenu();
-      const isDark = document.documentElement.getAttribute("data-theme") === "dark";
-      const msg = [
-        `当前主题：${isDark ? "深色模式" : "浅色模式"}（可点右上角图标切换）`,
-        `自动推送：工作日 09:30 额度变化 Bark 提醒已启用`,
-        `登录有效期：7 天（支持通行密钥与账号密码）`
-      ].join("\n");
-      alert(msg);
+      const p = getPrefs();
+      document.getElementById("cfgBarkUrl").value = p.barkUrl;
+      document.getElementById("cfgPushTime").value = p.pushTime;
+      const st = document.getElementById("settingsStatus");
+      st.style.display = "none";
+      document.getElementById("settingsModal").classList.remove("hidden");
     });
+    document.getElementById("closeSettingsBtn").addEventListener("click", () => document.getElementById("settingsModal").classList.add("hidden"));
+    document.getElementById("settingsModal").addEventListener("click", (e) => { if (e.target.id === "settingsModal") e.currentTarget.classList.add("hidden"); });
+
+    document.getElementById("saveSettingsBtn").addEventListener("click", () => {
+      const barkUrl = document.getElementById("cfgBarkUrl").value.trim() || DEFAULT_BARK;
+      const pushTime = document.getElementById("cfgPushTime").value || "09:30";
+      localStorage.setItem(PREF_KEY, JSON.stringify({ barkUrl, pushTime }));
+      const st = document.getElementById("settingsStatus");
+      st.style.display = "block";
+      st.style.color = "var(--ok)";
+      st.textContent = `已保存设置：推送时间 ${pushTime} · Bark 地址已更新`;
+    });
+
+    document.getElementById("testBarkBtn").addEventListener("click", async () => {
+      const barkUrl = (document.getElementById("cfgBarkUrl").value.trim() || DEFAULT_BARK).replace(/\/+$/, "");
+      const st = document.getElementById("settingsStatus");
+      st.style.display = "block";
+      st.style.color = "var(--text-2)";
+      st.textContent = "正在发送测试通知...";
+      try {
+        await fetch(`${barkUrl}/`, {
+          method: "POST", mode: "no-cors",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ title: "QDII 监控台测试提醒", body: "Bark 推送配置正常", group: "QDII限额" })
+        });
+        st.style.color = "var(--ok)";
+        st.textContent = "测试推送请求已发出，请留意手机 Bark 通知";
+      } catch {
+        st.style.color = "var(--danger)";
+        st.textContent = "测试推送发送失败，请检查 Bark 链接格式";
+      }
+    });
+
+    // 通行密钥管理弹窗（列表、新增、删除）
+    async function loadPasskeys() {
+      const token = localStorage.getItem(TOKEN_KEY);
+      const listEl = document.getElementById("passkeyList");
+      const stEl = document.getElementById("passkeyStatus");
+      listEl.innerHTML = `<div style="color:var(--text-3);font-size:13px;padding:12px 0;">加载中...</div>`;
+      stEl.textContent = "";
+      try {
+        const res = await fetch("/api/auth", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ action: "passkey_list" })
+        });
+        const data = await res.json();
+        if (!res.ok || !data.ok) {
+          listEl.innerHTML = `<div style="color:var(--danger);font-size:13px;">${data.message || "加载失败"}</div>`;
+          return;
+        }
+        const items = data.passkeys || [];
+        if (!items.length) {
+          listEl.innerHTML = `<div style="text-align:center;color:var(--text-3);font-size:13px;padding:18px 0;">当前尚未绑定任何通行密钥，可在上方点击“+ 新增通行密钥”</div>`;
+          return;
+        }
+        listEl.innerHTML = items.map(pk => {
+          const tail = pk.id.length > 10 ? `...${pk.id.slice(-8)}` : pk.id;
+          const dt = pk.created_at ? pk.created_at.replace("T", " ").slice(0, 16) : "";
+          return `<div class="pk-item">
+            <div>
+              <div class="pk-title">${pk.label || "设备通行密钥"}</div>
+              <div class="pk-meta">ID ${tail}${dt ? " · 添加于 " + dt : ""}</div>
+            </div>
+            <button class="fav-remove-btn" data-del-pk="${pk.id}" type="button">删除</button>
+          </div>`;
+        }).join("");
+        listEl.querySelectorAll("[data-del-pk]").forEach(b => b.addEventListener("click", async () => {
+          const pkId = b.dataset.delPk;
+          if (!confirm("确定要删除这把通行密钥吗？删除后该凭证将无法再用于免密登录。")) return;
+          b.disabled = true;
+          try {
+            const delRes = await fetch("/api/auth", {
+              method: "POST",
+              headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+              body: JSON.stringify({ action: "passkey_delete", id: pkId })
+            });
+            const delData = await delRes.json();
+            stEl.style.color = delData.ok ? "var(--ok)" : "var(--danger)";
+            stEl.textContent = delData.message || (delData.ok ? "已删除" : "删除失败");
+            await loadPasskeys();
+          } catch {
+            stEl.style.color = "var(--danger)";
+            stEl.textContent = "删除请求失败";
+          } finally { b.disabled = false; }
+        }));
+      } catch {
+        listEl.innerHTML = `<div style="color:var(--danger);font-size:13px;">无法连接服务</div>`;
+      }
+    }
+
+    document.getElementById("bindPasskeyBtn").addEventListener("click", () => {
+      closeUserMenu();
+      document.getElementById("passkeyModal").classList.remove("hidden");
+      loadPasskeys();
+    });
+    document.getElementById("closePasskeyBtn").addEventListener("click", () => document.getElementById("passkeyModal").classList.add("hidden"));
+    document.getElementById("passkeyModal").addEventListener("click", (e) => { if (e.target.id === "passkeyModal") e.currentTarget.classList.add("hidden"); });
 
     function openFavManager() {
       closeUserMenu();
