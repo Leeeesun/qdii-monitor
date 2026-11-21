@@ -8,10 +8,10 @@ import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 
-# 筛选规则：匹配纳指、标普，同时剔除美元份额、纯场内ETF及纯行业主题基金
+# 筛选规则：匹配纳指、标普，剔除美元/港币份额及非宽基行业主题
 NASDAQ_KW = r"纳斯达克|纳指"
 SP500_KW = r"标普"
-EXCLUDE_KW = r"美元|现汇|现钞|ETF(?!联接)|港币|消费|生物|医药|信息|科技精选|油气|医疗"
+EXCLUDE_KW = r"美元|现汇|现钞|港币|消费|生物|医药|信息|科技精选|油气|医疗|黄金|商品|原油|房地产|红利"
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
@@ -44,10 +44,10 @@ def load_json(path, default):
     return default
 
 
-def parse_percent(text):
-    if not text:
+def parse_percent(val):
+    if val is None or pd.isna(val):
         return 0.0
-    m = re.search(r"(\d+(?:\.\d+)?)\s*%", str(text))
+    m = re.search(r"(\d+(?:\.\d+)?)", str(val))
     return round(float(m.group(1)), 4) if m else 0.0
 
 
@@ -135,25 +135,32 @@ def main():
     fees_cache = load_json(CACHE_FILE, {})
     direct_overrides = load_json(OVERRIDE_FILE, {})
 
+    # 1. 拉取全市场申购状态表 + 全市场开放式基金收益排行（避免漏掉指数型 QDII）
     purchase_df = fetch_with_retry(ak.fund_purchase_em)
-    rank_df = fetch_with_retry(ak.fund_open_fund_rank_em, symbol="QDII")
+    rank_df = fetch_with_retry(ak.fund_open_fund_rank_em, symbol="全部")
 
-    # 统一补齐 6 位基金代码，防止合并丢失
     purchase_df["基金代码"] = purchase_df["基金代码"].astype(str).str.zfill(6)
     rank_df["基金代码"] = rank_df["基金代码"].astype(str).str.zfill(6)
 
+    # 2. 左连接：保留所有场外纳指/标普基金，即使成立不满一年暂无近1年收益
     df = pd.merge(
         purchase_df[["基金代码", "基金简称", "申购状态", "日累计限定金额", "手续费"]],
-        rank_df[["基金代码", "近1年", "日期", "单位净值"]],
+        rank_df[["基金代码", "近1年", "日期", "单位净值"]].drop_duplicates(subset=["基金代码"]),
         on="基金代码",
-        how="inner"
+        how="left"
     )
 
     is_nasdaq = df["基金简称"].str.contains(NASDAQ_KW, regex=True, na=False)
     is_sp500 = df["基金简称"].str.contains(SP500_KW, regex=True, na=False)
     not_excluded = ~df["基金简称"].str.contains(EXCLUDE_KW, regex=True, na=False)
 
-    filtered = df[(is_nasdaq | is_sp500) & not_excluded].copy()
+    # 仅排除纯场内 ETF（名称含 ETF 且不含“联接”，或申购状态标注“场内”）
+    is_pure_etf = (
+        df["基金简称"].str.contains("ETF", case=False, na=False)
+        & ~df["基金简称"].str.contains("联接", na=False)
+    ) | df["申购状态"].astype(str).str.contains("场内", na=False)
+
+    filtered = df[(is_nasdaq | is_sp500) & not_excluded & ~is_pure_etf].copy()
     today_utc = datetime.now(timezone.utc)
 
     nasdaq_list = []
@@ -164,10 +171,8 @@ def main():
         name = str(row["基金简称"])
         category = "nasdaq" if re.search(NASDAQ_KW, name) else "sp500"
 
-        # 1. 代销额度
         agency_text, agency_num = format_limit(row["日累计限定金额"], row["申购状态"])
 
-        # 2. 费率数据（7天缓存防限流）
         fee_info = fees_cache.get(code)
         need_refresh = True
         if fee_info and "cached_at" in fee_info:
@@ -182,7 +187,7 @@ def main():
             try:
                 fee_info = fetch_fund_fees(code)
                 fees_cache[code] = fee_info
-                time.sleep(0.35)
+                time.sleep(0.25)
             except Exception:
                 fee_info = fee_info or {
                     "mgmt_fee": 0.0, "custody_fee": 0.0, "mgmt_custody_fee": 0.0,
@@ -196,9 +201,8 @@ def main():
             if fallback_fee > 0:
                 purchase_fee = fallback_fee
 
-        # 3. 直销额度判定
         notice = fetch_latest_limit_notice(code)
-        time.sleep(0.1)
+        time.sleep(0.08)
         if code in direct_overrides:
             ov = direct_overrides[code]
             direct_num = ov["limit_num"]
@@ -219,7 +223,6 @@ def main():
         y1 = row["近1年"]
         y1_val = round(float(y1), 2) if pd.notna(y1) and str(y1).strip() != "" else None
 
-        # 首年综合持有成本 = 1折优惠申购费率 + 管理费 + 托管费 + 销售服务费
         first_year_cost = round(
             purchase_fee + fee_info["mgmt_custody_fee"] + fee_info["service_fee"], 4
         )
@@ -243,7 +246,7 @@ def main():
             "purchase_fee_orig": fee_info["purchase_fee_orig"],
             "service_fee": fee_info["service_fee"],
             "first_year_cost": first_year_cost,
-            "nav_date": str(row["日期"]),
+            "nav_date": str(row["日期"]) if pd.notna(row["日期"]) else "",
             "notice_title": notice["title"],
             "notice_date": notice["date"],
             "notice_url": f"https://fundf10.eastmoney.com/jjgg_{code}.html"
