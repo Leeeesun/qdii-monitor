@@ -1,6 +1,30 @@
 {
-  "updated_at": "2026-11-21 10:35:23",
+  "updated_at": "2026-11-21 10:42:40",
   "nasdaq": [
+    {
+      "code": "021000",
+      "name": "南方纳斯达克100指数发起(QDII)I",
+      "share_class": "I",
+      "status": "其他平台可买(据公告)",
+      "agency_limit_text": "200 元",
+      "agency_limit_num": 200,
+      "direct_limit_text": "200 元",
+      "direct_limit_num": 200,
+      "direct_source": "same_as_agency",
+      "direct_note": "未见渠道区分公告，默认同代销",
+      "return_1y": 1.52,
+      "mgmt_fee": 0.5,
+      "custody_fee": 0.15,
+      "mgmt_custody_fee": 0.65,
+      "purchase_fee": 0.0,
+      "purchase_fee_orig": 0.0,
+      "service_fee": 0.01,
+      "first_year_cost": 0.66,
+      "nav_date": "",
+      "notice_title": "关于调整南方纳斯达克100指数发起式证券投资基金(QDII)I类基金份额申购、定投及转换转入业务金额限制的公告",
+      "notice_date": "2026-07-20",
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_021000_5.html"
+    },
     {
       "code": "017436",
       "name": "华宝纳斯达克精选股票发起式(QDII)A",
@@ -23,7 +47,7 @@
       "nav_date": "2026-11-19",
       "notice_title": "华宝纳斯达克精选股票型发起式证券投资基金(QDII)调整大额申购(含定投)金额上限的公告",
       "notice_date": "2026-11-07",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_017436.html"
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_017436_5.html"
     },
     {
       "code": "017437",
@@ -47,7 +71,7 @@
       "nav_date": "2026-11-19",
       "notice_title": "华宝纳斯达克精选股票型发起式证券投资基金(QDII)调整大额申购(含定投)金额上限的公告",
       "notice_date": "2026-11-07",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_017437.html"
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_017437_5.html"
     },
     {
       "code": "022525",
@@ -71,7 +95,7 @@
       "nav_date": "",
       "notice_title": "天弘基金管理有限公司关于天弘纳斯达克100指数型发起式证券投资基金(QDII)A类基金份额、C类基金份额暂停申购及定期定额投资业务的公告",
       "notice_date": "2026-09-18",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_022525.html"
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_022525_5.html"
     },
     {
       "code": "019172",
@@ -93,9 +117,9 @@
       "service_fee": 0.0,
       "first_year_cost": 0.72,
       "nav_date": "2026-11-19",
-      "notice_title": "",
-      "notice_date": "",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_019172.html"
+      "notice_title": "摩根纳斯达克100指数型发起式证券投资基金(QDII)调整大额申购、定期定额投资及转换转入业务限制金额的公告",
+      "notice_date": "2026-07-27",
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_019172_5.html"
     },
     {
       "code": "016453",
@@ -117,9 +141,9 @@
       "service_fee": 0.1,
       "first_year_cost": 0.75,
       "nav_date": "2026-11-19",
-      "notice_title": "",
-      "notice_date": "",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_016453.html"
+      "notice_title": "关于调整南方纳斯达克100指数发起式证券投资基金(QDII)申购、定投及转换转入业务金额限制的公告",
+      "notice_date": "2026-07-08",
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_016453_5.html"
     },
     {
       "code": "016452",
@@ -141,9 +165,9 @@
       "service_fee": 0.0,
       "first_year_cost": 0.77,
       "nav_date": "2026-11-19",
-      "notice_title": "",
-      "notice_date": "",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_016452.html"
+      "notice_title": "关于调整南方纳斯达克100指数发起式证券投资基金(QDII)申购、定投及转换转入业务金额限制的公告",
+      "notice_date": "2026-07-08",
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_016452_5.html"
     },
     {
       "code": "019736",
@@ -167,7 +191,7 @@
       "nav_date": "2026-11-19",
       "notice_title": "宝盈纳斯达克100指数型发起式证券投资基金(QDII)调整大额申购、定期定额投资业务限制金额的公告",
       "notice_date": "2026-09-24",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_019736.html"
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_019736_5.html"
     },
     {
       "code": "019173",
@@ -189,9 +213,9 @@
       "service_fee": 0.3,
       "first_year_cost": 0.9,
       "nav_date": "2026-11-19",
-      "notice_title": "",
-      "notice_date": "",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_019173.html"
+      "notice_title": "摩根纳斯达克100指数型发起式证券投资基金(QDII)调整大额申购、定期定额投资及转换转入业务限制金额的公告",
+      "notice_date": "2026-07-27",
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_019173_5.html"
     },
     {
       "code": "019737",
@@ -215,7 +239,7 @@
       "nav_date": "2026-11-19",
       "notice_title": "宝盈纳斯达克100指数型发起式证券投资基金(QDII)调整大额申购、定期定额投资业务限制金额的公告",
       "notice_date": "2026-09-24",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_019737.html"
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_019737_5.html"
     },
     {
       "code": "000834",
@@ -237,9 +261,9 @@
       "service_fee": 0.0,
       "first_year_cost": 1.12,
       "nav_date": "2026-11-19",
-      "notice_title": "",
-      "notice_date": "",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_000834.html"
+      "notice_title": "关于大成纳斯达克100交易型开放式指数证券投资基金联接基金(QDII)调整大额申购(含定期定额申购)的公告",
+      "notice_date": "2026-06-03",
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_000834_5.html"
     },
     {
       "code": "539001",
@@ -263,7 +287,7 @@
       "nav_date": "2026-11-19",
       "notice_title": "建信纳斯达克100指数型证券投资基金(QDII)暂停大额申购、定期定额投资公告",
       "notice_date": "2026-08-19",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_539001.html"
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_539001_5.html"
     },
     {
       "code": "008971",
@@ -285,9 +309,9 @@
       "service_fee": 0.3,
       "first_year_cost": 1.3,
       "nav_date": "2026-11-19",
-      "notice_title": "",
-      "notice_date": "",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_008971.html"
+      "notice_title": "关于大成纳斯达克100交易型开放式指数证券投资基金联接基金(QDII)调整大额申购(含定期定额申购)的公告",
+      "notice_date": "2026-06-03",
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_008971_5.html"
     },
     {
       "code": "012752",
@@ -311,7 +335,7 @@
       "nav_date": "2026-11-19",
       "notice_title": "建信纳斯达克100指数型证券投资基金(QDII)暂停大额申购、定期定额投资公告",
       "notice_date": "2026-08-19",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_012752.html"
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_012752_5.html"
     },
     {
       "code": "023422",
@@ -335,7 +359,7 @@
       "nav_date": "2026-11-19",
       "notice_title": "建信纳斯达克100指数型证券投资基金(QDII)暂停大额申购、定期定额投资公告",
       "notice_date": "2026-08-19",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_023422.html"
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_023422_5.html"
     },
     {
       "code": "019441",
@@ -359,7 +383,7 @@
       "nav_date": "2026-11-19",
       "notice_title": "关于万家纳斯达克100指数型发起式证券投资基金(QDII)调整大额申购(含定期定额投资)业务金额限制的公告",
       "notice_date": "2026-10-21",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_019441.html"
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_019441_5.html"
     },
     {
       "code": "022664",
@@ -381,9 +405,9 @@
       "service_fee": 0.1,
       "first_year_cost": 0.75,
       "nav_date": "2026-11-19",
-      "notice_title": "",
-      "notice_date": "",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_022664.html"
+      "notice_title": "华泰柏瑞纳斯达克100交易型开放式指数证券投资基金发起式联接基金(QDII)调整大额申购(含定期定额投资)业务的公告",
+      "notice_date": "2026-09-22",
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_022664_5.html"
     },
     {
       "code": "019524",
@@ -405,9 +429,9 @@
       "service_fee": 0.0,
       "first_year_cost": 0.77,
       "nav_date": "2026-11-19",
-      "notice_title": "",
-      "notice_date": "",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_019524.html"
+      "notice_title": "华泰柏瑞纳斯达克100交易型开放式指数证券投资基金发起式联接基金(QDII)调整大额申购(含定期定额投资)业务的公告",
+      "notice_date": "2026-09-22",
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_019524_5.html"
     },
     {
       "code": "019442",
@@ -431,7 +455,7 @@
       "nav_date": "2026-11-19",
       "notice_title": "关于万家纳斯达克100指数型发起式证券投资基金(QDII)调整大额申购(含定期定额投资)业务金额限制的公告",
       "notice_date": "2026-10-21",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_019442.html"
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_019442_5.html"
     },
     {
       "code": "019525",
@@ -453,9 +477,9 @@
       "service_fee": 0.25,
       "first_year_cost": 0.9,
       "nav_date": "2026-11-19",
-      "notice_title": "",
-      "notice_date": "",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_019525.html"
+      "notice_title": "华泰柏瑞纳斯达克100交易型开放式指数证券投资基金发起式联接基金(QDII)调整大额申购(含定期定额投资)业务的公告",
+      "notice_date": "2026-09-22",
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_019525_5.html"
     },
     {
       "code": "016532",
@@ -477,9 +501,9 @@
       "service_fee": 0.0,
       "first_year_cost": 0.7,
       "nav_date": "",
-      "notice_title": "",
-      "notice_date": "",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_016532.html"
+      "notice_title": "嘉实纳斯达克100交易型开放式指数证券投资基金发起式联接基金(QDII)暂停申购(含定期定额投资)业务的公告",
+      "notice_date": "2026-02-03",
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_016532_5.html"
     },
     {
       "code": "018043",
@@ -503,7 +527,7 @@
       "nav_date": "",
       "notice_title": "天弘基金管理有限公司关于天弘纳斯达克100指数型发起式证券投资基金(QDII)A类基金份额、C类基金份额暂停申购及定期定额投资业务的公告",
       "notice_date": "2026-09-18",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_018043.html"
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_018043_5.html"
     },
     {
       "code": "021838",
@@ -525,9 +549,9 @@
       "service_fee": 0.1,
       "first_year_cost": 0.7,
       "nav_date": "",
-      "notice_title": "",
-      "notice_date": "",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_021838.html"
+      "notice_title": "嘉实纳斯达克100交易型开放式指数证券投资基金发起式联接基金(QDII)暂停申购(含定期定额投资)业务的公告",
+      "notice_date": "2026-02-03",
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_021838_5.html"
     },
     {
       "code": "161130",
@@ -549,9 +573,9 @@
       "service_fee": 0.0,
       "first_year_cost": 0.72,
       "nav_date": "",
-      "notice_title": "",
-      "notice_date": "",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_161130.html"
+      "notice_title": "关于旗下部分基金2026年4月3日暂停申购、赎回、转换、定期定额投资业务的提示性公告",
+      "notice_date": "2026-03-31",
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_161130_5.html"
     },
     {
       "code": "016055",
@@ -573,9 +597,9 @@
       "service_fee": 0.0,
       "first_year_cost": 0.75,
       "nav_date": "",
-      "notice_title": "",
-      "notice_date": "",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_016055.html"
+      "notice_title": "博时纳斯达克100交易型开放式指数证券投资基金发起式联接基金(QDII)2026年境外主要市场节假日暂停申购、赎回等交易类业务的公告",
+      "notice_date": "2026-01-07",
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_016055_5.html"
     },
     {
       "code": "021773",
@@ -599,7 +623,7 @@
       "nav_date": "",
       "notice_title": "关于汇添富纳斯达克100交易型开放式指数证券投资基金发起式联接基金(QDII)暂停申购、定期定额投资业务的公告",
       "notice_date": "2026-09-24",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_021773.html"
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_021773_5.html"
     },
     {
       "code": "018966",
@@ -623,7 +647,7 @@
       "nav_date": "",
       "notice_title": "关于汇添富纳斯达克100交易型开放式指数证券投资基金发起式联接基金(QDII)暂停申购、定期定额投资业务的公告",
       "notice_date": "2026-09-24",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_018966.html"
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_018966_5.html"
     },
     {
       "code": "019547",
@@ -647,7 +671,7 @@
       "nav_date": "",
       "notice_title": "关于旗下部分基金2026年9月7日因境外主要投资市场节假日暂停申购、赎回、转换、定期定额投资业务的公告",
       "notice_date": "2026-09-03",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_019547.html"
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_019547_5.html"
     },
     {
       "code": "018044",
@@ -671,7 +695,7 @@
       "nav_date": "",
       "notice_title": "天弘基金管理有限公司关于天弘纳斯达克100指数型发起式证券投资基金(QDII)A类基金份额、C类基金份额暂停申购及定期定额投资业务的公告",
       "notice_date": "2026-09-18",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_018044.html"
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_018044_5.html"
     },
     {
       "code": "024237",
@@ -693,9 +717,9 @@
       "service_fee": 0.15,
       "first_year_cost": 0.8,
       "nav_date": "",
-      "notice_title": "",
-      "notice_date": "",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_024237.html"
+      "notice_title": "博时纳斯达克100交易型开放式指数证券投资基金发起式联接基金(QDII)2026年境外主要市场节假日暂停申购、赎回等交易类业务的公告",
+      "notice_date": "2026-01-07",
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_024237_5.html"
     },
     {
       "code": "016533",
@@ -717,9 +741,9 @@
       "service_fee": 0.25,
       "first_year_cost": 0.85,
       "nav_date": "",
-      "notice_title": "",
-      "notice_date": "",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_016533.html"
+      "notice_title": "嘉实纳斯达克100交易型开放式指数证券投资基金发起式联接基金(QDII)暂停申购(含定期定额投资)业务的公告",
+      "notice_date": "2026-02-03",
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_016533_5.html"
     },
     {
       "code": "012870",
@@ -741,9 +765,9 @@
       "service_fee": 0.3,
       "first_year_cost": 0.9,
       "nav_date": "",
-      "notice_title": "",
-      "notice_date": "",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_012870.html"
+      "notice_title": "关于旗下部分基金2026年4月3日暂停申购、赎回、转换、定期定额投资业务的提示性公告",
+      "notice_date": "2026-03-31",
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_012870_5.html"
     },
     {
       "code": "015299",
@@ -765,9 +789,9 @@
       "service_fee": 0.0,
       "first_year_cost": 0.92,
       "nav_date": "",
-      "notice_title": "",
-      "notice_date": "",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_015299.html"
+      "notice_title": "华夏纳斯达克100交易型开放式指数证券投资基金发起式联接基金(QDII)在境外主要投资场所2026年节假日暂停申购、赎回等业务的公告",
+      "notice_date": "2026-01-14",
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_015299_5.html"
     },
     {
       "code": "040046",
@@ -791,7 +815,7 @@
       "nav_date": "",
       "notice_title": "关于华安纳斯达克100交易型开放式指数证券投资基金联接基金(QDII)暂停申购及定期定额投资的公告",
       "notice_date": "2026-10-20",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_040046.html"
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_040046_5.html"
     },
     {
       "code": "016057",
@@ -813,9 +837,9 @@
       "service_fee": 0.3,
       "first_year_cost": 0.95,
       "nav_date": "",
-      "notice_title": "",
-      "notice_date": "",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_016057.html"
+      "notice_title": "博时纳斯达克100交易型开放式指数证券投资基金发起式联接基金(QDII)2026年境外主要市场节假日暂停申购、赎回等交易类业务的公告",
+      "notice_date": "2026-01-07",
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_016057_5.html"
     },
     {
       "code": "014978",
@@ -839,7 +863,7 @@
       "nav_date": "",
       "notice_title": "关于华安纳斯达克100交易型开放式指数证券投资基金联接基金(QDII)暂停申购及定期定额投资的公告",
       "notice_date": "2026-10-20",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_014978.html"
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_014978_5.html"
     },
     {
       "code": "160213",
@@ -863,7 +887,7 @@
       "nav_date": "",
       "notice_title": "国泰纳斯达克100指数证券投资基金暂停申购、定期定额投资业务的公告",
       "notice_date": "2026-09-22",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_160213.html"
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_160213_5.html"
     },
     {
       "code": "018967",
@@ -887,7 +911,7 @@
       "nav_date": "",
       "notice_title": "关于汇添富纳斯达克100交易型开放式指数证券投资基金发起式联接基金(QDII)暂停申购、定期定额投资业务的公告",
       "notice_date": "2026-09-24",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_018967.html"
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_018967_5.html"
     },
     {
       "code": "019548",
@@ -911,7 +935,7 @@
       "nav_date": "",
       "notice_title": "关于旗下部分基金2026年9月7日因境外主要投资市场节假日暂停申购、赎回、转换、定期定额投资业务的公告",
       "notice_date": "2026-09-03",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_019548.html"
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_019548_5.html"
     },
     {
       "code": "015300",
@@ -933,9 +957,9 @@
       "service_fee": 0.3,
       "first_year_cost": 1.1,
       "nav_date": "",
-      "notice_title": "",
-      "notice_date": "",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_015300.html"
+      "notice_title": "华夏纳斯达克100交易型开放式指数证券投资基金发起式联接基金(QDII)在境外主要投资场所2026年节假日暂停申购、赎回等业务的公告",
+      "notice_date": "2026-01-14",
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_015300_5.html"
     },
     {
       "code": "017091",
@@ -959,7 +983,7 @@
       "nav_date": "",
       "notice_title": "关于景顺长城纳斯达克科技市值加权交易型开放式指数证券投资基金发起式联接基金(QDII)暂停申购(含日常申购和定期定额投资)及转换转入业务的公告",
       "notice_date": "2026-09-22",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_017091.html"
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_017091_5.html"
     },
     {
       "code": "270042",
@@ -981,9 +1005,9 @@
       "service_fee": 0.0,
       "first_year_cost": 1.13,
       "nav_date": "",
-      "notice_title": "广发基金管理有限公司关于广发纳斯达克100交易型开放式指数证券投资基金联接基金(QDII)继续暂停申购(包含转换转入、定期定额及不定额投资)业务的提示性公告",
-      "notice_date": "2026-11-12",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_270042.html"
+      "notice_title": "关于广发纳斯达克100交易型开放式指数证券投资基金联接基金(QDII)人民币份额暂停申购(含转换转入、定期定额和不定额投资)业务的公告",
+      "notice_date": "2026-10-14",
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_270042_5.html"
     },
     {
       "code": "021778",
@@ -1005,9 +1029,9 @@
       "service_fee": 0.18,
       "first_year_cost": 1.18,
       "nav_date": "",
-      "notice_title": "广发基金管理有限公司关于广发纳斯达克100交易型开放式指数证券投资基金联接基金(QDII)继续暂停申购(包含转换转入、定期定额及不定额投资)业务的提示性公告",
-      "notice_date": "2026-11-12",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_021778.html"
+      "notice_title": "关于广发纳斯达克100交易型开放式指数证券投资基金联接基金(QDII)人民币份额暂停申购(含转换转入、定期定额和不定额投资)业务的公告",
+      "notice_date": "2026-10-14",
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_021778_5.html"
     },
     {
       "code": "006479",
@@ -1029,9 +1053,9 @@
       "service_fee": 0.2,
       "first_year_cost": 1.2,
       "nav_date": "",
-      "notice_title": "广发基金管理有限公司关于广发纳斯达克100交易型开放式指数证券投资基金联接基金(QDII)继续暂停申购(包含转换转入、定期定额及不定额投资)业务的提示性公告",
-      "notice_date": "2026-11-12",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_006479.html"
+      "notice_title": "关于广发纳斯达克100交易型开放式指数证券投资基金联接基金(QDII)人民币份额暂停申购(含转换转入、定期定额和不定额投资)业务的公告",
+      "notice_date": "2026-10-14",
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_006479_5.html"
     },
     {
       "code": "019118",
@@ -1055,7 +1079,7 @@
       "nav_date": "",
       "notice_title": "关于景顺长城纳斯达克科技市值加权交易型开放式指数证券投资基金发起式联接基金(QDII)暂停申购(含日常申购和定期定额投资)及转换转入业务的公告",
       "notice_date": "2026-09-22",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_019118.html"
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_019118_5.html"
     },
     {
       "code": "017093",
@@ -1079,31 +1103,7 @@
       "nav_date": "",
       "notice_title": "关于景顺长城纳斯达克科技市值加权交易型开放式指数证券投资基金发起式联接基金(QDII)暂停申购(含日常申购和定期定额投资)及转换转入业务的公告",
       "notice_date": "2026-09-22",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_017093.html"
-    },
-    {
-      "code": "021000",
-      "name": "南方纳斯达克100指数发起(QDII)I",
-      "share_class": "I",
-      "status": "天天未代销·其他平台可买",
-      "agency_limit_text": "限大额(见公告)",
-      "agency_limit_num": -1,
-      "direct_limit_text": "限大额(见公告)",
-      "direct_limit_num": -1,
-      "direct_source": "same_as_agency",
-      "direct_note": "未见渠道区分公告，默认同代销",
-      "return_1y": 1.52,
-      "mgmt_fee": 0.5,
-      "custody_fee": 0.15,
-      "mgmt_custody_fee": 0.65,
-      "purchase_fee": 0.0,
-      "purchase_fee_orig": 0.0,
-      "service_fee": 0.01,
-      "first_year_cost": 0.66,
-      "nav_date": "",
-      "notice_title": "",
-      "notice_date": "",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_021000.html"
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_017093_5.html"
     }
   ],
   "sp500": [
@@ -1129,7 +1129,7 @@
       "nav_date": "2026-11-19",
       "notice_title": "长信美国标准普尔100等权重指数增强型证券投资基金暂停大额申购(含定期定额投资)业务的公告",
       "notice_date": "2026-10-27",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_519981.html"
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_519981_5.html"
     },
     {
       "code": "022523",
@@ -1153,7 +1153,7 @@
       "nav_date": "",
       "notice_title": "天弘基金管理有限公司关于天弘标普500发起式证券投资基金(QDII-FOF)恢复申购、定期定额投资业务及限制大额申购、定期定额投资业务的公告",
       "notice_date": "2026-09-01",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_022523.html"
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_022523_5.html"
     },
     {
       "code": "096001",
@@ -1177,7 +1177,7 @@
       "nav_date": "2026-11-19",
       "notice_title": "关于大成标普500等权重指数证券投资基金调整大额申购(含定期定额申购)的公告",
       "notice_date": "2026-10-15",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_096001.html"
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_096001_5.html"
     },
     {
       "code": "008401",
@@ -1201,7 +1201,7 @@
       "nav_date": "2026-11-19",
       "notice_title": "关于大成标普500等权重指数证券投资基金调整大额申购(含定期定额申购)的公告",
       "notice_date": "2026-10-15",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_008401.html"
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_008401_5.html"
     },
     {
       "code": "017641",
@@ -1223,9 +1223,9 @@
       "service_fee": 0.0,
       "first_year_cost": 0.77,
       "nav_date": "2026-11-19",
-      "notice_title": "",
-      "notice_date": "",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_017641.html"
+      "notice_title": "摩根标普500指数型发起式证券投资基金(QDII)调整大额申购、定期定额投资及转换转入业务限制金额的公告",
+      "notice_date": "2026-07-27",
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_017641_5.html"
     },
     {
       "code": "019305",
@@ -1247,9 +1247,9 @@
       "service_fee": 0.3,
       "first_year_cost": 0.95,
       "nav_date": "2026-11-19",
-      "notice_title": "",
-      "notice_date": "",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_019305.html"
+      "notice_title": "摩根标普500指数型发起式证券投资基金(QDII)调整大额申购、定期定额投资及转换转入业务限制金额的公告",
+      "notice_date": "2026-07-27",
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_019305_5.html"
     },
     {
       "code": "018738",
@@ -1271,9 +1271,9 @@
       "service_fee": 0.01,
       "first_year_cost": 0.81,
       "nav_date": "",
-      "notice_title": "",
-      "notice_date": "",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_018738.html"
+      "notice_title": "博时标普500交易型开放式指数证券投资基金联接基金E类份额暂停申购、转换转入、定期定额投资业务公告",
+      "notice_date": "2026-08-19",
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_018738_5.html"
     },
     {
       "code": "017028",
@@ -1295,9 +1295,9 @@
       "service_fee": 0.0,
       "first_year_cost": 0.85,
       "nav_date": "",
-      "notice_title": "",
-      "notice_date": "",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_017028.html"
+      "notice_title": "关于旗下部分基金2026年9月7日因境外主要投资市场节假日暂停申购、赎回、转换、定期定额投资业务的公告",
+      "notice_date": "2026-09-02",
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_017028_5.html"
     },
     {
       "code": "018064",
@@ -1319,9 +1319,9 @@
       "service_fee": 0.0,
       "first_year_cost": 0.87,
       "nav_date": "",
-      "notice_title": "",
-      "notice_date": "",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_018064.html"
+      "notice_title": "华夏标普500交易型开放式指数证券投资基金发起式联接基金(QDII)在境外主要投资场所2026年节假日暂停申购、赎回等业务的公告",
+      "notice_date": "2026-01-14",
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_018064_5.html"
     },
     {
       "code": "007721",
@@ -1345,7 +1345,7 @@
       "nav_date": "",
       "notice_title": "天弘基金管理有限公司关于天弘标普500发起式证券投资基金(QDII-FOF)A类基金份额、C类基金份额暂停申购及定期定额投资业务的公告",
       "notice_date": "2026-09-18",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_007721.html"
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_007721_5.html"
     },
     {
       "code": "050025",
@@ -1367,9 +1367,9 @@
       "service_fee": 0.0,
       "first_year_cost": 0.92,
       "nav_date": "",
-      "notice_title": "",
-      "notice_date": "",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_050025.html"
+      "notice_title": "博时标普500交易型开放式指数证券投资基金联接基金E类份额暂停申购、转换转入、定期定额投资业务公告",
+      "notice_date": "2026-08-19",
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_050025_5.html"
     },
     {
       "code": "007722",
@@ -1393,7 +1393,7 @@
       "nav_date": "",
       "notice_title": "天弘基金管理有限公司关于天弘标普500发起式证券投资基金(QDII-FOF)A类基金份额、C类基金份额暂停申购及定期定额投资业务的公告",
       "notice_date": "2026-09-18",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_007722.html"
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_007722_5.html"
     },
     {
       "code": "017030",
@@ -1415,9 +1415,9 @@
       "service_fee": 0.3,
       "first_year_cost": 1.05,
       "nav_date": "",
-      "notice_title": "",
-      "notice_date": "",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_017030.html"
+      "notice_title": "关于旗下部分基金2026年9月7日因境外主要投资市场节假日暂停申购、赎回、转换、定期定额投资业务的公告",
+      "notice_date": "2026-09-02",
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_017030_5.html"
     },
     {
       "code": "018065",
@@ -1439,9 +1439,9 @@
       "service_fee": 0.3,
       "first_year_cost": 1.05,
       "nav_date": "",
-      "notice_title": "",
-      "notice_date": "",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_018065.html"
+      "notice_title": "华夏标普500交易型开放式指数证券投资基金发起式联接基金(QDII)在境外主要投资场所2026年节假日暂停申购、赎回等业务的公告",
+      "notice_date": "2026-01-14",
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_018065_5.html"
     },
     {
       "code": "161125",
@@ -1463,9 +1463,9 @@
       "service_fee": 0.0,
       "first_year_cost": 1.12,
       "nav_date": "",
-      "notice_title": "",
-      "notice_date": "",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_161125.html"
+      "notice_title": "关于旗下部分基金2026年4月3日暂停申购、赎回、转换、定期定额投资业务的提示性公告",
+      "notice_date": "2026-03-31",
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_161125_5.html"
     },
     {
       "code": "006075",
@@ -1487,9 +1487,9 @@
       "service_fee": 0.35,
       "first_year_cost": 1.15,
       "nav_date": "",
-      "notice_title": "",
-      "notice_date": "",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_006075.html"
+      "notice_title": "博时标普500交易型开放式指数证券投资基金联接基金E类份额暂停申购、转换转入、定期定额投资业务公告",
+      "notice_date": "2026-08-19",
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_006075_5.html"
     },
     {
       "code": "012860",
@@ -1511,9 +1511,9 @@
       "service_fee": 0.35,
       "first_year_cost": 1.35,
       "nav_date": "",
-      "notice_title": "",
-      "notice_date": "",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_012860.html"
+      "notice_title": "关于旗下部分基金2026年4月3日暂停申购、赎回、转换、定期定额投资业务的提示性公告",
+      "notice_date": "2026-03-31",
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_012860_5.html"
     }
   ]
 }
