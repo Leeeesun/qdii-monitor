@@ -19,14 +19,17 @@ MAG7 = {
 }
 
 
-def get_close_series(ticker, period="18mo"):
-    df = yf.download(ticker, period=period, interval="1d", progress=False, auto_adjust=False)
-    if df.empty:
+def get_close_series(ticker, period="18mo", interval="1d"):
+    try:
+        df = yf.download(ticker, period=period, interval=interval, progress=False, auto_adjust=False)
+        if df.empty:
+            return pd.Series(dtype=float)
+        close = df["Close"]
+        if isinstance(close, pd.DataFrame):
+            close = close.iloc[:, 0]
+        return close.dropna()
+    except Exception:
         return pd.Series(dtype=float)
-    close = df["Close"]
-    if isinstance(close, pd.DataFrame):
-        close = close.iloc[:, 0]
-    return close.dropna()
 
 
 def calc_rsi(series, period=14):
@@ -52,12 +55,38 @@ def fetch_cnn_fear_greed():
         if res.status_code == 200:
             fg = res.json().get("fear_and_greed", {})
             score = fg.get("score")
+            prev = fg.get("previous_close")
+            prev_1w = fg.get("previous_1_week")
             rating = fg.get("rating", "")
             if score is not None:
-                return round(float(score), 1), str(rating)
+                return {
+                    "score": round(float(score), 1),
+                    "prev": round(float(prev), 1) if prev is not None else None,
+                    "prev_1w": round(float(prev_1w), 1) if prev_1w is not None else None,
+                    "rating": str(rating)
+                }
     except Exception:
         pass
-    return None, ""
+    return {"score": None, "prev": None, "prev_1w": None, "rating": ""}
+
+
+def fetch_etf_pe(symbol, fallback):
+    try:
+        info = yf.Ticker(symbol).info or {}
+        pe = info.get("trailingPE")
+        if pe and 5 < float(pe) < 120:
+            return round(float(pe), 1)
+    except Exception:
+        pass
+    return fallback
+
+
+def period_return(series, trading_days):
+    if len(series) <= trading_days:
+        return None
+    cur = float(series.iloc[-1])
+    prev = float(series.iloc[-1 - trading_days])
+    return round((cur - prev) / prev * 100, 2)
 
 
 def build_drawdown_series(close_series, days=252):
@@ -80,6 +109,77 @@ def build_drawdown_series(close_series, days=252):
     }
 
 
+def build_monthly_returns(ndx_s, spx_s):
+    ndx_m = ndx_s.resample("ME").last()
+    spx_m = spx_s.resample("ME").last()
+    ndx_ret = ndx_m.pct_change().dropna() * 100
+    spx_ret = spx_m.pct_change().dropna() * 100
+    common = ndx_ret.index.intersection(spx_ret.index)
+    if len(common) < 2:
+        return {"labels": [], "ndx": [], "spx": [], "mtd_ndx": None, "mtd_spx": None}
+
+    # 最后一条为当前月 MTD，前 12 条为完整自然月
+    mtd_ndx = round(float(ndx_ret.loc[common[-1]]), 2)
+    mtd_spx = round(float(spx_ret.loc[common[-1]]), 2)
+    full_idx = common[:-1][-12:]
+    return {
+        "labels": [d.strftime("%Y-%m") for d in full_idx],
+        "ndx": [round(float(ndx_ret.loc[d]), 2) for d in full_idx],
+        "spx": [round(float(spx_ret.loc[d]), 2) for d in full_idx],
+        "mtd_ndx": mtd_ndx,
+        "mtd_spx": mtd_spx
+    }
+
+
+def build_15d_compare(ndx_s, spx_s):
+    common = ndx_s.index.intersection(spx_s.index)[-15:]
+    if len(common) < 2:
+        return {"dates": [], "ndx": [], "spx": []}
+    n0, s0 = float(ndx_s.loc[common[0]]), float(spx_s.loc[common[0]])
+    return {
+        "dates": [d.strftime("%m/%d") for d in common],
+        "ndx": [round((float(ndx_s.loc[d]) / n0 - 1) * 100, 2) for d in common],
+        "spx": [round((float(spx_s.loc[d]) / s0 - 1) * 100, 2) for d in common]
+    }
+
+
+def build_fx_impact():
+    """2015年起月度数据：剥离 USD/CNY 汇率对纳指100与标普500人民币收益的影响"""
+    ndx_m = get_close_series("^NDX", period="max", interval="1mo")
+    spx_m = get_close_series("^GSPC", period="max", interval="1mo")
+    fx_m = get_close_series("CNY=X", period="max", interval="1mo")
+
+    if ndx_m.empty or spx_m.empty or fx_m.empty:
+        return None
+
+    df = pd.DataFrame({"ndx": ndx_m, "spx": spx_m, "fx": fx_m}).resample("ME").last().dropna()
+    df = df[df.index >= "2015-01-01"]
+    if len(df) < 12:
+        return None
+
+    def calc_one(col):
+        usd_idx = (df[col] / df[col].iloc[0] * 100).round(1)
+        cny_raw = df[col] * df["fx"]
+        cny_idx = (cny_raw / cny_raw.iloc[0] * 100).round(1)
+        usd_gain = round(float(usd_idx.iloc[-1] - 100), 1)
+        cny_gain = round(float(cny_idx.iloc[-1] - 100), 1)
+        return {
+            "usd": [float(v) for v in usd_idx.values],
+            "cny": [float(v) for v in cny_idx.values],
+            "usd_gain": usd_gain,
+            "cny_gain": cny_gain,
+            "fx_contrib": round(cny_gain - usd_gain, 1)
+        }
+
+    return {
+        "dates": [d.strftime("%Y-%m") for d in df.index],
+        "fx": [round(float(v), 4) for v in df["fx"].values],
+        "current_fx": round(float(df["fx"].iloc[-1]), 4),
+        "ndx": calc_one("ndx"),
+        "spx": calc_one("spx")
+    }
+
+
 def eval_light(value, green_cond, red_cond):
     if value is None:
         return "yellow", "数据暂缺"
@@ -93,12 +193,8 @@ def eval_light(value, green_cond, red_cond):
 def make_indicator(name, value_text, rule, detail, value, green_cond, red_cond):
     light, status_text = eval_light(value, green_cond, red_cond)
     return {
-        "name": name,
-        "value_text": value_text,
-        "rule": rule,
-        "detail": detail,
-        "light": light,
-        "status_text": status_text
+        "name": name, "value_text": value_text, "rule": rule,
+        "detail": detail, "light": light, "status_text": status_text
     }
 
 
@@ -110,8 +206,7 @@ def generate_rule_commentary(summary, mag7_list, overall_light, ndx_dd, ma200_bi
     mag_desc = ""
     if mag7_list:
         mag_sorted = sorted(mag7_list, key=lambda x: x["chg_pct"], reverse=True)
-        leader = mag_sorted[0]
-        laggard = mag_sorted[-1]
+        leader, laggard = mag_sorted[0], mag_sorted[-1]
         mag_desc = f"权重科技股方面，{leader['name']}({leader['symbol']}) 领涨 {leader['chg_pct']:+.2f}%，{laggard['name']}({laggard['symbol']}) 表现相对偏弱（{laggard['chg_pct']:+.2f}%）。"
 
     rate_desc = (
@@ -145,7 +240,6 @@ def generate_rule_commentary(summary, mag7_list, overall_light, ndx_dd, ma200_bi
 
 
 def generate_ai_commentary(payload):
-    """可选：若在 GitHub Secrets 配置了 LLM_API_KEY 则自动调用大模型撰写点评"""
     api_key = os.getenv("LLM_API_KEY", "").strip()
     if not api_key:
         return None
@@ -186,21 +280,38 @@ def generate_ai_commentary(payload):
 def main():
     os.makedirs("data", exist_ok=True)
 
-    ndx_s = get_close_series("^NDX", "18mo")
-    spx_s = get_close_series("^GSPC", "18mo")
+    ndx_s = get_close_series("^NDX", "2y")
+    spx_s = get_close_series("^GSPC", "2y")
+    vix_s = get_close_series("^VIX", "3mo")
     vxn_s = get_close_series("^VXN", "3mo")
     tnx_s = get_close_series("^TNX", "1mo")
 
     def latest_stat(s):
         cur, prev = float(s.iloc[-1]), float(s.iloc[-2])
         chg_pct = round((cur - prev) / prev * 100, 2)
-        return {"close": round(cur, 2), "chg_pct": chg_pct, "date": s.index[-1].strftime("%Y-%m-%d")}
+        return {
+            "close": round(cur, 2),
+            "chg_pct": chg_pct,
+            "date": s.index[-1].strftime("%Y-%m-%d"),
+            "ret_1y": period_return(s, 252),
+            "ret_6m": period_return(s, 126),
+            "ret_1m": period_return(s, 21),
+            "ret_15d": period_return(s, 15)
+        }
 
     ndx_stat = latest_stat(ndx_s)
     spx_stat = latest_stat(spx_s)
+    vix_val = round(float(vix_s.iloc[-1]), 2) if not vix_s.empty else None
+    vix_chg = round((float(vix_s.iloc[-1]) - float(vix_s.iloc[-2])) / float(vix_s.iloc[-2]) * 100, 2) if len(vix_s) >= 2 else None
     vxn_val = round(float(vxn_s.iloc[-1]), 2) if not vxn_s.empty else None
     tnx_cur = round(float(tnx_s.iloc[-1]), 2) if not tnx_s.empty else 0.0
     tnx_chg_bp = round(float(tnx_s.iloc[-1] - tnx_s.iloc[-2]) * 100, 1) if len(tnx_s) >= 2 else 0.0
+
+    # 估值 PE（SPY 代理标普500，QQQ 代理纳指100）
+    spx_pe = fetch_etf_pe("SPY", 23.6)
+    ndx_pe = fetch_etf_pe("QQQ", 27.0)
+    # 标普500 1950-2025 历史 PE 参考分位近似映射
+    spx_pe_pct = int(min(98, max(5, round((spx_pe - 10) / 18 * 100))))
 
     mag7_list = []
     for sym, cn_name in MAG7.items():
@@ -216,44 +327,26 @@ def main():
 
     ndx_dd_data = build_drawdown_series(ndx_s, days=252)
     spx_dd_data = build_drawdown_series(spx_s, days=252)
-    fg_score, fg_rating = fetch_cnn_fear_greed()
+    fg = fetch_cnn_fear_greed()
+    fg_score = fg["score"]
 
     indicators = [
-        make_indicator(
-            "CNN 恐慌与贪婪指数",
-            f"{fg_score}" if fg_score is not None else "暂缺",
-            "绿灯: 小于35 | 黄灯: 35-65 | 红灯: 大于65",
-            f"当前情绪评级：{fg_rating or '未获取'}",
-            fg_score, lambda v: v < 35, lambda v: v > 65
-        ),
-        make_indicator(
-            "纳指波动率 (VXN)",
-            f"{vxn_val}" if vxn_val is not None else "暂缺",
-            "绿灯: 大于25 | 黄灯: 16-25 | 红灯: 小于16",
-            "反映市场对纳指100未来30天波动的恐慌定价",
-            vxn_val, lambda v: v > 25, lambda v: v < 16
-        ),
-        make_indicator(
-            "纳指100 年线乖离率",
-            f"{ma200_bias:+.2f}%",
-            "绿灯: 小于0% | 黄灯: 0%-12% | 红灯: 大于12%",
-            f"200日均线 {ma200:,.0f} / 60日均线 {ma60:,.0f}",
-            ma200_bias, lambda v: v < 0, lambda v: v > 12
-        ),
-        make_indicator(
-            "纳指100 强弱指标 (RSI14)",
-            f"{rsi14}",
-            "绿灯: 小于35 | 黄灯: 35-70 | 红灯: 大于70",
-            "衡量短期超买与超卖动能",
-            rsi14, lambda v: v < 35, lambda v: v > 70
-        ),
-        make_indicator(
-            "年度动态回撤深度",
-            f"{ndx_dd_data['current_dd']:.2f}%",
-            "绿灯: 低于-10% | 黄灯: -10%至-3% | 红灯: 浅于-3%",
-            f"近一年峰值 {ndx_dd_data['peak_price']:,.2f}，最大回撤 {ndx_dd_data['max_dd']:.2f}%",
-            ndx_dd_data["current_dd"], lambda v: v <= -10, lambda v: v > -3
-        )
+        make_indicator("CNN 恐慌与贪婪指数", f"{fg_score}" if fg_score is not None else "暂缺",
+                       "绿灯: <35 | 黄灯: 35-65 | 红灯: >65", f"当前情绪评级：{fg['rating'] or '未获取'}",
+                       fg_score, lambda v: v < 35, lambda v: v > 65),
+        make_indicator("纳指波动率 (VXN)", f"{vxn_val}" if vxn_val is not None else "暂缺",
+                       "绿灯: >25 | 黄灯: 16-25 | 红灯: <16", "反映市场对纳指100未来30天波动的恐慌定价",
+                       vxn_val, lambda v: v > 25, lambda v: v < 16),
+        make_indicator("纳指100 年线乖离率", f"{ma200_bias:+.2f}%",
+                       "绿灯: <0% | 黄灯: 0%-12% | 红灯: >12%", f"200日均线 {ma200:,.0f} / 60日均线 {ma60:,.0f}",
+                       ma200_bias, lambda v: v < 0, lambda v: v > 12),
+        make_indicator("纳指100 强弱指标 (RSI14)", f"{rsi14}",
+                       "绿灯: <35 | 黄灯: 35-70 | 红灯: >70", "衡量短期超买与超卖动能",
+                       rsi14, lambda v: v < 35, lambda v: v > 70),
+        make_indicator("年度动态回撤深度", f"{ndx_dd_data['current_dd']:.2f}%",
+                       "绿灯: <=-10% | 黄灯: -10%至-3% | 红灯: >-3%",
+                       f"近一年峰值 {ndx_dd_data['peak_price']:,.2f}，最大回撤 {ndx_dd_data['max_dd']:.2f}%",
+                       ndx_dd_data["current_dd"], lambda v: v <= -10, lambda v: v > -3)
     ]
 
     score_map = {"green": 1, "yellow": 0, "red": -1}
@@ -269,6 +362,9 @@ def main():
         "ndx": ndx_stat,
         "spx": spx_stat,
         "tnx": {"close": tnx_cur, "chg_bp": tnx_chg_bp},
+        "vix": {"close": vix_val, "chg_pct": vix_chg, "date": vix_s.index[-1].strftime("%Y-%m-%d") if not vix_s.empty else ""},
+        "fear_greed": fg,
+        "pe": {"spx": spx_pe, "spx_pct": spx_pe_pct, "ndx": ndx_pe},
         "ma200": round(ma200, 2),
         "ma60": round(ma60, 2)
     }
@@ -277,8 +373,7 @@ def main():
         "summary": summary,
         "mag7": mag7_list,
         "ndx_drawdown": ndx_dd_data["current_dd"],
-        "overall_sentiment": overall_label,
-        "indicators": [{k: i[k] for k in ("name", "value_text", "light")} for i in indicators]
+        "overall_sentiment": overall_label
     }
     commentary = generate_ai_commentary(ai_payload) or generate_rule_commentary(
         summary, mag7_list, overall_light, ndx_dd_data["current_dd"], ma200_bias, tnx_chg_bp
@@ -296,10 +391,10 @@ def main():
             "indicators": indicators
         },
         "commentary": commentary,
-        "drawdown": {
-            "ndx": ndx_dd_data,
-            "spx": spx_dd_data
-        }
+        "drawdown": {"ndx": ndx_dd_data, "spx": spx_dd_data},
+        "monthly_returns": build_monthly_returns(ndx_s, spx_s),
+        "compare_15d": build_15d_compare(ndx_s, spx_s),
+        "fx_impact": build_fx_impact()
     }
 
     with open(OUTPUT_FILE, "w", encoding="utf-8") as f:
