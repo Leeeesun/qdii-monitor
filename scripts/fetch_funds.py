@@ -8,10 +8,10 @@ import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 
-# 筛选规则：匹配纳指、标普，剔除美元/港币份额及非宽基行业主题
+# 筛选规则：严格聚焦美股纳指、标普宽基，排除港股、石油商品及美元/港币份额
 NASDAQ_KW = r"纳斯达克|纳指"
 SP500_KW = r"标普"
-EXCLUDE_KW = r"美元|现汇|现钞|港币|消费|生物|医药|信息|科技精选|油气|医疗|黄金|商品|原油|房地产|红利"
+EXCLUDE_KW = r"美元|美钞|美汇|现汇|现钞|港币|港股|香港|中国|石油|天然气|消费|生物|医药|信息|科技精选|油气|医疗|黄金|商品|原油|房地产|红利"
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
@@ -51,18 +51,138 @@ def parse_percent(val):
     return round(float(m.group(1)), 4) if m else 0.0
 
 
+def detect_share_class(name):
+    # 兼容如 "人民币A"、"A人民币"、"(QDII)D" 等命名
+    m = re.search(r"(?:人民币|\)|\s)([ACDEFI])(?:人民币|\s|\(|$)", name.upper())
+    if m:
+        return m.group(1)
+    if name.upper().endswith(("A", "C", "D", "E", "F", "I")):
+        return name.upper()[-1]
+    return "其他"
+
+
 def format_limit(val, status):
-    if "暂停" in str(status):
+    st = str(status)
+    if "暂停" in st:
         return "暂停申购", 0
     try:
         num = float(val)
         if pd.isna(num):
-            return "以平台为准", -1
+            return "限大额(见公告)", -1
         if num >= 1e9:
             return "不限额", 999999999
+        # 天天基金状态为“限大额”但金额返回 0，通常代表天天基金未代销该份额
+        if num <= 0 and "限大额" in st:
+            return "限大额(其他平台)", -1
         return f"{int(num):,} 元", int(num)
     except (ValueError, TypeError):
         return "未知", -1
+
+
+def parse_cn_amount(num_str, unit):
+    try:
+        val = float(num_str.replace(",", ""))
+        if unit == "万":
+            val *= 10000
+        elif unit == "千":
+            val *= 1000
+        return int(round(val))
+    except Exception:
+        return None
+
+
+def extract_limit_from_text(text, share_class=""):
+    """从官方限购公告正文中提取人民币单日限额"""
+    if not text:
+        return None
+    clean = re.sub(r"\s+", "", text)
+
+    # 先尝试匹配针对当前份额类别（如 D类、A类）的专属限额
+    patterns = []
+    if share_class in ("A", "C", "D", "E", "F", "I"):
+        patterns.append(
+            rf"{share_class}类[^。；]{{0,50}}?(?:不超过|不得超过|上限为|调整为|限制为|限定为|限额为|金额为)(?:人民币)?([\d,]+(?:\.\d+)?)(万|千)?元"
+        )
+
+    # 通用限额句式
+    patterns.extend([
+        r"(?:单日单个基金账户|单个基金账户|累计申购|大额申购|申购金额|申购限额|限制申购金额)[^。；]{0,45}?(?:不超过|不得超过|上限为|调整为|限制为|限定为|限额为|为)(?:人民币)?([\d,]+(?:\.\d+)?)(万|千)?元",
+        r"(?:不超过|不得超过|上限为|调整为|限额为)(?:人民币)?([\d,]+(?:\.\d+)?)(万|千)?元"
+    ])
+
+    for pat in patterns:
+        m = re.search(pat, clean)
+        if m:
+            amt = parse_cn_amount(m.group(1), m.group(2))
+            if amt and 1 <= amt <= 100000000:
+                return amt
+    return None
+
+
+def fetch_notice_content(art_code, notices_cache):
+    """拉取东方财富公告正文，并按公告 ID 缓存避免重复请求"""
+    if not art_code:
+        return ""
+    if art_code in notices_cache:
+        return notices_cache[art_code]
+    url = "https://np-cnotice-stock.eastmoney.com/api/content/ann"
+    try:
+        res = requests.get(
+            url,
+            params={"art_code": art_code, "client_source": "web", "page_index": 1},
+            headers=HEADERS,
+            timeout=10
+        )
+        data = res.json().get("data") or {}
+        content = data.get("notice_content") or data.get("attach_content") or ""
+        # 只保留前 3000 字即可覆盖限额正文，控制缓存体积
+        content = content[:3000]
+        if content:
+            notices_cache[art_code] = content
+        return content
+    except Exception:
+        return ""
+
+
+def fetch_latest_limit_notice(code, share_class, notices_cache, need_body=False):
+    """查询最新限购公告，并在需要时解析正文真实限额"""
+    url = "https://api.fund.eastmoney.com/f10/JJGG"
+    params = {"fundcode": code, "pageIndex": 1, "pageSize": 10, "type": 0}
+    try:
+        res = requests.get(url, params=params, headers=HEADERS, timeout=8)
+        items = res.json().get("Data", [])
+        for item in items:
+            title = item.get("TITLE", "")
+            if any(k in title for k in ["大额申购", "暂停申购", "恢复申购", "申购限额"]):
+                art_code = item.get("ID", "")
+                has_diff = ("直销" in title or "代销" in title or "非直销" in title)
+                parsed_limit = None
+                if need_body or has_diff:
+                    body = fetch_notice_content(art_code, notices_cache)
+                    parsed_limit = extract_limit_from_text(body, share_class)
+                    time.sleep(0.1)
+                return {
+                    "title": title,
+                    "date": str(item.get("PUBLISHDATE", ""))[:10],
+                    "has_channel_diff": has_diff,
+                    "parsed_limit": parsed_limit
+                }
+    except Exception:
+        pass
+    return {"title": "", "date": "", "has_channel_diff": False, "parsed_limit": None}
+
+
+def fetch_return_1y_fallback(code):
+    """通过 pingzhongdata 补全暂停申购或未入榜基金的近1年收益"""
+    url = f"https://fund.eastmoney.com/pingzhongdata/{code}.js"
+    try:
+        res = requests.get(url, headers=HEADERS, timeout=8)
+        m = re.search(r'var\s+syl_1n\s*=\s*"([^"]+)"', res.text)
+        if m and m.group(1).strip() != "":
+            return round(float(m.group(1)), 2)
+    except Exception:
+        pass
+    return None
 
 
 def fetch_fund_fees(code):
@@ -73,9 +193,9 @@ def fetch_fund_fees(code):
     soup = BeautifulSoup(res.text, "html.parser")
     text = soup.get_text(" ", strip=True)
 
-    mgmt_m = re.search(r"管理费率\s*[:：]?\s*([\d.]+)%", text)
-    cust_m = re.search(r"托管费率\s*[:：]?\s*([\d.]+)%", text)
-    serv_m = re.search(r"销售服务费率\s*[:：]?\s*([\d.]+)%", text)
+    mgmt_m = re.search(r"管理费率[^\d]{0,12}([\d.]+)%", text)
+    cust_m = re.search(r"托管费率[^\d]{0,12}([\d.]+)%", text)
+    serv_m = re.search(r"销售服务费率[^\d]{0,12}([\d.]+)%", text)
 
     mgmt = float(mgmt_m.group(1)) if mgmt_m else 0.0
     cust = float(cust_m.group(1)) if cust_m else 0.0
@@ -110,39 +230,18 @@ def fetch_fund_fees(code):
     }
 
 
-def fetch_latest_limit_notice(code):
-    """查询最新限购公告标题，辅助识别直销与代销渠道差异"""
-    url = "https://api.fund.eastmoney.com/f10/JJGG"
-    params = {"fundcode": code, "pageIndex": 1, "pageSize": 10, "type": 0}
-    try:
-        res = requests.get(url, params=params, headers=HEADERS, timeout=8)
-        items = res.json().get("Data", [])
-        for item in items:
-            title = item.get("TITLE", "")
-            if any(k in title for k in ["大额申购", "暂停申购", "恢复申购", "申购限额"]):
-                return {
-                    "title": title,
-                    "date": str(item.get("PUBLISHDATE", ""))[:10],
-                    "has_channel_diff": ("直销" in title or "代销" in title or "非直销" in title)
-                }
-    except Exception:
-        pass
-    return {"title": "", "date": "", "has_channel_diff": False}
-
-
 def main():
     os.makedirs("data", exist_ok=True)
     fees_cache = load_json(CACHE_FILE, {})
+    notices_cache = fees_cache.get("__notices__", {})
     direct_overrides = load_json(OVERRIDE_FILE, {})
 
-    # 1. 拉取全市场申购状态表 + 全市场开放式基金收益排行（避免漏掉指数型 QDII）
     purchase_df = fetch_with_retry(ak.fund_purchase_em)
     rank_df = fetch_with_retry(ak.fund_open_fund_rank_em, symbol="全部")
 
     purchase_df["基金代码"] = purchase_df["基金代码"].astype(str).str.zfill(6)
     rank_df["基金代码"] = rank_df["基金代码"].astype(str).str.zfill(6)
 
-    # 2. 左连接：保留所有场外纳指/标普基金，即使成立不满一年暂无近1年收益
     df = pd.merge(
         purchase_df[["基金代码", "基金简称", "申购状态", "日累计限定金额", "手续费"]],
         rank_df[["基金代码", "近1年", "日期", "单位净值"]].drop_duplicates(subset=["基金代码"]),
@@ -154,7 +253,6 @@ def main():
     is_sp500 = df["基金简称"].str.contains(SP500_KW, regex=True, na=False)
     not_excluded = ~df["基金简称"].str.contains(EXCLUDE_KW, regex=True, na=False)
 
-    # 仅排除纯场内 ETF（名称含 ETF 且不含“联接”，或申购状态标注“场内”）
     is_pure_etf = (
         df["基金简称"].str.contains("ETF", case=False, na=False)
         & ~df["基金简称"].str.contains("联接", na=False)
@@ -170,12 +268,30 @@ def main():
         code = row["基金代码"]
         name = str(row["基金简称"])
         category = "nasdaq" if re.search(NASDAQ_KW, name) else "sp500"
+        share_class = detect_share_class(name)
 
-        agency_text, agency_num = format_limit(row["日累计限定金额"], row["申购状态"])
+        # 1. 代销额度初判
+        status_str = str(row["申购状态"])
+        agency_text, agency_num = format_limit(row["日累计限定金额"], status_str)
 
+        # 如果天天基金标着“限大额”却给了 0（天天未代销），必须深挖官方公告正文获取真实额度
+        need_notice_body = (agency_num == -1 and "限大额" in status_str)
+        notice = fetch_latest_limit_notice(code, share_class, notices_cache, need_body=need_notice_body)
+        time.sleep(0.08)
+
+        if need_notice_body:
+            if notice["parsed_limit"]:
+                agency_num = notice["parsed_limit"]
+                agency_text = f"{agency_num:,} 元"
+                status_str = "其他平台可买(据公告)"
+            else:
+                agency_text = "限大额(见公告)"
+                status_str = "天天未代销·其他平台可买"
+
+        # 2. 费率抓取（若上次缓存为 0.00% 则自动重抓纠错）
         fee_info = fees_cache.get(code)
         need_refresh = True
-        if fee_info and "cached_at" in fee_info:
+        if isinstance(fee_info, dict) and "cached_at" in fee_info and fee_info.get("mgmt_custody_fee", 0) > 0:
             try:
                 cached_dt = datetime.strptime(fee_info["cached_at"], "%Y-%m-%d").replace(tzinfo=timezone.utc)
                 if (today_utc - cached_dt).days < CACHE_TTL_DAYS:
@@ -186,8 +302,9 @@ def main():
         if need_refresh:
             try:
                 fee_info = fetch_fund_fees(code)
-                fees_cache[code] = fee_info
-                time.sleep(0.25)
+                if fee_info["mgmt_custody_fee"] > 0:
+                    fees_cache[code] = fee_info
+                time.sleep(0.2)
             except Exception:
                 fee_info = fee_info or {
                     "mgmt_fee": 0.0, "custody_fee": 0.0, "mgmt_custody_fee": 0.0,
@@ -196,13 +313,14 @@ def main():
                 }
 
         purchase_fee = fee_info["purchase_fee"]
-        if purchase_fee == 0.0 and not name.upper().endswith("C"):
+        if purchase_fee == 0.0 and share_class == "A":
             fallback_fee = parse_percent(row["手续费"])
             if fallback_fee > 0:
                 purchase_fee = fallback_fee
+                if fee_info.get("purchase_fee_orig", 0) == 0:
+                    fee_info["purchase_fee_orig"] = round(fallback_fee * 10, 2)
 
-        notice = fetch_latest_limit_notice(code)
-        time.sleep(0.08)
+        # 3. 直销额度判定（手动校准 > 公告渠道差异 > 同代销）
         if code in direct_overrides:
             ov = direct_overrides[code]
             direct_num = ov["limit_num"]
@@ -210,8 +328,8 @@ def main():
             direct_source = "manual"
             direct_note = ov.get("note", "已手动校准")
         elif notice["has_channel_diff"]:
-            direct_num = agency_num
-            direct_text = "渠道有差异(见公告)"
+            direct_num = notice["parsed_limit"] if notice["parsed_limit"] else agency_num
+            direct_text = f"{direct_num:,} 元(见公告)" if notice["parsed_limit"] else "渠道有差异(见公告)"
             direct_source = "notice_diff"
             direct_note = notice["title"]
         else:
@@ -220,8 +338,12 @@ def main():
             direct_source = "same_as_agency"
             direct_note = "未见渠道区分公告，默认同代销"
 
+        # 4. 近 1 年收益（排行表缺失时用 pingzhongdata 补全）
         y1 = row["近1年"]
         y1_val = round(float(y1), 2) if pd.notna(y1) and str(y1).strip() != "" else None
+        if y1_val is None:
+            y1_val = fetch_return_1y_fallback(code)
+            time.sleep(0.08)
 
         first_year_cost = round(
             purchase_fee + fee_info["mgmt_custody_fee"] + fee_info["service_fee"], 4
@@ -230,8 +352,8 @@ def main():
         record = {
             "code": code,
             "name": name,
-            "share_class": "C" if name.upper().endswith("C") else ("A" if name.upper().endswith("A") else "其他"),
-            "status": str(row["申购状态"]),
+            "share_class": share_class,
+            "status": status_str,
             "agency_limit_text": agency_text,
             "agency_limit_num": agency_num,
             "direct_limit_text": direct_text,
@@ -261,6 +383,7 @@ def main():
     nasdaq_list.sort(key=sort_fn)
     sp500_list.sort(key=sort_fn)
 
+    fees_cache["__notices__"] = notices_cache
     with open(CACHE_FILE, "w", encoding="utf-8") as f:
         json.dump(fees_cache, f, ensure_ascii=False, indent=2)
 
