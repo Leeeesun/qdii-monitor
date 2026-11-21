@@ -1,0 +1,20 @@
+{
+  "017436": {
+    "mgmt_fee": 1.2,
+    "custody_fee": 0.2,
+    "mgmt_custody_fee": 1.4,
+    "service_fee": 0.0,
+    "purchase_fee_orig": 0.0,
+    "purchase_fee": 0.0,
+    "cached_at": "2026-11-21"
+  },
+  "017437": {
+    "mgmt_fee": 1.2,
+    "custody_fee": 0.2,
+    "mgmt_custody_fee": 1.4,
+    "service_fee": 0.4,
+    "purchase_fee_orig": 0.0,
+    "purchase_fee": 0.0,
+    "cached_at": "2026-11-21"
+  }
+}
