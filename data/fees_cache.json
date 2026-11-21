@@ -24,6 +24,7 @@
     "service_fee": 0.0,
     "purchase_fee_orig": 1.2,
     "purchase_fee": 0.0,
+    "scale": 49.58,
     "cached_at": "2026-11-21"
   },
   "006075": {
@@ -33,6 +34,7 @@
     "service_fee": 0.35,
     "purchase_fee_orig": 0.0,
     "purchase_fee": 0.0,
+    "scale": 12.43,
     "cached_at": "2026-11-21"
   },
   "006127": {
@@ -51,6 +53,7 @@
     "service_fee": 0.2,
     "purchase_fee_orig": 0.0,
     "purchase_fee": 0.0,
+    "scale": 64.63,
     "cached_at": "2026-11-21"
   },
   "007721": {
@@ -60,6 +63,7 @@
     "service_fee": 0.0,
     "purchase_fee_orig": 1.0,
     "purchase_fee": 0.0,
+    "scale": 26.83,
     "cached_at": "2026-11-21"
   },
   "007722": {
@@ -69,6 +73,7 @@
     "service_fee": 0.25,
     "purchase_fee_orig": 0.0,
     "purchase_fee": 0.0,
+    "scale": 17.84,
     "cached_at": "2026-11-21"
   },
   "008401": {
@@ -78,6 +83,7 @@
     "service_fee": 0.3,
     "purchase_fee_orig": 0.0,
     "purchase_fee": 0.0,
+    "scale": 2.81,
     "cached_at": "2026-11-21"
   },
   "008971": {
@@ -87,6 +93,7 @@
     "service_fee": 0.3,
     "purchase_fee_orig": 0.0,
     "purchase_fee": 0.0,
+    "scale": 11.15,
     "cached_at": "2026-11-21"
   },
   "012752": {
@@ -96,6 +103,7 @@
     "service_fee": 0.3,
     "purchase_fee_orig": 0.0,
     "purchase_fee": 0.0,
+    "scale": 23.61,
     "cached_at": "2026-11-21"
   },
   "012860": {
@@ -105,6 +113,7 @@
     "service_fee": 0.35,
     "purchase_fee_orig": 0.0,
     "purchase_fee": 0.0,
+    "scale": 1.15,
     "cached_at": "2026-11-21"
   },
   "012870": {
@@ -114,6 +123,7 @@
     "service_fee": 0.3,
     "purchase_fee_orig": 0.0,
     "purchase_fee": 0.0,
+    "scale": 1.65,
     "cached_at": "2026-11-21"
   },
   "014978": {
@@ -123,6 +133,7 @@
     "service_fee": 0.2,
     "purchase_fee_orig": 0.0,
     "purchase_fee": 0.0,
+    "scale": 15.14,
     "cached_at": "2026-11-21"
   },
   "014982": {
@@ -141,6 +152,7 @@
     "service_fee": 0.0,
     "purchase_fee_orig": 1.2,
     "purchase_fee": 0.0,
+    "scale": 3.26,
     "cached_at": "2026-11-21"
   },
   "015300": {
@@ -150,6 +162,7 @@
     "service_fee": 0.3,
     "purchase_fee_orig": 0.0,
     "purchase_fee": 0.0,
+    "scale": 1.64,
     "cached_at": "2026-11-21"
   },
   "016055": {
@@ -159,6 +172,7 @@
     "service_fee": 0.0,
     "purchase_fee_orig": 1.0,
     "purchase_fee": 0.0,
+    "scale": 14.57,
     "cached_at": "2026-11-21"
   },
   "016057": {
@@ -168,6 +182,7 @@
     "service_fee": 0.3,
     "purchase_fee_orig": 0.0,
     "purchase_fee": 0.0,
+    "scale": 6.69,
     "cached_at": "2026-11-21"
   },
   "016452": {
@@ -186,6 +201,7 @@
     "service_fee": 0.1,
     "purchase_fee_orig": 0.0,
     "purchase_fee": 0.0,
+    "scale": 46.49,
     "cached_at": "2026-11-21"
   },
   "016532": {
@@ -195,6 +211,7 @@
     "service_fee": 0.0,
     "purchase_fee_orig": 1.0,
     "purchase_fee": 0.0,
+    "scale": 19.89,
     "cached_at": "2026-11-21"
   },
   "016533": {
@@ -204,6 +221,7 @@
     "service_fee": 0.25,
     "purchase_fee_orig": 0.0,
     "purchase_fee": 0.0,
+    "scale": 15.39,
     "cached_at": "2026-11-21"
   },
   "017028": {
@@ -222,6 +240,7 @@
     "service_fee": 0.3,
     "purchase_fee_orig": 0.0,
     "purchase_fee": 0.0,
+    "scale": 0.58,
     "cached_at": "2026-11-21"
   },
   "017091": {
@@ -231,6 +250,7 @@
     "service_fee": 0.0,
     "purchase_fee_orig": 1.2,
     "purchase_fee": 0.0,
+    "scale": 31.25,
     "cached_at": "2026-11-21"
   },
   "017093": {
@@ -240,6 +260,7 @@
     "service_fee": 0.4,
     "purchase_fee_orig": 0.0,
     "purchase_fee": 0.0,
+    "scale": 15.24,
     "cached_at": "2026-11-21"
   },
   "017641": {
@@ -339,6 +360,7 @@
     "service_fee": 0.0,
     "purchase_fee_orig": 1.2,
     "purchase_fee": 0.0,
+    "scale": 20.35,
     "cached_at": "2026-11-21"
   },
   "018967": {
@@ -348,6 +370,7 @@
     "service_fee": 0.4,
     "purchase_fee_orig": 0.0,
     "purchase_fee": 0.0,
+    "scale": 11.58,
     "cached_at": "2026-11-21"
   },
   "019118": {
@@ -366,6 +389,7 @@
     "service_fee": 0.0,
     "purchase_fee_orig": 1.2,
     "purchase_fee": 0.0,
+    "scale": 32.03,
     "cached_at": "2026-11-21"
   },
   "019173": {
@@ -375,6 +399,7 @@
     "service_fee": 0.3,
     "purchase_fee_orig": 0.0,
     "purchase_fee": 0.0,
+    "scale": 11.09,
     "cached_at": "2026-11-21"
   },
   "019305": {
@@ -384,6 +409,7 @@
     "service_fee": 0.3,
     "purchase_fee_orig": 0.0,
     "purchase_fee": 0.0,
+    "scale": 19.88,
     "cached_at": "2026-11-21"
   },
   "019441": {
@@ -393,6 +419,7 @@
     "service_fee": 0.0,
     "purchase_fee_orig": 1.0,
     "purchase_fee": 0.0,
+    "scale": 14.86,
     "cached_at": "2026-11-21"
   },
   "019442": {
@@ -402,6 +429,7 @@
     "service_fee": 0.2,
     "purchase_fee_orig": 0.0,
     "purchase_fee": 0.0,
+    "scale": 6.97,
     "cached_at": "2026-11-21"
   },
   "019524": {
@@ -411,6 +439,7 @@
     "service_fee": 0.0,
     "purchase_fee_orig": 1.2,
     "purchase_fee": 0.0,
+    "scale": 8.12,
     "cached_at": "2026-11-21"
   },
   "019525": {
@@ -420,6 +449,7 @@
     "service_fee": 0.25,
     "purchase_fee_orig": 0.0,
     "purchase_fee": 0.0,
+    "scale": 6.03,
     "cached_at": "2026-11-21"
   },
   "019547": {
@@ -429,6 +459,7 @@
     "service_fee": 0.0,
     "purchase_fee_orig": 1.2,
     "purchase_fee": 0.0,
+    "scale": 23.23,
     "cached_at": "2026-11-21"
   },
   "019548": {
@@ -438,6 +469,7 @@
     "service_fee": 0.4,
     "purchase_fee_orig": 0.0,
     "purchase_fee": 0.0,
+    "scale": 14.46,
     "cached_at": "2026-11-21"
   },
   "019736": {
@@ -447,6 +479,7 @@
     "service_fee": 0.0,
     "purchase_fee_orig": 1.2,
     "purchase_fee": 0.0,
+    "scale": 14.46,
     "cached_at": "2026-11-21"
   },
   "019737": {
@@ -456,6 +489,7 @@
     "service_fee": 0.25,
     "purchase_fee_orig": 0.0,
     "purchase_fee": 0.0,
+    "scale": 5.52,
     "cached_at": "2026-11-21"
   },
   "021000": {
@@ -465,6 +499,7 @@
     "service_fee": 0.01,
     "purchase_fee_orig": 0.0,
     "purchase_fee": 0.0,
+    "scale": 40.79,
     "cached_at": "2026-11-21"
   },
   "021773": {
@@ -474,6 +509,7 @@
     "service_fee": 0.1,
     "purchase_fee_orig": 0.0,
     "purchase_fee": 0.0,
+    "scale": 4.66,
     "cached_at": "2026-11-21"
   },
   "021778": {
@@ -483,6 +519,7 @@
     "service_fee": 0.18,
     "purchase_fee_orig": 0.0,
     "purchase_fee": 0.0,
+    "scale": 24.6,
     "cached_at": "2026-11-21"
   },
   "021838": {
@@ -492,6 +529,7 @@
     "service_fee": 0.1,
     "purchase_fee_orig": 0.0,
     "purchase_fee": 0.0,
+    "scale": 0.24,
     "cached_at": "2026-11-21"
   },
   "022523": {
@@ -501,6 +539,7 @@
     "service_fee": 0.25,
     "purchase_fee_orig": 0.0,
     "purchase_fee": 0.0,
+    "scale": 1.83,
     "cached_at": "2026-11-21"
   },
   "022525": {
@@ -510,6 +549,7 @@
     "service_fee": 0.2,
     "purchase_fee_orig": 0.0,
     "purchase_fee": 0.0,
+    "scale": 1.62,
     "cached_at": "2026-11-21"
   },
   "022664": {
@@ -519,6 +559,7 @@
     "service_fee": 0.1,
     "purchase_fee_orig": 0.0,
     "purchase_fee": 0.0,
+    "scale": 0.62,
     "cached_at": "2026-11-21"
   },
   "024237": {
@@ -528,6 +569,7 @@
     "service_fee": 0.15,
     "purchase_fee_orig": 0.0,
     "purchase_fee": 0.0,
+    "scale": 1.63,
     "cached_at": "2026-11-21"
   },
   "040046": {
@@ -537,6 +579,7 @@
     "service_fee": 0.0,
     "purchase_fee_orig": 1.2,
     "purchase_fee": 0.0,
+    "scale": 63.39,
     "cached_at": "2026-11-21"
   },
   "050025": {
@@ -546,6 +589,7 @@
     "service_fee": 0.0,
     "purchase_fee_orig": 1.2,
     "purchase_fee": 0.0,
+    "scale": 63.48,
     "cached_at": "2026-11-21"
   },
   "160213": {
@@ -555,6 +599,7 @@
     "service_fee": 0.0,
     "purchase_fee_orig": 0.0,
     "purchase_fee": 0.0,
+    "scale": 28.82,
     "cached_at": "2026-11-21"
   },
   "160416": {
@@ -573,6 +618,7 @@
     "service_fee": 0.0,
     "purchase_fee_orig": 1.2,
     "purchase_fee": 0.0,
+    "scale": 15.26,
     "cached_at": "2026-11-21"
   },
   "270042": {
@@ -582,6 +628,7 @@
     "service_fee": 0.0,
     "purchase_fee_orig": 1.3,
     "purchase_fee": 0.0,
+    "scale": 122.81,
     "cached_at": "2026-11-21"
   },
   "501021": {
@@ -618,6 +665,7 @@
     "service_fee": 0.3,
     "purchase_fee_orig": 0.0,
     "purchase_fee": 0.0,
+    "scale": 1.15,
     "cached_at": "2026-11-21"
   },
   "096001": {
@@ -627,6 +675,7 @@
     "service_fee": 0.0,
     "purchase_fee_orig": 1.5,
     "purchase_fee": 0.0,
+    "scale": 8.83,
     "cached_at": "2026-11-21"
   },
   "161130": {
@@ -642,5 +691,105 @@
     "AN202609011828844257": "\n  天弘基金管理有限公司关于天弘标普 500 发起式证券投资基金\n  （QDII-FOF）恢复申购、定期定额投资业务及限制大额申购、\n                  定期定额投资业务的公告\n\n                      公告送出日期：2026 年 9 月 1 日\n\n      1、公告基本信息\n\n 基金名称                      天弘标普 500 发起式证券投资基金（QDII-\n\n                                FOF）\n\n 基金简称                      天弘标普 500 发起（QDII-FOF）\n\n 基金主代码                    007721\n\n 基金管理人名称                天弘基金管理有限公司\n\n                                根据法律法规以及《天弘标普 500 发起式证券\n 公告依据                      投资基金（QDII-FOF）基金合同》、《天弘标普 5\n                                00 发起式证券投资基金（QDII-FOF）招募说明\n                                书》等相关文件\n\n            恢复申购日        2026 年 9 月 2 日\n\n 恢复相关业  恢复定期定额投资  2026 年 9 月 2 日\n\n 务的日期及  日\n\n 原因说明    恢复申购（定期定额 更好满足投资者投资需求\n\n            投资）的原因说明\n\n                                天弘标普500发 天弘标普 500  天弘标普 500\n 下属分级基金的基金简称        起（QDII-FOF） 发 起 （ QDII- 发 起 （ QDII-\n                                A              FOF）C        FOF）D\n\n下属分级基金的交易代码          007721        007722        022523\n\n该分级基金是否恢复申购（定期定额\n\n                                是            是            是\n\n投资） 业务\n\n      2、其他需要提示的事项\n\n      （1）为了更好满足投资者投资需求，根据法律法规及本基金基金合同等相\n  关规定，本公司决定自 2026 年 9 月 2 日起恢复办理本基金的申购（含定期定额\n  投资）业务并于同日起限制大额申购（含定期定额投资）业务，即暂停本基金单\n个基金份额单笔金额 100 元以上（不含 100 元）的申购（含定期定额投资）业务申请，且单个基金账户单日累计申购单个基金份额的金额不得超过 100 元（不含100 元）。如单日累计申购单个基金份额金额超过 100 元，本公司有权拒绝。本基金的申购、定期定额投资、赎回等业务均正常办理。本基金恢复办理大额申购（含定期定额投资）业务的具体时间，本公司将另行公告。\n\n  （2）投资者可登录本公司网站（www.thfund.com.cn）查询相关信息或拨打客户服务电话（400-986-8888）咨询相关事宜。\n\n  风险提示：\n\n  本公司承诺以诚实信用、勤勉尽责的原则管理和运用基金资产，但不保证基金一定盈利，也不保证最低收益。投资者投资于本基金时应认真阅读本基金的《基金合同》和《招募说明书》等相关法律文件。\n\n  特此公告。\n\n                                                天弘基金管理有限公司\n                                                  二〇二六年九月一日\n",
     "AN202609181829590491": "天弘基金管理有限公司关于天弘纳斯达克 100 指数型发起式证券投资基金（QDII）A 类基金份额、C 类基金份额暂停申购及定\n                期定额投资业务的公告\n\n                  公告送出日期：2026 年 09 月 18 日\n\n1.公告基本信息\n\n                              天弘纳斯达克100指数型发起式证券投资基金\n 基金名称\n\n                              （QDII）\n\n 基金简称                      天弘纳斯达克 100 指数发起（QDII）\n\n 基金主代码                    018043\n\n 基金管理人名称                天弘基金管理有限公司\n\n                              《中华人民共和国证券投资基金法》、《公开\n                              募集证券投资基金运作管理办法》等相关法律\n                              法规以及《天弘纳斯达克 100 指数型发起式证\n 公告依据\n\n                              券投资基金（QDII）基金合同》、《天弘纳斯\n                              达克 100 指数型发起式证券投资基金（QDII）\n                              招募说明书》等相关文件\n\n              暂停申购起始日  2026 年 09 月 21 日\n\n 暂停相关业务 暂停定期定额投\n\n                              2026 年 09 月 21 日\n\n 的起始日及原 资起始日\n\n 因说明        暂停申购及定期\n\n              定额投资的原因 为了保证基金的平稳运作，保护投资者利益。\n              说明\n\n                                天弘纳斯达克  天弘纳斯达克 天弘纳斯达克\n              下属分级基金的\n\n                                100 指数发起  100 指数发起 100 指数发起\n下属分级基金  简称\n\n                                （QDII）A    （QDII）C    （QDII）D\n信息\n\n              下属分级基金的\n\n                                  018043        018044      022525\n\n              交易代码\n\n\n              该分级基金是否\n\n              暂停申购及定期      是            是          否\n\n              定额投资业务\n\n  2.其他需要提示的事项\n\n  （1）天弘基金管理有限公司（以下简称“本公司”）决定自 2026 年 09 月 21\n日起暂停天弘纳斯达克 100 指数型发起式证券投资基金（QDII）（以下简称“本基金”）A 类基金份额、C 类基金份额的申购及定期定额投资业务。\n （2）暂停上述业务期间，本基金 A 类基金份额、C 类基金份额的赎回业务按照本基金基金合同、招募说明书的约定正常办理。\n\n （3）本基金 D 类基金份额仍按照 2026 年 9 月 1 日公告进行限制，即暂停本基\n金 D 类基金份额单笔金额 100 元以上（不含 100 元）的申购（含定期定额投资）\n业务申请，且单个基金账户单日累计申购 D 类基金份额的金额不得超过 100 元\n（不含 100 元）。如单日累计申购 D 类基金份额金额超过 100 元，本公司有权拒\n绝。\n （4）投资者可登录本公司官方网站（www.thfund.com.cn）或拨打客户服务热线（400-986-8888）进行详细咨询。\n\n  风险提示：\n\n  本基金管理人承诺以诚实信用、勤勉尽责的原则管理和运用基金资产，但不保证基金一定盈利，也不保证最低收益。敬请投资者注意投资风险。\n\n  特此公告。\n\n                                                天弘基金管理有限公司\n                                                二〇二六年九月十八日\n",
     "AN202607201827139668": "关于调整南方纳斯达克 100 指数发起式证券投资基金（QDII）I 类基金份额申购、\n  定投及转换转入业务金额限制的公告\n                公告送出日期：2026 年 7 月 20 日\n\n\n  1 公告基本信息\n\n基金名称                          南方纳斯达克 100 指数发起式证券投资基金（QDII）\n\n基金简称                          南方纳斯达克 100 指数发起（QDII）\n\n基金主代码                        016452\n\n基金管理人名称                    南方基金管理股份有限公司\n\n公告依据                          《南方纳斯达克 100 指数发起式证券投资基金（QDII）基金合同》\n\n调整相关  调整大额申购起始日      2026 年 7 月 21 日\n\n业务的起  调整大额定投起始日      2026 年 7 月 21 日\n\n始日及原  调整大额转换转入起始日  2026 年 7 月 21 日\n\n因说明    调整原因说明            保护基金份额持有人的利益\n\n下属基金份额的简称                南方纳斯达克 100 指数发起（QDII）I\n\n下属基金份额的代码                021000\n\n该基金份额的限制金额              200 元\n\n  注：本次调整不涉及本基金 A 类、C 类基金份额。\n\n  2 其他需要提示的事项\n\n      （1）本公司自 2026 年 7 月 21 日起将调整本基金 I 类基金份额的大额申购、定投和转换转入\n\n  金额限制，调整后限额 200 元。如单日单个基金账户的申购、定投和转换转入累计金额超过以上\n\n  情况，本公司有权全部或部分拒绝。\n\n      （2）自 2026 年 7 月 21 日起，如个人投资者单日单个基金账户单笔申购本基金 I 类基金份额\n\n  超过 200 元（不含 200 元，申购、定投和转换转入的申请金额合并计算，各类基金份额的申请金\n\n  额每类单独计算，下同），则本公司将仅对 200 元确认申购成功，超过部分有权确认失败；如个人\n\n  投资者单日单个基金账户多笔累计申购本基金 I 类基金份额超过 200 元，则本公司将对多笔申请\n\n  按照申请金额从大到小排序，并逐笔累加至不超过 200 元（含 200 元）的申请确认成功，超过部\n\n  分有权确认失败。\n\n      自 2026 年 7 月 21 日起，如非个人投资者单日单个基金账户累计申购本基金 I 类基金份额超\n\n  过 200 元（不含 200 元，申购、定投和转换转入的申请金额合并计算，各类基金份额的申请金额\n\n  每类单独计算，下同），则本公司对其全部申购金额有权确认失败。\n\n      （3）在本基金限制大额申购、定投和转换转入业务期间，其他业务照常办理。\n\n      （4）本基金恢复办理大额申购、定投和转换转入业务的具体时间将另行公告。\n\n      （5）投资人可访问本公司网站(www.nffund.com)或拨打客户服务电话（400－889－8899）咨\n\n  询相关情况。\n\n南方基金管理股份有限公司\n\n    2026 年 7 月 20 日\n\n"
+  },
+  "159941": {
+    "mgmt_fee": 0.8,
+    "custody_fee": 0.2,
+    "mgmt_custody_fee": 1.0,
+    "service_fee": 0.0,
+    "purchase_fee_orig": 0.0,
+    "purchase_fee": 0.0,
+    "scale": 350.53,
+    "cached_at": "2026-11-21"
+  },
+  "513300": {
+    "mgmt_fee": 0.6,
+    "custody_fee": 0.2,
+    "mgmt_custody_fee": 0.8,
+    "service_fee": 0.0,
+    "purchase_fee_orig": 0.0,
+    "purchase_fee": 0.0,
+    "scale": 139.14,
+    "cached_at": "2026-11-21"
+  },
+  "513390": {
+    "mgmt_fee": 0.5,
+    "custody_fee": 0.15,
+    "mgmt_custody_fee": 0.65,
+    "service_fee": 0.0,
+    "purchase_fee_orig": 0.0,
+    "purchase_fee": 0.0,
+    "scale": 50.48,
+    "cached_at": "2026-11-21"
+  },
+  "159660": {
+    "mgmt_fee": 0.5,
+    "custody_fee": 0.15,
+    "mgmt_custody_fee": 0.65,
+    "service_fee": 0.0,
+    "purchase_fee_orig": 0.0,
+    "purchase_fee": 0.0,
+    "scale": 57.74,
+    "cached_at": "2026-11-21"
+  },
+  "159632": {
+    "mgmt_fee": 0.6,
+    "custody_fee": 0.2,
+    "mgmt_custody_fee": 0.8,
+    "service_fee": 0.0,
+    "purchase_fee_orig": 0.0,
+    "purchase_fee": 0.0,
+    "scale": 118.08,
+    "cached_at": "2026-11-21"
+  },
+  "513110": {
+    "mgmt_fee": 0.8,
+    "custody_fee": 0.2,
+    "mgmt_custody_fee": 1.0,
+    "service_fee": 0.0,
+    "purchase_fee_orig": 0.0,
+    "purchase_fee": 0.0,
+    "scale": 52.06,
+    "cached_at": "2026-11-21"
+  },
+  "159513": {
+    "mgmt_fee": 0.8,
+    "custody_fee": 0.2,
+    "mgmt_custody_fee": 1.0,
+    "service_fee": 0.0,
+    "purchase_fee_orig": 0.0,
+    "purchase_fee": 0.0,
+    "scale": 82.47,
+    "cached_at": "2026-11-21"
+  },
+  "513500": {
+    "mgmt_fee": 0.6,
+    "custody_fee": 0.2,
+    "mgmt_custody_fee": 0.8,
+    "service_fee": 0.0,
+    "purchase_fee_orig": 0.0,
+    "purchase_fee": 0.0,
+    "scale": 251.81,
+    "cached_at": "2026-11-21"
+  },
+  "159612": {
+    "mgmt_fee": 0.6,
+    "custody_fee": 0.15,
+    "mgmt_custody_fee": 0.75,
+    "service_fee": 0.0,
+    "purchase_fee_orig": 0.0,
+    "purchase_fee": 0.0,
+    "scale": 9.78,
+    "cached_at": "2026-11-21"
+  },
+  "513650": {
+    "mgmt_fee": 0.6,
+    "custody_fee": 0.15,
+    "mgmt_custody_fee": 0.75,
+    "service_fee": 0.0,
+    "purchase_fee_orig": 0.0,
+    "purchase_fee": 0.0,
+    "scale": 87.11,
+    "cached_at": "2026-11-21"
   }
 }
