@@ -376,17 +376,16 @@
 <body>
 
   <!-- ===== 登录 / 注册 / 邀请码视图 ===== -->
-  <div id="authScreen" class="auth-screen">
+<div id="authScreen" class="auth-screen hidden">
     <div class="auth-card">
       <div class="auth-brand">
         <div class="brand-icon"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg></div>
         <h1>QDII 监控台</h1>
       </div>
       <p class="auth-desc">登录后查看美股大盘估值温度、回撤水位、场外基金限额与场内 ETF 溢价。</p>
-      <div class="auth-tabs">
+      <div class="auth-tabs" style="grid-template-columns: repeat(2, 1fr);">
         <button class="auth-tab active" data-auth-tab="login" type="button">账号登录</button>
         <button class="auth-tab" data-auth-tab="register" type="button">注册账号</button>
-        <button class="auth-tab" data-auth-tab="invite" type="button">邀请码登录</button>
       </div>
       <form id="authForm">
         <div id="userFields">
@@ -965,10 +964,9 @@
       state.authMode = tab.dataset.authTab;
       document.querySelectorAll(".auth-tab").forEach(t => t.classList.remove("active"));
       tab.classList.add("active");
-      const isInvite = state.authMode === "invite", isLogin = state.authMode === "login";
-      document.getElementById("userFields").classList.toggle("hidden", isInvite);
-      document.getElementById("inviteFields").classList.toggle("hidden", isLogin);
-      document.getElementById("authSubmit").textContent = state.authMode === "register" ? "注册并登录" : (isInvite ? "验证邀请码" : "登录监控台");
+      const isRegister = state.authMode === "register";
+      document.getElementById("inviteFields").classList.toggle("hidden", !isRegister);
+      document.getElementById("authSubmit").textContent = isRegister ? "注册并登录" : "登录监控台";
       document.getElementById("authMsg").className = "auth-msg";
     }));
     document.getElementById("authForm").addEventListener("submit", async (e) => {
@@ -976,9 +974,11 @@
       const btn = document.getElementById("authSubmit"); btn.disabled = true;
       document.getElementById("authMsg").className = "auth-msg";
       const code = document.getElementById("authInvite").value.trim();
-      const payload = state.authMode === "invite" ? { action: "invite", code } : {
-        action: state.authMode, username: document.getElementById("authUser").value.trim(),
-        password: document.getElementById("authPass").value, ...(state.authMode === "register" ? { code } : {})
+      const payload = {
+        action: state.authMode,
+        username: document.getElementById("authUser").value.trim(),
+        password: document.getElementById("authPass").value,
+        ...(state.authMode === "register" ? { code } : {})
       };
       try {
         const res = await fetch("/api/auth", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
@@ -995,12 +995,16 @@
     });
     async function checkSession() {
       const token = localStorage.getItem(TOKEN_KEY);
-      if (!token) return;
+      if (!token) {
+        document.getElementById("authScreen").classList.remove("hidden");
+        return;
+      }
       try {
         const res = await fetch("/api/auth", { headers: { Authorization: `Bearer ${token}` } });
         if (res.ok) { const d = await res.json(); if (d.ok && d.user) { enterApp(d.user); return; } }
       } catch {}
       localStorage.removeItem(TOKEN_KEY);
+      document.getElementById("authScreen").classList.remove("hidden");
     }
     function enterApp(user) {
       document.getElementById("userNameText").textContent = user.username;
