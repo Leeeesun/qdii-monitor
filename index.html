@@ -609,6 +609,27 @@
     }
     .pk-title { font-size: 13.5px; font-weight: 600; }
     .pk-meta { font-size: 11.5px; color: var(--text-3); margin-top: 3px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .pref-item-card {
+      padding: 13px 14px; border-radius: 11px; background: var(--surface-2);
+      border: 1px solid var(--border); display: flex; flex-direction: column; gap: 10px;
+    }
+    .pref-item-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .pref-switch-lbl { display: inline-flex; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 600; cursor: pointer; }
+    .pref-switch-lbl input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; }
+    .pref-row-2 { display: grid; grid-template-columns: 150px 1fr; gap: 10px; align-items: end; }
+    @media (max-width: 560px) { .pref-row-2 { grid-template-columns: 1fr; } }
+    .pref-mini-lbl { display: block; font-size: 11.5px; color: var(--text-3); margin-bottom: 4px; }
+    .pref-tpl-ta {
+      width: 100%; min-height: 64px; padding: 8px 10px; font-size: 12.5px; line-height: 1.5;
+      border-radius: 8px; border: 1px solid var(--border); background: var(--surface);
+      color: var(--text); font-family: inherit; resize: vertical; outline: none;
+    }
+    .pref-tpl-ta:focus { border-color: var(--accent); }
+    .btn-link-reset {
+      border: none; background: transparent; color: var(--accent); font-size: 11.5px;
+      cursor: pointer; padding: 0; text-decoration: underline;
+    }
+
     .pk-add-box {
       display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
       padding: 12px; border-radius: 10px; background: var(--surface-2); border: 1px dashed var(--border-strong);
@@ -1259,22 +1280,50 @@
     </div>
   </div>
   <div id="settingsModal" class="modal-backdrop hidden">
-    <div class="modal-box" style="max-width:540px;">
+    <div class="modal-box" style="max-width:660px;">
       <div class="card-head" style="margin-bottom:0;">
-        <div class="card-title">推送与偏好设置</div>
+        <div class="card-title">推送选项与模板设置</div>
         <button id="closeSettingsBtn" class="chip-btn" type="button">关闭</button>
       </div>
       <div class="modal-section">
         <div class="field" style="margin-bottom:0;">
           <label for="cfgBarkUrl">Bark 推送链接</label>
           <input id="cfgBarkUrl" class="input" type="url" placeholder="https://bark.youranzi.de/你的Key" />
-          <div class="modal-hint" style="margin-top:5px;">填写完整的 Bark 推送地址（含推送 Key），检测到额度变化时将推送至该地址。</div>
         </div>
-        <div class="field" style="margin-bottom:0;">
-          <label for="cfgPushTime">每日推送时间（北京时间）</label>
-          <input id="cfgPushTime" class="input" type="time" style="max-width:180px;" />
-          <div class="modal-hint" style="margin-top:5px;">默认 09:30；也可在下方点“测试推送”验证 Bark 连通性。</div>
+
+        <div class="pref-item-card">
+          <div class="pref-item-head">
+            <label class="pref-switch-lbl"><input id="optQuotaEnabled" type="checkbox" /><span>1. 基金额度变化提醒</span></label>
+            <button class="btn-link-reset" data-reset-tpl="quota" type="button">恢复默认模板</button>
+          </div>
+          <div class="pref-row-2">
+            <div><span class="pref-mini-lbl">推送时间（北京时间）</span><input id="timeQuota" class="input" type="time" style="height:35px;" /></div>
+            <div><span class="pref-mini-lbl">支持占位符：{count} {details}</span><textarea id="tplQuota" class="pref-tpl-ta"></textarea></div>
+          </div>
         </div>
+
+        <div class="pref-item-card">
+          <div class="pref-item-head">
+            <label class="pref-switch-lbl"><input id="optEtfPremEnabled" type="checkbox" /><span>2. 场内 ETF 高溢价预警</span></label>
+            <button class="btn-link-reset" data-reset-tpl="etf_premium" type="button">恢复默认模板</button>
+          </div>
+          <div class="pref-row-2">
+            <div><span class="pref-mini-lbl">推送时间（北京时间）</span><input id="timeEtfPrem" class="input" type="time" style="height:35px;" /></div>
+            <div><span class="pref-mini-lbl">支持占位符：{count} {details}</span><textarea id="tplEtfPrem" class="pref-tpl-ta"></textarea></div>
+          </div>
+        </div>
+
+        <div class="pref-item-card">
+          <div class="pref-item-head">
+            <label class="pref-switch-lbl"><input id="optMarketRecapEnabled" type="checkbox" /><span>3. 美股收盘复盘与情绪</span></label>
+            <button class="btn-link-reset" data-reset-tpl="market_recap" type="button">恢复默认模板</button>
+          </div>
+          <div class="pref-row-2">
+            <div><span class="pref-mini-lbl">推送时间（北京时间）</span><input id="timeMarketRecap" class="input" type="time" style="height:35px;" /></div>
+            <div><span class="pref-mini-lbl">支持占位符：{ndx} {chg} {vix} {fg} {light}</span><textarea id="tplMarketRecap" class="pref-tpl-ta"></textarea></div>
+          </div>
+        </div>
+
         <div id="settingsStatus" class="modal-hint" style="color:var(--ok);display:none;"></div>
         <div class="modal-actions">
           <button id="testBarkBtn" class="btn-secondary" type="button">测试推送</button>
@@ -1559,22 +1608,57 @@
       if (!e.target.closest(".user-menu-wrap")) closeUserMenu();
     });
 
-    const PREF_KEY = "qdii_user_prefs_v1";
+    const PREF_KEY = "qdii_user_prefs_v2";
     const DEFAULT_BARK = "https://bark.youranzi.de/3cdh5mj7wiRryZWuPAf84u";
+    const DEFAULT_TPLS = {
+      quota: "检测到 {count} 项额度变动：\n{details}",
+      etf_premium: "发现 {count} 只场内 ETF 溢价偏高：\n{details}",
+      market_recap: "纳指100 {ndx}（{chg}）· VIX {vix} · 恐慌贪婪 {fg}\n信号：{light}"
+    };
+    const DEFAULT_PREFS = {
+      barkUrl: DEFAULT_BARK,
+      options: {
+        quota: { enabled: true, time: "09:30", template: DEFAULT_TPLS.quota },
+        etf_premium: { enabled: true, time: "10:00", template: DEFAULT_TPLS.etf_premium },
+        market_recap: { enabled: false, time: "08:00", template: DEFAULT_TPLS.market_recap }
+      }
+    };
+
     function getPrefs() {
       try {
-        const p = JSON.parse(localStorage.getItem(PREF_KEY) || "{}");
-        return { barkUrl: p.barkUrl || DEFAULT_BARK, pushTime: p.pushTime || "09:30" };
+        const raw = JSON.parse(localStorage.getItem(PREF_KEY) || "{}");
+        const opts = raw.options || {};
+        return {
+          barkUrl: raw.barkUrl || DEFAULT_BARK,
+          options: {
+            quota: { ...DEFAULT_PREFS.options.quota, ...(opts.quota || {}) },
+            etf_premium: { ...DEFAULT_PREFS.options.etf_premium, ...(opts.etf_premium || {}) },
+            market_recap: { ...DEFAULT_PREFS.options.market_recap, ...(opts.market_recap || {}) }
+          }
+        };
       } catch {
-        return { barkUrl: DEFAULT_BARK, pushTime: "09:30" };
+        return JSON.parse(JSON.stringify(DEFAULT_PREFS));
       }
+    }
+
+    function fillSettingsForm(p) {
+      document.getElementById("cfgBarkUrl").value = p.barkUrl;
+      document.getElementById("optQuotaEnabled").checked = !!p.options.quota.enabled;
+      document.getElementById("timeQuota").value = p.options.quota.time || "09:30";
+      document.getElementById("tplQuota").value = p.options.quota.template || DEFAULT_TPLS.quota;
+
+      document.getElementById("optEtfPremEnabled").checked = !!p.options.etf_premium.enabled;
+      document.getElementById("timeEtfPrem").value = p.options.etf_premium.time || "10:00";
+      document.getElementById("tplEtfPrem").value = p.options.etf_premium.template || DEFAULT_TPLS.etf_premium;
+
+      document.getElementById("optMarketRecapEnabled").checked = !!p.options.market_recap.enabled;
+      document.getElementById("timeMarketRecap").value = p.options.market_recap.time || "08:00";
+      document.getElementById("tplMarketRecap").value = p.options.market_recap.template || DEFAULT_TPLS.market_recap;
     }
 
     document.getElementById("menuSettingsBtn").addEventListener("click", () => {
       closeUserMenu();
-      const p = getPrefs();
-      document.getElementById("cfgBarkUrl").value = p.barkUrl;
-      document.getElementById("cfgPushTime").value = p.pushTime;
+      fillSettingsForm(getPrefs());
       const st = document.getElementById("settingsStatus");
       st.style.display = "none";
       document.getElementById("settingsModal").classList.remove("hidden");
@@ -1582,27 +1666,57 @@
     document.getElementById("closeSettingsBtn").addEventListener("click", () => document.getElementById("settingsModal").classList.add("hidden"));
     document.getElementById("settingsModal").addEventListener("click", (e) => { if (e.target.id === "settingsModal") e.currentTarget.classList.add("hidden"); });
 
+    document.querySelectorAll("[data-reset-tpl]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const k = btn.dataset.resetTpl;
+        const map = { quota: "tplQuota", etf_premium: "tplEtfPrem", market_recap: "tplMarketRecap" };
+        if (map[k]) document.getElementById(map[k]).value = DEFAULT_TPLS[k];
+      });
+    });
+
     document.getElementById("saveSettingsBtn").addEventListener("click", () => {
-      const barkUrl = document.getElementById("cfgBarkUrl").value.trim() || DEFAULT_BARK;
-      const pushTime = document.getElementById("cfgPushTime").value || "09:30";
-      localStorage.setItem(PREF_KEY, JSON.stringify({ barkUrl, pushTime }));
+      const next = {
+        barkUrl: document.getElementById("cfgBarkUrl").value.trim() || DEFAULT_BARK,
+        options: {
+          quota: {
+            enabled: document.getElementById("optQuotaEnabled").checked,
+            time: document.getElementById("timeQuota").value || "09:30",
+            template: document.getElementById("tplQuota").value.trim() || DEFAULT_TPLS.quota
+          },
+          etf_premium: {
+            enabled: document.getElementById("optEtfPremEnabled").checked,
+            time: document.getElementById("timeEtfPrem").value || "10:00",
+            template: document.getElementById("tplEtfPrem").value.trim() || DEFAULT_TPLS.etf_premium
+          },
+          market_recap: {
+            enabled: document.getElementById("optMarketRecapEnabled").checked,
+            time: document.getElementById("timeMarketRecap").value || "08:00",
+            template: document.getElementById("tplMarketRecap").value.trim() || DEFAULT_TPLS.market_recap
+          }
+        }
+      };
+      localStorage.setItem(PREF_KEY, JSON.stringify(next));
       const st = document.getElementById("settingsStatus");
       st.style.display = "block";
       st.style.color = "var(--ok)";
-      st.textContent = `已保存设置：推送时间 ${pushTime} · Bark 地址已更新`;
+      st.textContent = "已保存推送选项、独立推送时间与模板";
     });
 
     document.getElementById("testBarkBtn").addEventListener("click", async () => {
       const barkUrl = (document.getElementById("cfgBarkUrl").value.trim() || DEFAULT_BARK).replace(/\/+$/, "");
+      const tpl = document.getElementById("tplQuota").value.trim() || DEFAULT_TPLS.quota;
+      const preview = tpl
+        .replace("{count}", "2")
+        .replace("{details}", "景顺长城纳指(161130) 代销：100 元 -> 1,000 元");
       const st = document.getElementById("settingsStatus");
       st.style.display = "block";
       st.style.color = "var(--text-2)";
-      st.textContent = "正在发送测试通知...";
+      st.textContent = "正在发送模板测试通知...";
       try {
         await fetch(`${barkUrl}/`, {
           method: "POST", mode: "no-cors",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ title: "QDII 监控台测试提醒", body: "Bark 推送配置正常", group: "QDII限额" })
+          body: JSON.stringify({ title: "QDII 推送模板测试", body: preview, group: "QDII监控" })
         });
         st.style.color = "var(--ok)";
         st.textContent = "测试推送请求已发出，请留意手机 Bark 通知";

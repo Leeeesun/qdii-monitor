@@ -401,27 +401,57 @@ def build_active_top5(purchase_df, rank_df):
         return []
 
 
+DEFAULT_PUSH_CFG = {
+    "bark_url": DEFAULT_BARK_URL,
+    "quota": {
+        "enabled": True,
+        "time": "09:30",
+        "template": "检测到 {count} 项额度变动：\n{details}"
+    }
+}
+
+
+def _hhmm_to_mins(hhmm, fallback):
+    try:
+        parts = str(hhmm or fallback).split(":")
+        return int(parts[0]) * 60 + int(parts[1])
+    except Exception:
+        p = fallback.split(":")
+        return int(p[0]) * 60 + int(p[1])
+
+
 def send_bark_quota_alert(changes, now_bj):
-    """在 09:30 窗口发现额度变化时通过 Bark 推送"""
+    """按配置的推送开关、独立推送时间与独立推送模板（默认用默认模板）发送 Bark 通知"""
     if not changes:
         return
-    bark_base = (os.getenv("BARK_URL") or DEFAULT_BARK_URL).strip().rstrip("/")
+
+    file_cfg = load_json("data/push_config.json", {})
+    q_cfg = {**DEFAULT_PUSH_CFG["quota"], **(file_cfg.get("quota") or {})}
+    if not q_cfg.get("enabled", True):
+        return
+
+    bark_base = (os.getenv("BARK_URL") or file_cfg.get("bark_url") or DEFAULT_BARK_URL).strip().rstrip("/")
     if not bark_base:
         return
 
     force = os.getenv("FORCE_BARK", "").strip() == "1"
-    in_window = (now_bj.hour == 9 and 20 <= now_bj.minute <= 50)
+    cur_mins = now_bj.hour * 60 + now_bj.minute
+    target_mins = _hhmm_to_mins(q_cfg.get("time"), "09:30")
+    in_window = abs(cur_mins - target_mins) <= 20
     if not (force or in_window):
         return
 
-    title = f"QDII 限额变化提醒（{len(changes)}项）"
     lines = [
         f"{c['name']}({c['code']}) {c['channel']}：{c['old']} -> {c['new']}"
         for c in changes[:12]
     ]
     if len(changes) > 12:
         lines.append(f"...另有 {len(changes) - 12} 项变化，请打开监控台查看")
-    body = "\n".join(lines)
+    details_str = "\n".join(lines)
+
+    tpl = str(q_cfg.get("template") or "").strip() or DEFAULT_PUSH_CFG["quota"]["template"]
+    body = tpl.replace("{count}", str(len(changes))).replace("{details}", details_str)
+    title = f"QDII 限额变化提醒（{len(changes)}项）"
 
     try:
         requests.post(
