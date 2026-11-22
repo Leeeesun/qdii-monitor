@@ -121,7 +121,7 @@ export async function onRequestGet(context) {
 export async function onRequestPost(context) {
   const { request, env } = context;
   const secret = env.JWT_SECRET || "qdii-monitor-default-secret-change-me";
-  const rawCodes = env.INVITE_CODES || "QDII2026,VIP888";
+  const rawCodes = env.INVITE_CODES || "";
   const validCodes = rawCodes.split(/[,，\s]+/).map(c => c.trim().toUpperCase()).filter(Boolean);
 
   if (!env.AUTH_KV) {
@@ -141,13 +141,17 @@ export async function onRequestPost(context) {
   const expectedOrigin = url.origin;
   const exp = Date.now() + 7 * 24 * 3600 * 1000;
 
-  // 1. 新用户注册
+  // 1. 新用户注册（一次性邀请码）
   if (action === "register") {
     const username = String(body.username || "").trim();
     const password = String(body.password || "");
     const inviteCode = String(body.code || "").trim().toUpperCase();
     if (!inviteCode || !validCodes.includes(inviteCode)) {
       return jsonRes({ ok: false, message: "注册失败：请输入有效的邀请码" }, 403);
+    }
+    const inviteUsedKey = `used_invite:${inviteCode}`;
+    if (await env.AUTH_KV.get(inviteUsedKey)) {
+      return jsonRes({ ok: false, message: "注册失败：该邀请码已被使用" }, 403);
     }
     if (username.length < 2 || username.length > 20) {
       return jsonRes({ ok: false, message: "用户名长度需在 2 到 20 位之间" }, 400);
@@ -161,9 +165,14 @@ export async function onRequestPost(context) {
     }
     const salt = toHex(crypto.getRandomValues(new Uint8Array(8)));
     const hash = await hashPassword(password, salt);
+    const nowIso = new Date().toISOString();
     await env.AUTH_KV.put(
       key,
-      JSON.stringify({ username, salt, hash, invite_code: inviteCode, passkeys: [], created_at: new Date().toISOString() })
+      JSON.stringify({ username, salt, hash, invite_code: inviteCode, passkeys: [], created_at: nowIso })
+    );
+    await env.AUTH_KV.put(
+      inviteUsedKey,
+      JSON.stringify({ used_by: username, used_at: nowIso })
     );
     const user = { username, role: "user", exp };
     const token = await signToken(user, secret);
