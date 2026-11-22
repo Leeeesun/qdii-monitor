@@ -444,6 +444,43 @@
     }
     .quota-banner strong { color: var(--text); }
 
+    .admin-badge {
+      font-size: 10.5px; font-weight: 700; padding: 1px 6px; border-radius: 5px;
+      background: var(--accent-soft); color: var(--accent); letter-spacing: 0.02em;
+    }
+    .settings-tabs {
+      display: flex; gap: 6px; padding: 4px; border-radius: 10px;
+      background: var(--surface-2); margin-top: 12px;
+    }
+    .settings-tab {
+      flex: 1; border: none; background: transparent; color: var(--text-2);
+      padding: 7px 10px; border-radius: 7px; font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: all 0.15s ease;
+    }
+    .settings-tab.active { background: var(--surface); color: var(--accent); box-shadow: var(--shadow-sm); }
+    .inv-toolbar {
+      display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+      padding: 12px; border-radius: 10px; background: var(--surface-2); border: 1px solid var(--border);
+    }
+    .inv-stats-row {
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;
+      gap: 8px; font-size: 12px; color: var(--text-3);
+    }
+    .inv-list {
+      display: flex; flex-direction: column; gap: 8px; max-height: 320px; overflow-y: auto; padding-right: 2px;
+    }
+    .inv-row {
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      padding: 10px 12px; border-radius: 10px; background: var(--surface-2); border: 1px solid var(--border);
+    }
+    .inv-code-txt {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; font-weight: 700;
+    }
+    .inv-import-box {
+      padding: 12px; border-radius: 10px; background: var(--surface-2); border: 1px dashed var(--border-strong);
+      display: flex; flex-direction: column; gap: 8px;
+    }
+
     .pk-add-box {
       display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
       padding: 12px; border-radius: 10px; background: var(--surface-2); border: 1px dashed var(--border-strong);
@@ -577,6 +614,7 @@
             <button id="userMenuBtn" class="chip-btn" type="button" aria-expanded="false">
               <svg viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
               <span id="userNameText">--</span>
+              <span id="adminRoleBadge" class="admin-badge hidden">超管</span>
               <svg viewBox="0 0 24 24" style="width:13px;height:13px;opacity:0.7;"><polyline points="6 9 12 15 18 9"/></svg>
             </button>
             <div id="userDropdown" class="user-dropdown hidden" role="menu">
@@ -1078,12 +1116,19 @@
     </div>
   </div>
   <div id="settingsModal" class="modal-backdrop hidden">
-    <div class="modal-box" style="max-width:660px;">
+    <div class="modal-box" style="max-width:720px;">
       <div class="card-head" style="margin-bottom:0;">
-        <div class="card-title">推送选项与模板设置</div>
+        <div class="card-title">系统设置</div>
         <button id="closeSettingsBtn" class="chip-btn" type="button">关闭</button>
       </div>
-      <div class="modal-section">
+
+      <div id="settingsTabs" class="settings-tabs hidden">
+        <button class="settings-tab active" data-stab="push" type="button">推送选项与模板</button>
+        <button class="settings-tab" data-stab="invites" type="button">邀请码管理（超管）</button>
+      </div>
+
+      <!-- Tab 1: 推送选项与模板 -->
+      <div id="stab-push" class="modal-section">
         <div class="field" style="margin-bottom:0;">
           <label for="cfgBarkUrl">Bark 推送链接</label>
           <input id="cfgBarkUrl" class="input" type="url" placeholder="https://bark.youranzi.de/你的Key" />
@@ -1127,6 +1172,50 @@
           <button id="testBarkBtn" class="btn-secondary" type="button">测试推送</button>
           <button id="saveSettingsBtn" class="btn-solid-sm" type="button">保存设置</button>
         </div>
+      </div>
+
+      <!-- Tab 2: 邀请码管理与使用记录（超级管理员） -->
+      <div id="stab-invites" class="modal-section hidden">
+        <!-- 添加 & 随机生成 -->
+        <div class="inv-toolbar">
+          <input id="invSingleInput" class="input" type="text" placeholder="输入自定义邀请码（如 VIP2026）" style="flex:1;min-width:150px;height:35px;background:var(--surface);" />
+          <button id="invAddBtn" class="btn-solid-sm" type="button" style="height:35px;">+ 添加</button>
+          <input id="invPrefixInput" class="input" type="text" value="QDII" placeholder="前缀" style="width:76px;height:35px;background:var(--surface);text-align:center;" title="生成前缀" />
+          <input id="invCountInput" class="input" type="number" value="5" min="1" max="50" style="width:66px;height:35px;background:var(--surface);text-align:center;" title="生成数量" />
+          <button id="invGenBtn" class="btn-secondary" type="button" style="height:35px;">随机生成</button>
+        </div>
+
+        <!-- 批量导入 / 导出 -->
+        <div class="inv-import-box">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+            <span style="font-size:12.5px;font-weight:600;">批量导入与导出</span>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+              <label class="chip-btn" style="cursor:pointer;">
+                <span>选择 TXT/CSV 文件</span>
+                <input id="invFileInput" type="file" accept=".txt,.csv" style="display:none;" />
+              </label>
+              <button id="invCopyUnusedBtn" class="chip-btn" type="button">复制未使用</button>
+              <button id="invExportBtn" class="chip-btn" type="button">导出 CSV</button>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;">
+            <textarea id="invBatchTextarea" class="pref-tpl-ta" style="min-height:48px;flex:1;" placeholder="支持粘贴多个邀请码（每行一个或用逗号/空格分隔），点击右侧批量导入"></textarea>
+            <button id="invImportBtn" class="btn-secondary" type="button" style="height:36px;">批量导入</button>
+          </div>
+        </div>
+
+        <!-- 状态筛选与统计 -->
+        <div class="inv-stats-row">
+          <div class="pill-group" id="invFilterGroup">
+            <button class="filter-pill active" data-inv-filter="all" type="button">全部</button>
+            <button class="filter-pill" data-inv-filter="unused" type="button">未使用</button>
+            <button class="filter-pill" data-inv-filter="used" type="button">已使用</button>
+          </div>
+          <span id="invSummaryText">加载中...</span>
+        </div>
+
+        <div id="invStatusMsg" class="modal-hint" style="display:none;"></div>
+        <div id="invListWrap" class="inv-list"></div>
       </div>
     </div>
   </div>
@@ -1451,11 +1540,227 @@
       document.getElementById("tplMarketRecap").value = p.options.market_recap.template || DEFAULT_TPLS.market_recap;
     }
 
+    let inviteCache = [];
+    let inviteFilter = "all";
+
+    function switchSettingsTab(tabName) {
+      document.querySelectorAll(".settings-tab").forEach(b => b.classList.toggle("active", b.dataset.stab === tabName));
+      document.getElementById("stab-push").classList.toggle("hidden", tabName !== "push");
+      document.getElementById("stab-invites").classList.toggle("hidden", tabName !== "invites");
+      if (tabName === "invites") loadInvites();
+    }
+
+    document.querySelectorAll(".settings-tab").forEach(b => {
+      b.addEventListener("click", () => switchSettingsTab(b.dataset.stab));
+    });
+
+    function showInvMsg(text, ok = true) {
+      const el = document.getElementById("invStatusMsg");
+      el.style.display = "block";
+      el.style.color = ok ? "var(--ok)" : "var(--danger)";
+      el.textContent = text;
+    }
+
+    function renderInviteList() {
+      const total = inviteCache.length;
+      const unusedCnt = inviteCache.filter(x => x.status !== "used").length;
+      const usedCnt = inviteCache.filter(x => x.status === "used").length;
+      document.getElementById("invSummaryText").textContent = `共 ${total} 个 · 未使用 ${unusedCnt} · 已使用 ${usedCnt}`;
+
+      const filtered = inviteCache.filter(x => {
+        if (inviteFilter === "unused") return x.status !== "used";
+        if (inviteFilter === "used") return x.status === "used";
+        return true;
+      });
+
+      const wrap = document.getElementById("invListWrap");
+      if (!filtered.length) {
+        wrap.innerHTML = `<div style="text-align:center;color:var(--text-3);font-size:13px;padding:22px 0;">暂无符合条件的邀请码</div>`;
+        return;
+      }
+
+      wrap.innerHTML = filtered.map(inv => {
+        const isUsed = inv.status === "used";
+        const tag = isUsed
+          ? `<span class="tag tag-stop">已使用</span>`
+          : `<span class="tag tag-ok">未使用</span>`;
+        const usedAt = inv.used_at ? inv.used_at.replace("T", " ").slice(0, 16) : "";
+        const createdAt = inv.created_at ? inv.created_at.replace("T", " ").slice(0, 16) : "";
+        const usageLine = isUsed
+          ? `使用账号：<strong>${inv.used_by || "未知"}</strong>${usedAt ? " · 使用时间 " + usedAt : ""}`
+          : `来源：${inv.created_by || "管理员"}${createdAt ? " · 创建于 " + createdAt : ""}`;
+        return `<div class="inv-row">
+          <div style="min-width:0;">
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+              <span class="inv-code-txt">${inv.code}</span>
+              ${tag}
+            </div>
+            <div class="sub-line" style="margin-top:4px;">${usageLine}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+            ${!isUsed ? `<button class="cmp-btn" data-copy-inv="${inv.code}" type="button">复制</button>` : ""}
+            <button class="fav-remove-btn" data-del-inv="${inv.code}" type="button">删除</button>
+          </div>
+        </div>`;
+      }).join("");
+
+      wrap.querySelectorAll("[data-copy-inv]").forEach(b => b.addEventListener("click", () => copyText(b.dataset.copyInv, b)));
+      wrap.querySelectorAll("[data-del-inv]").forEach(b => b.addEventListener("click", async () => {
+        const code = b.dataset.delInv;
+        if (!confirm(`确定删除邀请码 ${code} 吗？`)) return;
+        const token = localStorage.getItem(TOKEN_KEY);
+        b.disabled = true;
+        try {
+          const res = await fetch("/api/auth", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+            body: JSON.stringify({ action: "invite_delete", code })
+          });
+          const data = await res.json();
+          if (data.ok) {
+            inviteCache = data.invites || [];
+            renderInviteList();
+            showInvMsg(data.message || "已删除");
+          } else {
+            showInvMsg(data.message || "删除失败", false);
+          }
+        } catch { showInvMsg("请求失败", false); }
+        finally { b.disabled = false; }
+      }));
+    }
+
+    async function loadInvites() {
+      const token = localStorage.getItem(TOKEN_KEY);
+      if (!token) return;
+      document.getElementById("invListWrap").innerHTML = `<div style="color:var(--text-3);font-size:13px;padding:14px 0;">加载邀请码列表中...</div>`;
+      try {
+        const res = await fetch("/api/auth", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ action: "invite_list" })
+        });
+        const data = await res.json();
+        if (res.ok && data.ok) {
+          inviteCache = data.invites || [];
+          renderInviteList();
+        } else {
+          document.getElementById("invListWrap").innerHTML = `<div style="color:var(--danger);font-size:13px;">${data.message || "无权限"}</div>`;
+        }
+      } catch {
+        document.getElementById("invListWrap").innerHTML = `<div style="color:var(--danger);font-size:13px;">无法连接接口</div>`;
+      }
+    }
+
+    document.getElementById("invFilterGroup").querySelectorAll("button").forEach(b => {
+      b.addEventListener("click", () => {
+        document.getElementById("invFilterGroup").querySelectorAll("button").forEach(x => x.classList.remove("active"));
+        b.classList.add("active");
+        inviteFilter = b.dataset.invFilter;
+        renderInviteList();
+      });
+    });
+
+    document.getElementById("invAddBtn").addEventListener("click", async () => {
+      const val = document.getElementById("invSingleInput").value.trim();
+      if (!val) { showInvMsg("请输入要添加的邀请码", false); return; }
+      const token = localStorage.getItem(TOKEN_KEY);
+      try {
+        const res = await fetch("/api/auth", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ action: "invite_add", codes: [val], source: "manual" })
+        });
+        const data = await res.json();
+        if (data.ok) {
+          document.getElementById("invSingleInput").value = "";
+          inviteCache = data.invites || [];
+          renderInviteList();
+          showInvMsg(data.added > 0 ? `成功添加 ${data.added} 个邀请码` : "该邀请码已存在");
+        } else showInvMsg(data.message || "添加失败", false);
+      } catch { showInvMsg("请求失败", false); }
+    });
+
+    document.getElementById("invGenBtn").addEventListener("click", async () => {
+      const prefix = document.getElementById("invPrefixInput").value.trim();
+      const count = Number(document.getElementById("invCountInput").value) || 5;
+      const token = localStorage.getItem(TOKEN_KEY);
+      try {
+        const res = await fetch("/api/auth", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ action: "invite_generate", prefix, count })
+        });
+        const data = await res.json();
+        if (data.ok) {
+          inviteCache = data.invites || [];
+          renderInviteList();
+          showInvMsg(`已随机生成 ${(data.created || []).length} 个一次性邀请码`);
+        } else showInvMsg(data.message || "生成失败", false);
+      } catch { showInvMsg("请求失败", false); }
+    });
+
+    document.getElementById("invFileInput").addEventListener("change", (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        document.getElementById("invBatchTextarea").value = String(reader.result || "");
+        showInvMsg(`已读取文件 ${file.name}，请点击“批量导入”`);
+      };
+      reader.readAsText(file, "utf-8");
+      e.target.value = "";
+    });
+
+    document.getElementById("invImportBtn").addEventListener("click", async () => {
+      const text = document.getElementById("invBatchTextarea").value.trim();
+      if (!text) { showInvMsg("请先粘贴或选择包含邀请码的文件", false); return; }
+      const token = localStorage.getItem(TOKEN_KEY);
+      try {
+        const res = await fetch("/api/auth", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ action: "invite_add", codes: text, source: "import" })
+        });
+        const data = await res.json();
+        if (data.ok) {
+          document.getElementById("invBatchTextarea").value = "";
+          inviteCache = data.invites || [];
+          renderInviteList();
+          showInvMsg(`导入完成：新增 ${data.added} 个，跳过重复 ${data.skipped} 个`);
+        } else showInvMsg(data.message || "导入失败", false);
+      } catch { showInvMsg("请求失败", false); }
+    });
+
+    document.getElementById("invCopyUnusedBtn").addEventListener("click", (e) => {
+      const unused = inviteCache.filter(x => x.status !== "used").map(x => x.code);
+      if (!unused.length) { showInvMsg("当前没有未使用的邀请码", false); return; }
+      copyText(unused.join("\n"), e.currentTarget);
+      showInvMsg(`已复制全部 ${unused.length} 个未使用邀请码`);
+    });
+
+    document.getElementById("invExportBtn").addEventListener("click", () => {
+      const rows = [["邀请码", "状态", "使用账号", "使用时间", "创建人", "创建时间"]];
+      inviteCache.forEach(i => rows.push([
+        i.code,
+        i.status === "used" ? "已使用" : "未使用",
+        i.used_by || "",
+        i.used_at || "",
+        i.created_by || "",
+        i.created_at || ""
+      ]));
+      const csv = "\uFEFF" + rows.map(r => r.map(c => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\n");
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+      a.download = "qdii_invite_codes.csv";
+      a.click();
+    });
+
     document.getElementById("menuSettingsBtn").addEventListener("click", () => {
       closeUserMenu();
       fillSettingsForm(getPrefs());
-      const st = document.getElementById("settingsStatus");
-      st.style.display = "none";
+      document.getElementById("settingsStatus").style.display = "none";
+      document.getElementById("invStatusMsg").style.display = "none";
+      switchSettingsTab("push");
       document.getElementById("settingsModal").classList.remove("hidden");
     });
     document.getElementById("closeSettingsBtn").addEventListener("click", () => document.getElementById("settingsModal").classList.add("hidden"));
@@ -1680,8 +1985,16 @@
       } catch {}
     }
 
+    function isUserAdmin(user) {
+      return !!(user && (user.role === "admin" || String(user.username || "").toLowerCase() === "lesun"));
+    }
+
     function enterApp(user) {
+      state.user = user;
+      const admin = isUserAdmin(user);
       document.getElementById("userNameText").textContent = user.username;
+      document.getElementById("adminRoleBadge").classList.toggle("hidden", !admin);
+      document.getElementById("settingsTabs").classList.toggle("hidden", !admin);
       document.getElementById("authScreen").classList.add("hidden");
       document.getElementById("appShell").classList.remove("hidden");
       syncFromCloud().then(() => {

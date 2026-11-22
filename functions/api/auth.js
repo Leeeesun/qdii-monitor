@@ -1,6 +1,6 @@
 // Cloudflare Pages Function: /api/auth
-// 支持：账号密码登录、带邀请码注册、通行密钥 (WebAuthn/Passkey ES256) 列表、绑定、删除与免密登录
-// 依赖绑定：KV 命名空间 AUTH_KV；环境变量 INVITE_CODES（逗号分隔）、JWT_SECRET
+// 支持：账号密码登录、一次性邀请码注册、通行密钥 (WebAuthn/Passkey ES256) 管理与免密登录、云端同步、超级管理员邀请码管理
+// 依赖绑定：KV 命名空间 AUTH_KV；环境变量 INVITE_CODES（可选）、ADMIN_USERS（可选，默认包含 Lesun）、JWT_SECRET
 
 const encoder = new TextEncoder();
 
@@ -104,11 +104,81 @@ function bytesEqual(a, b) {
   return true;
 }
 
+function isSuperAdmin(username, env) {
+  const u = String(username || "").trim().toLowerCase();
+  if (!u) return false;
+  const extra = String(env.ADMIN_USERS || "lesun")
+    .split(/[,，\s]+/)
+    .map(s => s.trim().toLowerCase())
+    .filter(Boolean);
+  return u === "lesun" || extra.includes(u);
+}
+
 async function getAuthedUser(request, env) {
   const secret = env.JWT_SECRET || "qdii-monitor-default-secret-change-me";
   const auth = request.headers.get("Authorization") || "";
   const token = auth.startsWith("Bearer ") ? auth.slice(7).trim() : "";
-  return await verifyToken(token, secret);
+  const user = await verifyToken(token, secret);
+  if (!user) return null;
+  user.role = isSuperAdmin(user.username, env) ? "admin" : "user";
+  return user;
+}
+
+async function loadInviteRegistry(env) {
+  const raw = await env.AUTH_KV.get("invites_registry");
+  let list = [];
+  if (raw) {
+    try {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) list = parsed;
+    } catch {}
+  }
+  const map = new Map(list.map(item => [String(item.code || "").toUpperCase(), item]));
+
+  // 合并环境变量 INVITE_CODES 中尚未录入注册表的邀请码，方便管理员统一查看和管理
+  const envCodes = String(env.INVITE_CODES || "")
+    .split(/[,，\s]+/)
+    .map(c => c.trim().toUpperCase())
+    .filter(Boolean);
+  let dirty = false;
+  for (const code of envCodes) {
+    if (!map.has(code)) {
+      const usedRaw = await env.AUTH_KV.get(`used_invite:${code}`);
+      let usedInfo = null;
+      if (usedRaw) {
+        try { usedInfo = JSON.parse(usedRaw); } catch {}
+      }
+      const item = {
+        code,
+        source: "env",
+        status: usedInfo ? "used" : "unused",
+        created_at: "",
+        created_by: "环境变量",
+        used_by: usedInfo ? usedInfo.used_by : "",
+        used_at: usedInfo ? usedInfo.used_at : ""
+      };
+      map.set(code, item);
+      dirty = true;
+    }
+  }
+  const merged = [...map.values()];
+  if (dirty) {
+    await env.AUTH_KV.put("invites_registry", JSON.stringify(merged));
+  }
+  return merged;
+}
+
+async function saveInviteRegistry(env, list) {
+  await env.AUTH_KV.put("invites_registry", JSON.stringify(list));
+}
+
+function genRandomCode(prefix = "QDII") {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  const rnd = crypto.getRandomValues(new Uint8Array(6));
+  let body = "";
+  for (let i = 0; i < rnd.length; i++) body += chars[rnd[i] % chars.length];
+  const cleanPrefix = String(prefix || "").replace(/[^A-Za-z0-9]/g, "").toUpperCase().slice(0, 8);
+  return cleanPrefix ? `${cleanPrefix}-${body}` : body;
 }
 
 export async function onRequestGet(context) {
@@ -121,8 +191,6 @@ export async function onRequestGet(context) {
 export async function onRequestPost(context) {
   const { request, env } = context;
   const secret = env.JWT_SECRET || "qdii-monitor-default-secret-change-me";
-  const rawCodes = env.INVITE_CODES || "";
-  const validCodes = rawCodes.split(/[,，\s]+/).map(c => c.trim().toUpperCase()).filter(Boolean);
 
   if (!env.AUTH_KV) {
     return jsonRes({ ok: false, message: "尚未在 Cloudflare 后台绑定 AUTH_KV 数据库" }, 500);
@@ -146,13 +214,22 @@ export async function onRequestPost(context) {
     const username = String(body.username || "").trim();
     const password = String(body.password || "");
     const inviteCode = String(body.code || "").trim().toUpperCase();
-    if (!inviteCode || !validCodes.includes(inviteCode)) {
-      return jsonRes({ ok: false, message: "注册失败：请输入有效的邀请码" }, 403);
+    if (!inviteCode) {
+      return jsonRes({ ok: false, message: "注册失败：请输入邀请码" }, 403);
     }
+
+    const registry = await loadInviteRegistry(env);
+    const invItem = registry.find(x => x.code === inviteCode);
     const inviteUsedKey = `used_invite:${inviteCode}`;
-    if (await env.AUTH_KV.get(inviteUsedKey)) {
+    const alreadyUsed = await env.AUTH_KV.get(inviteUsedKey);
+
+    if (!invItem || invItem.status === "revoked") {
+      return jsonRes({ ok: false, message: "注册失败：邀请码无效或已作废" }, 403);
+    }
+    if (invItem.status === "used" || alreadyUsed) {
       return jsonRes({ ok: false, message: "注册失败：该邀请码已被使用" }, 403);
     }
+
     if (username.length < 2 || username.length > 20) {
       return jsonRes({ ok: false, message: "用户名长度需在 2 到 20 位之间" }, 400);
     }
@@ -163,18 +240,24 @@ export async function onRequestPost(context) {
     if (await env.AUTH_KV.get(key)) {
       return jsonRes({ ok: false, message: "该用户名已被注册，请直接登录" }, 409);
     }
+
     const salt = toHex(crypto.getRandomValues(new Uint8Array(8)));
     const hash = await hashPassword(password, salt);
     const nowIso = new Date().toISOString();
+    const role = isSuperAdmin(username, env) ? "admin" : "user";
+
     await env.AUTH_KV.put(
       key,
-      JSON.stringify({ username, salt, hash, invite_code: inviteCode, passkeys: [], created_at: nowIso })
+      JSON.stringify({ username, role, salt, hash, invite_code: inviteCode, passkeys: [], created_at: nowIso })
     );
-    await env.AUTH_KV.put(
-      inviteUsedKey,
-      JSON.stringify({ used_by: username, used_at: nowIso })
-    );
-    const user = { username, role: "user", exp };
+    await env.AUTH_KV.put(inviteUsedKey, JSON.stringify({ used_by: username, used_at: nowIso }));
+
+    invItem.status = "used";
+    invItem.used_by = username;
+    invItem.used_at = nowIso;
+    await saveInviteRegistry(env, registry);
+
+    const user = { username, role, exp };
     const token = await signToken(user, secret);
     return jsonRes({ ok: true, token, user });
   }
@@ -190,12 +273,18 @@ export async function onRequestPost(context) {
     const record = JSON.parse(recordRaw);
     const hash = await hashPassword(password, record.salt);
     if (hash !== record.hash) return jsonRes({ ok: false, message: "账号不存在或密码错误" }, 401);
-    const user = { username: record.username, role: "user", exp };
+
+    const role = isSuperAdmin(record.username, env) ? "admin" : "user";
+    if (record.role !== role) {
+      record.role = role;
+      await env.AUTH_KV.put(key, JSON.stringify(record));
+    }
+    const user = { username: record.username, role, exp };
     const token = await signToken(user, secret);
     return jsonRes({ ok: true, token, user });
   }
 
-  // 3. 通行密钥列表（需已登录）
+  // 3. 通行密钥列表
   if (action === "passkey_list") {
     const curUser = await getAuthedUser(request, env);
     if (!curUser) return jsonRes({ ok: false, message: "登录已失效" }, 401);
@@ -210,17 +299,13 @@ export async function onRequestPost(context) {
       const pkRaw = await env.AUTH_KV.get(`passkey:${id}`);
       if (pkRaw) {
         const pk = JSON.parse(pkRaw);
-        list.push({
-          id: pk.id,
-          label: pk.label || "设备通行密钥",
-          created_at: pk.created_at || ""
-        });
+        list.push({ id: pk.id, label: pk.label || "设备通行密钥", created_at: pk.created_at || "" });
       }
     }
     return jsonRes({ ok: true, passkeys: list });
   }
 
-  // 4. 删除指定通行密钥（需已登录）
+  // 4. 删除指定通行密钥
   if (action === "passkey_delete") {
     const curUser = await getAuthedUser(request, env);
     if (!curUser) return jsonRes({ ok: false, message: "登录已失效" }, 401);
@@ -231,9 +316,7 @@ export async function onRequestPost(context) {
     const pkRaw = await env.AUTH_KV.get(`passkey:${targetId}`);
     if (pkRaw) {
       const pk = JSON.parse(pkRaw);
-      if (pk.username !== curUser.username) {
-        return jsonRes({ ok: false, message: "无权删除他人的通行密钥" }, 403);
-      }
+      if (pk.username !== curUser.username) return jsonRes({ ok: false, message: "无权删除他人的通行密钥" }, 403);
       await env.AUTH_KV.delete(`passkey:${targetId}`);
     }
 
@@ -247,7 +330,7 @@ export async function onRequestPost(context) {
     return jsonRes({ ok: true, message: "已删除通行密钥" });
   }
 
-  // 5. 通行密钥：获取绑定参数（需已登录）
+  // 5. 通行密钥：获取绑定参数
   if (action === "passkey_reg_options") {
     const curUser = await getAuthedUser(request, env);
     if (!curUser) return jsonRes({ ok: false, message: "请先登录后再绑定通行密钥" }, 401);
@@ -383,7 +466,8 @@ export async function onRequestPost(context) {
       );
       if (!valid) return jsonRes({ ok: false, message: "通行密钥签名校验失败" }, 401);
 
-      const user = { username: pkRec.username, role: "user", exp };
+      const role = isSuperAdmin(pkRec.username, env) ? "admin" : "user";
+      const user = { username: pkRec.username, role, exp };
       const token = await signToken(user, secret);
       return jsonRes({ ok: true, token, user });
     } catch (e) {
@@ -400,6 +484,7 @@ export async function onRequestPost(context) {
     const uRec = uRaw ? JSON.parse(uRaw) : {};
     return jsonRes({
       ok: true,
+      role: curUser.role,
       prefs: uRec.prefs || null,
       favorites: Array.isArray(uRec.favorites) ? uRec.favorites : null
     });
@@ -413,14 +498,111 @@ export async function onRequestPost(context) {
     const uRaw = await env.AUTH_KV.get(uKey);
     if (!uRaw) return jsonRes({ ok: false, message: "用户记录不存在" }, 404);
     const uRec = JSON.parse(uRaw);
-    if (body.prefs && typeof body.prefs === "object") {
-      uRec.prefs = body.prefs;
-    }
-    if (Array.isArray(body.favorites)) {
-      uRec.favorites = body.favorites.slice(0, 200);
-    }
+    if (body.prefs && typeof body.prefs === "object") uRec.prefs = body.prefs;
+    if (Array.isArray(body.favorites)) uRec.favorites = body.favorites.slice(0, 200);
     await env.AUTH_KV.put(uKey, JSON.stringify(uRec));
     return jsonRes({ ok: true, message: "已同步至云端" });
+  }
+
+  // ===== 11. 超级管理员：邀请码列表与使用记录 =====
+  if (action === "invite_list") {
+    const curUser = await getAuthedUser(request, env);
+    if (!curUser || curUser.role !== "admin") {
+      return jsonRes({ ok: false, message: "仅超级管理员可访问邀请码管理" }, 403);
+    }
+    const list = await loadInviteRegistry(env);
+    return jsonRes({ ok: true, invites: list });
+  }
+
+  // ===== 12. 超级管理员：手动添加 / 批量导入邀请码 =====
+  if (action === "invite_add") {
+    const curUser = await getAuthedUser(request, env);
+    if (!curUser || curUser.role !== "admin") {
+      return jsonRes({ ok: false, message: "仅超级管理员可添加邀请码" }, 403);
+    }
+    const rawList = Array.isArray(body.codes)
+      ? body.codes
+      : String(body.codes || "").split(/[\r\n,，;\s]+/);
+    const cleaned = Array.from(
+      new Set(rawList.map(c => String(c || "").trim().toUpperCase()).filter(c => /^[A-Z0-9_-]{3,32}$/.test(c)))
+    );
+    if (!cleaned.length) {
+      return jsonRes({ ok: false, message: "请输入有效邀请码（3-32位字母/数字/短横线）" }, 400);
+    }
+
+    const registry = await loadInviteRegistry(env);
+    const existing = new Set(registry.map(x => x.code));
+    const nowIso = new Date().toISOString();
+    let added = 0;
+    for (const code of cleaned) {
+      if (!existing.has(code)) {
+        registry.unshift({
+          code,
+          source: body.source === "import" ? "import" : "manual",
+          status: "unused",
+          created_at: nowIso,
+          created_by: curUser.username,
+          used_by: "",
+          used_at: ""
+        });
+        existing.add(code);
+        added++;
+      }
+    }
+    await saveInviteRegistry(env, registry);
+    return jsonRes({ ok: true, added, skipped: cleaned.length - added, invites: registry });
+  }
+
+  // ===== 13. 超级管理员：随机生成一批邀请码 =====
+  if (action === "invite_generate") {
+    const curUser = await getAuthedUser(request, env);
+    if (!curUser || curUser.role !== "admin") {
+      return jsonRes({ ok: false, message: "仅超级管理员可生成邀请码" }, 403);
+    }
+    const count = Math.min(50, Math.max(1, parseInt(body.count, 10) || 5));
+    const prefix = String(body.prefix || "QDII").trim();
+    const registry = await loadInviteRegistry(env);
+    const existing = new Set(registry.map(x => x.code));
+    const nowIso = new Date().toISOString();
+    const created = [];
+
+    let guard = 0;
+    while (created.length < count && guard < count * 10) {
+      guard++;
+      const code = genRandomCode(prefix);
+      if (!existing.has(code)) {
+        existing.add(code);
+        const item = {
+          code,
+          source: "generated",
+          status: "unused",
+          created_at: nowIso,
+          created_by: curUser.username,
+          used_by: "",
+          used_at: ""
+        };
+        registry.unshift(item);
+        created.push(code);
+      }
+    }
+    await saveInviteRegistry(env, registry);
+    return jsonRes({ ok: true, created, invites: registry });
+  }
+
+  // ===== 14. 超级管理员：删除/作废邀请码 =====
+  if (action === "invite_delete") {
+    const curUser = await getAuthedUser(request, env);
+    if (!curUser || curUser.role !== "admin") {
+      return jsonRes({ ok: false, message: "仅超级管理员可删除邀请码" }, 403);
+    }
+    const code = String(body.code || "").trim().toUpperCase();
+    if (!code) return jsonRes({ ok: false, message: "缺少邀请码" }, 400);
+
+    const registry = await loadInviteRegistry(env);
+    const next = registry.filter(x => x.code !== code);
+    await env.AUTH_KV.delete(`used_invite:${code}`);
+    await saveInviteRegistry(env, next);
+    return jsonRes({ ok: true, message: `已删除邀请码 ${code}`, invites: next });
   }
 
   return jsonRes({ ok: false, message: "未知操作" }, 400);
