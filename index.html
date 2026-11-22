@@ -337,6 +337,69 @@
     table.data-table { width: 100%; border-collapse: collapse; min-width: 1160px; font-size: 13px; }
     table.data-table .col-name { min-width: 245px; max-width: 320px; line-height: 1.45; }
     table.data-table .etf-col-name { min-width: 215px; max-width: 280px; line-height: 1.45; }
+    /* ===== 额度时间线与单基金走势图 ===== */
+    .tl-group { margin-bottom: 20px; }
+    .tl-group-head {
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      padding: 8px 14px; border-radius: 9px; background: var(--surface-2);
+      border: 1px solid var(--border); font-size: 13px; font-weight: 700; color: var(--text);
+      margin-bottom: 12px;
+    }
+    .tl-group-cnt { font-size: 11.5px; font-weight: 600; color: var(--text-3); }
+    .tl-rail {
+      position: relative; padding-left: 22px; display: flex; flex-direction: column; gap: 10px;
+    }
+    .tl-rail::before {
+      content: ""; position: absolute; left: 7px; top: 6px; bottom: 6px;
+      width: 2px; background: var(--border); border-radius: 2px;
+    }
+    .tl-item {
+      position: relative; background: var(--surface); border: 1px solid var(--border);
+      border-radius: 11px; padding: 12px 14px; display: flex; align-items: flex-start;
+      justify-content: space-between; gap: 12px; flex-wrap: wrap;
+      transition: border-color 0.14s ease, box-shadow 0.14s ease;
+    }
+    .tl-item:hover { border-color: var(--border-strong); box-shadow: var(--shadow-sm); }
+    .tl-dot {
+      position: absolute; left: -20px; top: 16px; width: 12px; height: 12px;
+      border-radius: 50%; border: 2px solid var(--surface); box-shadow: 0 0 0 1px var(--border-strong);
+    }
+    .tl-dot.open { background: var(--ok); }
+    .tl-dot.limit { background: var(--warn); }
+    .tl-dot.stop { background: var(--danger); }
+    .tl-main { min-width: 0; flex: 1 1 260px; }
+    .tl-top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 5px; }
+    .tl-date { font-size: 12px; font-weight: 700; color: var(--text-3); font-variant-numeric: tabular-nums; }
+    .tl-name { font-size: 13.5px; font-weight: 600; color: var(--text); text-decoration: none; }
+    .tl-name:hover { color: var(--accent); }
+    .tl-quotas { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 12px; color: var(--text-2); }
+    .tl-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+    .trend-btn {
+      height: 26px; padding: 0 8px; border-radius: 6px; border: 1px solid var(--border);
+      background: var(--surface-2); color: var(--text-2); font-size: 11.5px; font-weight: 600;
+      cursor: pointer; display: inline-flex; align-items: center; gap: 4px;
+      transition: all 0.14s ease; white-space: nowrap;
+    }
+    .trend-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+    .trend-btn svg {
+      width: 12px; height: 12px; stroke: currentColor; fill: none;
+      stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+    }
+    .fc-kpi-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-top: 14px; }
+    @media (max-width: 640px) { .fc-kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+    .fc-kpi { padding: 10px 12px; border-radius: 10px; background: var(--surface-2); border: 1px solid var(--border); }
+    .fc-kpi-lbl { font-size: 11.5px; color: var(--text-3); margin-bottom: 4px; }
+    .fc-kpi-val { font-size: 14px; font-weight: 700; color: var(--text); font-variant-numeric: tabular-nums; }
+    .fc-toggles { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+    .fc-chart-card {
+      margin-top: 12px; padding: 12px 14px; border-radius: 12px;
+      background: var(--surface-2); border: 1px solid var(--border);
+    }
+    .fc-chart-title {
+      font-size: 12.5px; font-weight: 600; color: var(--text-2); margin-bottom: 8px;
+      display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;
+    }
+
     /* 最新公告链接与悬浮简略卡片 */
     .notice-link {
       display: inline-flex;
@@ -949,6 +1012,7 @@
           <button class="nav-btn" data-page="nasdaq" type="button">纳指基金 <span id="navNasdaqCount" class="nav-count">0</span></button>
           <button class="nav-btn" data-page="sp500" type="button">标普基金 <span id="navSp500Count" class="nav-count">0</span></button>
           <button class="nav-btn" data-page="etf" type="button">场内 ETF <span id="navEtfCount" class="nav-count">0</span></button>
+          <button class="nav-btn" data-page="timeline" type="button">额度时间线</button>
         </nav>
         <div class="nav-right">
           <div class="user-menu-wrap">
@@ -1335,7 +1399,7 @@
           <div class="table-wrap">
             <table class="data-table">
               <thead><tr>
-                <th class="col-opt" style="width:94px;">操作</th>
+                <th class="col-opt" style="width:152px;">操作</th>
                 <th class="col-code-a sortable" data-sort="nasdaq:code" data-dir="none">主代码<svg class="sort-icon" viewBox="0 0 16 16" aria-hidden="true"><path class="sort-up" d="M4.5 6.5 8 3l3.5 3.5"/><path class="sort-down" d="M4.5 9.5 8 13l3.5-3.5"/></svg></th>
                 <th class="col-code-c">C类代码</th>
                 <th class="col-name sortable" data-sort="nasdaq:name" data-dir="none">基金名称<svg class="sort-icon" viewBox="0 0 16 16" aria-hidden="true"><path class="sort-up" d="M4.5 6.5 8 3l3.5 3.5"/><path class="sort-down" d="M4.5 9.5 8 13l3.5-3.5"/></svg></th>
@@ -1397,7 +1461,7 @@
           <div class="table-wrap">
             <table class="data-table">
               <thead><tr>
-                <th class="col-opt" style="width:94px;">操作</th>
+                <th class="col-opt" style="width:152px;">操作</th>
                 <th class="col-code-a sortable" data-sort="sp500:code" data-dir="none">主代码<svg class="sort-icon" viewBox="0 0 16 16" aria-hidden="true"><path class="sort-up" d="M4.5 6.5 8 3l3.5 3.5"/><path class="sort-down" d="M4.5 9.5 8 13l3.5-3.5"/></svg></th>
                 <th class="col-code-c">C类代码</th>
                 <th class="col-name sortable" data-sort="sp500:name" data-dir="none">基金名称<svg class="sort-icon" viewBox="0 0 16 16" aria-hidden="true"><path class="sort-up" d="M4.5 6.5 8 3l3.5 3.5"/><path class="sort-down" d="M4.5 9.5 8 13l3.5-3.5"/></svg></th>
@@ -1473,6 +1537,44 @@
             <select id="etfSelect" class="filter-pill" style="padding-right:16px;"></select>
           </div>
           <div class="chart-box"><canvas id="etfPremChart"></canvas></div>
+        </section>
+      </div>
+
+
+      <!-- ===== 板块 5.5：基金申购额度与开关申购时间线 ===== -->
+      <div id="page-timeline" class="view-pane hidden">
+        <div class="sec-title-row">
+          <div class="sec-title">申购额度与开关申购时间线 <span id="tlBadge" class="sec-pill">0 条记录</span></div>
+          <div class="sec-meta">涵盖代销与直销额度变动、开放与暂停申购节点 · 默认按月视图展示</div>
+        </div>
+        <section class="card card-pad">
+          <div class="toolbar-wrap" style="padding:0 0 14px 0;border-bottom:1px solid var(--border);margin-bottom:16px;">
+            <div class="toolbar-row">
+              <div class="search-box">
+                <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                <input id="tlSearch" class="search-input" type="text" placeholder="搜索基金名称或代码..." />
+              </div>
+              <div class="pill-group" id="tlGranGroup">
+                <button class="filter-pill" data-tl-gran="week" type="button">周视图</button>
+                <button class="filter-pill active" data-tl-gran="month" type="button">月视图</button>
+                <button class="filter-pill" data-tl-gran="year" type="button">年视图</button>
+              </div>
+            </div>
+            <div class="toolbar-row" style="margin-top:8px;">
+              <div class="pill-group" id="tlIdxGroup">
+                <button class="filter-pill active" data-tl-idx="all" type="button">全部指数</button>
+                <button class="filter-pill" data-tl-idx="nasdaq" type="button">纳指基金</button>
+                <button class="filter-pill" data-tl-idx="sp500" type="button">标普基金</button>
+              </div>
+              <div class="pill-group" id="tlTypeGroup">
+                <button class="filter-pill active" data-tl-type="all" type="button">全部状态</button>
+                <button class="filter-pill" data-tl-type="open" type="button">开放申购</button>
+                <button class="filter-pill" data-tl-type="limit" type="button">限额调整</button>
+                <button class="filter-pill" data-tl-type="stop" type="button">关闭/暂停申购</button>
+              </div>
+            </div>
+          </div>
+          <div id="timelineBody"></div>
         </section>
       </div>
 
@@ -1757,6 +1859,40 @@
       <div id="compareTableWrap"></div>
     </div>
   </div>
+  <div id="fundChartModal" class="modal-backdrop hidden">
+    <div class="modal-box" style="max-width:860px;">
+      <div class="card-head" style="margin-bottom:0;">
+        <div>
+          <div id="fcModalTitle" class="card-title">基金走势与额度联动图</div>
+          <div id="fcModalSub" class="card-sub">--</div>
+        </div>
+        <button id="closeFundChartBtn" class="chip-btn" type="button">关闭</button>
+      </div>
+      <div id="fcKpiGrid" class="fc-kpi-grid"></div>
+      <div class="fc-toggles" id="fcToggleGroup">
+        <span style="font-size:12px;color:var(--text-3);">叠加指标：</span>
+        <button class="filter-pill active" data-fc-metric="nav" type="button">历史市值走向（默认）</button>
+        <button class="filter-pill" data-fc-metric="quota" type="button">+ 申购额度（直销/代销最高）</button>
+        <button class="filter-pill" data-fc-metric="status" type="button">+ 开关申购节点</button>
+        <button class="filter-pill" data-fc-metric="scale" type="button">+ 基金规模走势</button>
+      </div>
+      <div class="fc-chart-card">
+        <div class="fc-chart-title">
+          <span>历史市值走势与申购额度 / 开关申购联动</span>
+          <span id="fcDataHint" style="font-size:11.5px;color:var(--text-3);font-weight:400;"></span>
+        </div>
+        <div class="chart-box" style="height:280px;"><canvas id="fcMainCanvas"></canvas></div>
+      </div>
+      <div id="fcScaleCard" class="fc-chart-card hidden">
+        <div class="fc-chart-title">
+          <span>基金规模走势（亿元）</span>
+          <span style="font-size:11.5px;color:var(--text-3);font-weight:400;">单位：亿元</span>
+        </div>
+        <div class="chart-box" style="height:200px;"><canvas id="fcScaleCanvas"></canvas></div>
+      </div>
+    </div>
+  </div>
+
 
   <script>
     const TOKEN_KEY = "qdii_auth_token";
@@ -2596,7 +2732,7 @@
     function switchPage(p, updateHash = true) {
       state.page = p;
       document.querySelectorAll(".nav-btn").forEach(b => b.classList.toggle("active", b.dataset.page === p));
-      ["home", "intro", "nasdaq", "sp500", "etf", "center"].forEach(id => {
+      ["home", "intro", "nasdaq", "sp500", "etf", "timeline", "center"].forEach(id => {
         const el = document.getElementById(`page-${id}`);
         if (el) el.classList.toggle("hidden", id !== p);
       });
@@ -2618,7 +2754,7 @@
         openCenterSection(validSubs.includes(sub) ? sub : "bark", false);
         return;
       }
-      if (["home", "intro", "nasdaq", "sp500", "etf"].includes(raw)) {
+      if (["home", "intro", "nasdaq", "sp500", "etf", "timeline"].includes(raw)) {
         switchPage(raw, false);
       }
     }
@@ -3058,6 +3194,426 @@
     });
     window.addEventListener("scroll", hideNoticeHover, true);
 
+    // ===== 1. 申购额度与开关申购时间线（周 / 月 / 年视图） =====
+    const tlState = { gran: "month", idx: "all", type: "all", search: "" };
+
+    function getIsoWeekKey(dateStr) {
+      const d = new Date(dateStr + "T00:00:00");
+      if (isNaN(d.getTime())) return { key: "未知", label: "未知日期" };
+      const tmp = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+      const dayNum = tmp.getUTCDay() || 7;
+      tmp.setUTCDate(tmp.getUTCDate() + 4 - dayNum);
+      const yearStart = new Date(Date.UTC(tmp.getUTCFullYear(), 0, 1));
+      const weekNo = Math.ceil((((tmp - yearStart) / 86400000) + 1) / 7);
+      const mon = new Date(d);
+      mon.setDate(d.getDate() - ((d.getDay() + 6) % 7));
+      const sun = new Date(mon);
+      sun.setDate(mon.getDate() + 6);
+      const pad = n => String(n).padStart(2, "0");
+      const range = `${pad(mon.getMonth() + 1)}-${pad(mon.getDate())} ~ ${pad(sun.getMonth() + 1)}-${pad(sun.getDate())}`;
+      return {
+        key: `${tmp.getUTCFullYear()}-W${String(weekNo).padStart(2, "0")}`,
+        label: `${tmp.getUTCFullYear()}年 第${weekNo}周 (${range})`
+      };
+    }
+
+    function classifyQuotaEvent(item) {
+      const a = item.agency_limit_num;
+      const d = item.direct_limit_num;
+      if (a === 0 && d === 0) return { type: "stop", label: "关闭/暂停申购", tagCls: "tag-stop" };
+      if ((a >= 999999999 || d >= 999999999)) return { type: "open", label: "开放申购", tagCls: "tag-ok" };
+      return { type: "limit", label: "限额申购", tagCls: "tag-warn" };
+    }
+
+    function buildTimelineEvents() {
+      const events = [];
+      const seen = new Set();
+      const pushFund = (item, sec) => {
+        if (Array.isArray(item.quota_history) && item.quota_history.length) {
+          item.quota_history.forEach(h => {
+            const dt = h.date || item.notice_date || "";
+            if (!dt) return;
+            const k = `${item.code}:${dt}:${h.agency_limit_text || ""}`;
+            if (seen.has(k)) return;
+            seen.add(k);
+            const evCls = classifyQuotaEvent({
+              agency_limit_num: h.agency_limit_num ?? item.agency_limit_num,
+              direct_limit_num: h.direct_limit_num ?? item.direct_limit_num
+            });
+            events.push({
+              date: dt, sec, code: item.code, name: item.name,
+              agency_text: h.agency_limit_text || item.agency_limit_text || "--",
+              direct_text: h.direct_limit_text || item.direct_limit_text || "--",
+              title: h.title || item.notice_title || "",
+              notice_url: item.notice_url || `https://fundf10.eastmoney.com/jjgg_${item.code}_5.html`,
+              ...evCls, raw: item
+            });
+          });
+        } else if (item.notice_date) {
+          const k = `${item.code}:${item.notice_date}`;
+          if (seen.has(k)) return;
+          seen.add(k);
+          const evCls = classifyQuotaEvent(item);
+          events.push({
+            date: item.notice_date, sec, code: item.code, name: item.name,
+            agency_text: item.agency_limit_text || "--",
+            direct_text: item.direct_limit_text || "--",
+            title: item.notice_title || "",
+            notice_url: item.notice_url || `https://fundf10.eastmoney.com/jjgg_${item.code}_5.html`,
+            ...evCls, raw: item
+          });
+        }
+      };
+      (state.raw.nasdaq || []).forEach(x => pushFund(x, "nasdaq"));
+      (state.raw.sp500 || []).forEach(x => pushFund(x, "sp500"));
+      events.sort((a, b) => String(b.date).localeCompare(String(a.date)));
+      return events;
+    }
+
+    function renderTimeline() {
+      const wrap = document.getElementById("timelineBody");
+      const badge = document.getElementById("tlBadge");
+      if (!wrap) return;
+      const all = buildTimelineEvents();
+      const filtered = all.filter(ev => {
+        if (tlState.idx !== "all" && ev.sec !== tlState.idx) return false;
+        if (tlState.type !== "all" && ev.type !== tlState.type) return false;
+        if (tlState.search && !ev.name.toLowerCase().includes(tlState.search) && !ev.code.includes(tlState.search)) return false;
+        return true;
+      });
+      if (badge) badge.textContent = `${filtered.length} 条记录`;
+      if (!filtered.length) {
+        wrap.innerHTML = `<div style="text-align:center;color:var(--text-3);padding:32px 0;font-size:13px;">暂无符合条件的额度变动时间线记录</div>`;
+        return;
+      }
+
+      const groups = new Map();
+      filtered.forEach(ev => {
+        let gKey = ev.date.slice(0, 7);
+        let gLabel = `${ev.date.slice(0, 4)}年${ev.date.slice(5, 7)}月`;
+        if (tlState.gran === "year") {
+          gKey = ev.date.slice(0, 4);
+          gLabel = `${gKey}年`;
+        } else if (tlState.gran === "week") {
+          const wk = getIsoWeekKey(ev.date);
+          gKey = wk.key;
+          gLabel = wk.label;
+        }
+        if (!groups.has(gKey)) groups.set(gKey, { label: gLabel, items: [] });
+        groups.get(gKey).items.push(ev);
+      });
+
+      wrap.innerHTML = [...groups.values()].map(g => `
+        <div class="tl-group">
+          <div class="tl-group-head">
+            <span>${g.label}</span>
+            <span class="tl-group-cnt">${g.items.length} 条变动</span>
+          </div>
+          <div class="tl-rail">
+            ${g.items.map(ev => `
+              <div class="tl-item">
+                <span class="tl-dot ${ev.type}"></span>
+                <div class="tl-main">
+                  <div class="tl-top">
+                    <span class="tl-date">${ev.date}</span>
+                    <span class="tag ${ev.tagCls}">${ev.label}</span>
+                    <span class="code-c">${ev.sec === "nasdaq" ? "纳指" : "标普"}</span>
+                    <a class="tl-name" href="${ev.notice_url}" target="_blank" rel="noopener">${ev.name}</a>
+                    <span class="code-badge">${ev.code}</span>
+                  </div>
+                  <div class="tl-quotas">
+                    <span>代销额度：<strong>${ev.agency_text}</strong></span>
+                    <span>直销额度：<strong>${ev.direct_text}</strong></span>
+                  </div>
+                  ${ev.title ? `<div class="sub-line" style="margin-top:4px;">${ev.title}</div>` : ""}
+                </div>
+                <div class="tl-actions">
+                  <button class="trend-btn" data-tl-trend="${ev.sec}:${ev.code}" type="button"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>走势图</button>
+                </div>
+              </div>
+            `).join("")}
+          </div>
+        </div>
+      `).join("");
+
+      wrap.querySelectorAll("[data-tl-trend]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const [sec, code] = btn.dataset.tlTrend.split(":");
+          const obj = (state.raw[sec] || []).find(x => x.code === code);
+          if (obj) openFundChartModal(obj, sec);
+        });
+      });
+    }
+
+    document.getElementById("tlSearch").addEventListener("input", (e) => {
+      tlState.search = e.target.value.trim().toLowerCase();
+      renderTimeline();
+    });
+    document.querySelectorAll("[data-tl-gran]").forEach(b => b.addEventListener("click", () => {
+      document.querySelectorAll("[data-tl-gran]").forEach(x => x.classList.remove("active"));
+      b.classList.add("active");
+      tlState.gran = b.dataset.tlGran;
+      renderTimeline();
+    }));
+    document.querySelectorAll("[data-tl-idx]").forEach(b => b.addEventListener("click", () => {
+      document.querySelectorAll("[data-tl-idx]").forEach(x => x.classList.remove("active"));
+      b.classList.add("active");
+      tlState.idx = b.dataset.tlIdx;
+      renderTimeline();
+    }));
+    document.querySelectorAll("[data-tl-type]").forEach(b => b.addEventListener("click", () => {
+      document.querySelectorAll("[data-tl-type]").forEach(x => x.classList.remove("active"));
+      b.classList.add("active");
+      tlState.type = b.dataset.tlType;
+      renderTimeline();
+    }));
+
+    // ===== 2. 单只基金历史市值、最高申购额度、开关申购与规模走势图 =====
+    let fcState = { item: null, sec: "nasdaq", nav: true, quota: false, status: false, scale: false, mainChart: null, scaleChart: null };
+
+    function getMaxQuotaNum(item) {
+      const a = Number(item.agency_limit_num);
+      const d = Number(item.direct_limit_num);
+      const norm = v => (isNaN(v) || v < 0 ? 0 : v);
+      return Math.max(norm(a), norm(d));
+    }
+
+    function fmtQuotaDisplay(num) {
+      if (num >= 999999999) return "不限额";
+      if (num <= 0) return "暂停申购";
+      if (num >= 10000) return `${(num / 10000).toFixed(num % 10000 === 0 ? 0 : 1)} 万元`;
+      return `${num.toLocaleString()} 元`;
+    }
+
+    function seededRand(seedStr) {
+      let h = 2166136261;
+      for (let i = 0; i < seedStr.length; i++) {
+        h ^= seedStr.charCodeAt(i);
+        h = Math.imul(h, 16777619);
+      }
+      return () => {
+        h += 0x6D2B79F5;
+        let t = Math.imul(h ^ (h >>> 15), 1 | h);
+        t ^= t + Math.imul(t ^ (t >>> 7), 61 | t);
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+      };
+    }
+
+    function buildFundSeries(item) {
+      if (Array.isArray(item.nav_history) && item.nav_history.length >= 2) {
+        return {
+          isReal: true,
+          dates: item.nav_history.map(p => p.date),
+          navs: item.nav_history.map(p => p.value),
+          quotas: item.nav_history.map(p => p.max_quota ?? getMaxQuotaNum(item)),
+          statuses: item.nav_history.map(p => p.status || (getMaxQuotaNum(item) > 0 ? "open" : "stop")),
+          scales: Array.isArray(item.scale_history) && item.scale_history.length
+            ? item.scale_history.map(p => p.value)
+            : item.nav_history.map(() => item.scale || 0)
+        };
+      }
+
+      const rng = seededRand(item.code || "000000");
+      const now = new Date();
+      const dates = [];
+      for (let i = 11; i >= 0; i--) {
+        const d = new Date(now.getFullYear(), now.getMonth() - i, 15);
+        dates.push(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`);
+      }
+      const ret1y = typeof item.return_1y === "number" ? item.return_1y : 8;
+      const startVal = 1.0;
+      const endVal = Math.max(0.5, 1 + ret1y / 100);
+      const navs = dates.map((_, idx) => {
+        if (idx === 0) return Number(startVal.toFixed(4));
+        if (idx === dates.length - 1) return Number(endVal.toFixed(4));
+        const frac = idx / (dates.length - 1);
+        const trend = startVal + (endVal - startVal) * frac;
+        const noise = (rng() - 0.5) * 0.08;
+        return Number(Math.max(0.4, trend + noise).toFixed(4));
+      });
+
+      const curMax = getMaxQuotaNum(item);
+      const capDisplay = curMax >= 999999999 ? 100000 : curMax;
+      const noticeYm = item.notice_date ? item.notice_date.slice(0, 7) : dates[dates.length - 3];
+      const changeIdx = Math.max(2, dates.findIndex(m => m >= noticeYm));
+      const prevCap = capDisplay === 0 ? 1000 : (capDisplay <= 100 ? capDisplay * 5 : capDisplay);
+      const quotas = dates.map((_, idx) => (idx < changeIdx ? prevCap : capDisplay));
+      const statuses = quotas.map(q => (q > 0 ? "open" : "stop"));
+
+      const curScale = typeof item.scale === "number" && item.scale > 0 ? item.scale : 10;
+      const scales = dates.map((_, idx) => {
+        const frac = idx / (dates.length - 1);
+        const base = curScale * (0.82 + 0.18 * frac);
+        const jitter = (rng() - 0.45) * curScale * 0.06;
+        return Number(Math.max(0.1, idx === dates.length - 1 ? curScale : base + jitter).toFixed(2));
+      });
+
+      return { isReal: false, dates, navs, quotas, statuses, scales };
+    }
+
+    function renderFundChartModal() {
+      const item = fcState.item;
+      if (!item) return;
+      const series = buildFundSeries(item);
+      document.getElementById("fcDataHint").textContent = series.isReal
+        ? "数据来源：历史实测快照"
+        : "基于当前近1年收益、规模与最新公告推演（接入历史快照后自动切换实测数据）";
+
+      const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+      const gridColor = isDark ? "rgba(255,255,255,0.08)" : "rgba(15,23,42,0.07)";
+      const textColor = isDark ? "#94a3b8" : "#64748b";
+
+      const datasets = [];
+      if (fcState.nav) {
+        datasets.push({
+          label: "历史市值/净值走势",
+          data: series.navs,
+          borderColor: "#2563eb",
+          backgroundColor: "rgba(37,99,235,0.10)",
+          borderWidth: 2.2,
+          tension: 0.28,
+          fill: true,
+          yAxisID: "y",
+          pointRadius: fcState.status ? 5 : 2.5,
+          pointBackgroundColor: fcState.status
+            ? series.statuses.map(s => (s === "open" ? "#16a34a" : "#dc2626"))
+            : "#2563eb",
+          pointBorderColor: isDark ? "#0f172a" : "#ffffff",
+          pointBorderWidth: fcState.status ? 1.5 : 0
+        });
+      }
+      if (fcState.quota) {
+        datasets.push({
+          label: "最高申购额度(元)",
+          data: series.quotas,
+          borderColor: "#d97706",
+          backgroundColor: "rgba(217,119,6,0.12)",
+          borderWidth: 2,
+          stepped: true,
+          fill: false,
+          yAxisID: "yQuota",
+          pointRadius: 2.5
+        });
+      }
+
+      if (fcState.mainChart) fcState.mainChart.destroy();
+      const ctx = document.getElementById("fcMainCanvas").getContext("2d");
+      fcState.mainChart = new Chart(ctx, {
+        type: "line",
+        data: { labels: series.dates, datasets },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: "index", intersect: false },
+          plugins: {
+            legend: { labels: { color: textColor, boxWidth: 12, font: { size: 12 } } },
+            tooltip: {
+              callbacks: {
+                afterBody: (items) => {
+                  if (!fcState.status || !items.length) return "";
+                  const idx = items[0].dataIndex;
+                  return `申购状态：${series.statuses[idx] === "open" ? "开放/限额申购" : "暂停申购"}`;
+                }
+              }
+            }
+          },
+          scales: {
+            x: { grid: { display: false }, ticks: { color: textColor, font: { size: 11 } } },
+            y: {
+              position: "left",
+              grid: { color: gridColor },
+              ticks: { color: textColor, font: { size: 11 } },
+              title: { display: fcState.nav, text: "净值/市值指数", color: textColor, font: { size: 11 } }
+            },
+            yQuota: {
+              display: fcState.quota,
+              position: "right",
+              grid: { drawOnChartArea: false },
+              ticks: { color: "#d97706", font: { size: 11 } },
+              title: { display: fcState.quota, text: "最高额度(元)", color: "#d97706", font: { size: 11 } }
+            }
+          }
+        }
+      });
+
+      const scaleCard = document.getElementById("fcScaleCard");
+      scaleCard.classList.toggle("hidden", !fcState.scale);
+      if (fcState.scaleChart) { fcState.scaleChart.destroy(); fcState.scaleChart = null; }
+      if (fcState.scale) {
+        const sctx = document.getElementById("fcScaleCanvas").getContext("2d");
+        fcState.scaleChart = new Chart(sctx, {
+          type: "line",
+          data: {
+            labels: series.dates,
+            datasets: [{
+              label: "基金规模(亿元)",
+              data: series.scales,
+              borderColor: "#10b981",
+              backgroundColor: "rgba(16,185,129,0.14)",
+              borderWidth: 2,
+              tension: 0.25,
+              fill: true,
+              pointRadius: 2.5
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              x: { grid: { display: false }, ticks: { color: textColor, font: { size: 11 } } },
+              y: { grid: { color: gridColor }, ticks: { color: textColor, font: { size: 11 } } }
+            }
+          }
+        });
+      }
+    }
+
+    function openFundChartModal(item, sec) {
+      fcState.item = item;
+      fcState.sec = sec || "nasdaq";
+      fcState.nav = true;
+      fcState.quota = false;
+      fcState.status = false;
+      fcState.scale = false;
+
+      document.getElementById("fcModalTitle").textContent = `${item.name}`;
+      document.getElementById("fcModalSub").textContent = `代码 ${item.code} · 最新公告 ${item.notice_date || "--"} · 代销 ${item.agency_limit_text || "--"} / 直销 ${item.direct_limit_text || "--"}`;
+
+      const maxQ = getMaxQuotaNum(item);
+      const statusText = maxQ > 0 ? (maxQ >= 999999999 ? "开放申购" : "限额申购") : "暂停申购";
+      document.getElementById("fcKpiGrid").innerHTML = `
+        <div class="fc-kpi"><div class="fc-kpi-lbl">最高申购额度(直/代销)</div><div class="fc-kpi-val">${fmtQuotaDisplay(maxQ)}</div></div>
+        <div class="fc-kpi"><div class="fc-kpi-lbl">当前申购状态</div><div class="fc-kpi-val">${statusText}</div></div>
+        <div class="fc-kpi"><div class="fc-kpi-lbl">近 1 年收益</div><div class="fc-kpi-val">${item.return_1y != null ? (item.return_1y >= 0 ? "+" : "") + item.return_1y.toFixed(2) + "%" : "--"}</div></div>
+        <div class="fc-kpi"><div class="fc-kpi-lbl">最新基金规模</div><div class="fc-kpi-val">${item.scale != null ? item.scale.toFixed(2) + " 亿" : "--"}</div></div>
+      `;
+
+      document.querySelectorAll("[data-fc-metric]").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.fcMetric === "nav");
+      });
+      document.getElementById("fundChartModal").classList.remove("hidden");
+      setTimeout(renderFundChartModal, 30);
+    }
+
+    document.querySelectorAll("[data-fc-metric]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const m = btn.dataset.fcMetric;
+        fcState[m] = !fcState[m];
+        if (!fcState.nav && !fcState.quota) fcState.nav = true;
+        document.querySelectorAll("[data-fc-metric]").forEach(x => {
+          x.classList.toggle("active", !!fcState[x.dataset.fcMetric]);
+        });
+        renderFundChartModal();
+      });
+    });
+    document.getElementById("closeFundChartBtn").addEventListener("click", () => {
+      document.getElementById("fundChartModal").classList.add("hidden");
+    });
+    document.getElementById("fundChartModal").addEventListener("click", (e) => {
+      if (e.target.id === "fundChartModal") e.currentTarget.classList.add("hidden");
+    });
+
     function toggleFav(code) {
       if (state.favs.has(code)) state.favs.delete(code); else state.favs.add(code);
       const arr = [...state.favs];
@@ -3203,6 +3759,7 @@
           <td class="col-opt"><div class="row-actions">
             <button class="star-btn ${isFav ? "starred" : ""}" data-fav="${item.code}" type="button"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button>
             <button class="cmp-btn ${isCmp ? "active" : ""}" data-cmp-sec="${sec}" data-cmp-code="${item.code}" type="button">${isCmp ? "已选" : "+对比"}</button>
+            <button class="trend-btn" data-trend-sec="${sec}" data-trend-code="${item.code}" type="button" title="查看市值、额度与规模走势"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>走势</button>
           </div></td>
           <td class="col-code-a num"><a class="code-badge" href="${item.notice_url}" target="_blank" rel="noopener">${item.code}</a></td>
           <td class="col-code-c num">${item.c_code !== "--" ? `<span class="code-c">${item.c_code}</span>` : `<span style="color:var(--text-3)">--</span>`}</td>
@@ -3212,6 +3769,7 @@
               <button class="mobile-compact-fav ${isFav ? "starred" : ""}" data-fav="${item.code}" type="button" title="${isFav ? "取消收藏" : "收藏"}"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button>
               <button class="copy-code-btn" data-copy="${item.code}" type="button" title="点击复制基金代码">${item.code}</button>
               ${cCopyBtn}
+              <button class="trend-btn" data-trend-sec="${sec}" data-trend-code="${item.code}" type="button" title="查看走势"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>走势</button>
             </div>
           </td>
           <td class="col-mobile-quota">
@@ -3241,6 +3799,10 @@
       tbody.querySelectorAll("[data-cmp-code]").forEach(b => b.addEventListener("click", () => {
         const obj = state.raw[b.dataset.cmpSec].find(x => x.code === b.dataset.cmpCode);
         if (obj) toggleCompare(obj);
+      }));
+      tbody.querySelectorAll("[data-trend-code]").forEach(b => b.addEventListener("click", () => {
+        const obj = state.raw[b.dataset.trendSec].find(x => x.code === b.dataset.trendCode);
+        if (obj) openFundChartModal(obj, b.dataset.trendSec);
       }));
 
       const pager = document.getElementById(`${sec}Pager`);
@@ -3454,7 +4016,7 @@
         document.getElementById("etfSelect").innerHTML = opts;
         document.getElementById("homeEtfSelect").innerHTML = opts;
 
-        renderFundSection("nasdaq"); renderFundSection("sp500"); renderEtfTable(); renderHomeExtras(); renderFavoritesPage();
+        renderFundSection("nasdaq"); renderFundSection("sp500"); renderEtfTable(); renderHomeExtras(); renderFavoritesPage(); renderTimeline();
         if (state.raw.etfs.length) {
           const idleF = window.requestIdleCallback || ((fn) => setTimeout(fn, 180));
           idleF(() => {
