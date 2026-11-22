@@ -2314,6 +2314,18 @@
       } catch {}
     }
 
+    function switchPage(p) {
+      state.page = p;
+      document.querySelectorAll(".nav-btn").forEach(b => b.classList.toggle("active", b.dataset.page === p));
+      ["home", "intro", "nasdaq", "sp500", "etf", "center"].forEach(id => {
+        const el = document.getElementById(`page-${id}`);
+        if (el) el.classList.toggle("hidden", id !== p);
+      });
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      setTimeout(rerenderVisibleCharts, 40);
+    }
+    document.querySelectorAll(".nav-btn").forEach(b => b.addEventListener("click", () => switchPage(b.dataset.page)));
+
     function isUserAdmin(user) {
       return !!(user && (user.role === "admin" || String(user.username || "").toLowerCase() === "lesun"));
     }
