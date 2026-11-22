@@ -587,7 +587,31 @@
     .dock-clear { background: transparent; color: inherit; opacity: 0.75; border: none; cursor: pointer; font-size: 12px; }
 
     .modal-backdrop { position: fixed; inset: 0; z-index: 100; background: rgba(15, 23, 42, 0.55); display: flex; align-items: center; justify-content: center; padding: 20px; }
-    .modal-box { width: 100%; max-width: 900px; max-height: 85vh; overflow: auto; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 22px 24px; box-shadow: var(--shadow-md); }
+    .modal-box {
+      width: 100%; max-width: 900px; max-height: 86vh; overflow: hidden;
+      display: flex; flex-direction: column;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+      padding: 0; box-shadow: var(--shadow-md);
+    }
+    .modal-head {
+      padding: 18px 22px 14px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      flex-shrink: 0; background: var(--surface);
+    }
+    .modal-scroll {
+      flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden;
+      padding: 16px 22px 22px;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(148, 163, 184, 0.45) transparent;
+    }
+    .modal-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+    .modal-scroll::-webkit-scrollbar-track { background: transparent; margin: 6px 0; }
+    .modal-scroll::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.45); border-radius: 999px; }
+    .modal-scroll::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184, 0.7); }
+    /* 可拖拽表头样式 */
+    table.data-table th[draggable="true"] { cursor: grab; position: relative; }
+    table.data-table th.col-dragging { opacity: 0.45; }
+    table.data-table th.col-drag-over { box-shadow: inset 3px 0 0 var(--accent); background: var(--accent-soft); }
     .cmp-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 14px; }
     .cmp-table th, .cmp-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); text-align: left; }
     .cmp-table th { width: 130px; color: var(--text-3); background: var(--surface-2); font-weight: 500; }
@@ -1855,20 +1879,21 @@
   <div id="noticeHoverCard" class="notice-hover-card" role="tooltip" aria-hidden="true"></div>
     <div id="compareModal" class="modal-backdrop hidden">
     <div class="modal-box">
-      <div class="card-head" style="margin-bottom:0;"><div class="card-title">基金横向对比</div><button id="closeCompareBtn" class="chip-btn" type="button">关闭</button></div>
-      <div id="compareTableWrap"></div>
+      <div class="modal-head"><div class="card-title">基金横向对比</div><button id="closeCompareBtn" class="chip-btn" type="button">关闭</button></div>
+      <div class="modal-scroll"><div id="compareTableWrap"></div></div>
     </div>
   </div>
   <div id="fundChartModal" class="modal-backdrop hidden">
     <div class="modal-box" style="max-width:860px;">
-      <div class="card-head" style="margin-bottom:0;">
+      <div class="modal-head">
         <div>
           <div id="fcModalTitle" class="card-title">基金走势与额度联动图</div>
           <div id="fcModalSub" class="card-sub">--</div>
         </div>
         <button id="closeFundChartBtn" class="chip-btn" type="button">关闭</button>
       </div>
-      <div id="fcKpiGrid" class="fc-kpi-grid"></div>
+      <div id="fcModalScroll" class="modal-scroll">
+      <div id="fcKpiGrid" class="fc-kpi-grid" style="margin-top:0;"></div>
       <div class="fc-toggles" id="fcToggleGroup">
         <span style="font-size:12px;color:var(--text-3);">叠加指标：</span>
         <button class="filter-pill active" data-fc-metric="nav" type="button">历史市值走向（默认）</button>
@@ -1889,6 +1914,7 @@
           <span style="font-size:11.5px;color:var(--text-3);font-weight:400;">单位：亿元</span>
         </div>
         <div class="chart-box" style="height:200px;"><canvas id="fcScaleCanvas"></canvas></div>
+      </div>
       </div>
     </div>
   </div>
@@ -2740,6 +2766,7 @@
         const nextHash = `#${p}`;
         if (window.location.hash !== nextHash) history.replaceState(null, "", nextHash);
       }
+      ensurePageLoaded(p);
       window.scrollTo({ top: 0, behavior: "smooth" });
       setTimeout(rerenderVisibleCharts, 40);
     }
@@ -2801,6 +2828,7 @@
         }
         if (data.prefs && typeof data.prefs === "object") {
           localStorage.setItem(PREF_KEY, JSON.stringify(data.prefs));
+          if (data.prefs.colOrder) localStorage.setItem(COL_ORDER_KEY, JSON.stringify(data.prefs.colOrder));
           fillSettingsForm(getPrefs());
         }
       } catch {}
@@ -2818,6 +2846,56 @@
       } catch {}
     }
 
+    state.pageInited = {};
+    state.fundsPromise = null;
+    state.marketPromise = null;
+
+    function ensureFundsLoaded() {
+      if (!state.fundsPromise) state.fundsPromise = initFunds();
+      return state.fundsPromise;
+    }
+
+    function ensureMarketLoaded() {
+      if (!state.marketPromise) state.marketPromise = initMarket();
+      return state.marketPromise;
+    }
+
+    function ensurePageLoaded(p) {
+      if (p === "home") {
+        if (!state.pageInited.home) {
+          state.pageInited.home = true;
+          renderPeHighTable("spx");
+          renderPeRefChart(10);
+          renderYearlyChart("both");
+          renderGrowthChart();
+          ensureMarketLoaded();
+          ensureFundsLoaded().then(() => renderHomeExtras());
+        }
+      } else if (p === "intro") {
+        if (!state.pageInited.intro) {
+          state.pageInited.intro = true;
+          renderHoldings("ndx");
+        }
+      } else if (p === "nasdaq" || p === "sp500") {
+        if (!state.pageInited[p]) {
+          state.pageInited[p] = true;
+          ensureFundsLoaded().then(() => renderFundSection(p));
+        }
+      } else if (p === "etf") {
+        if (!state.pageInited.etf) {
+          state.pageInited.etf = true;
+          ensureFundsLoaded().then(() => renderEtfTable());
+        }
+      } else if (p === "timeline") {
+        if (!state.pageInited.timeline) {
+          state.pageInited.timeline = true;
+          ensureFundsLoaded().then(() => renderTimeline());
+        }
+      } else if (p === "center") {
+        ensureFundsLoaded().then(() => renderFavoritesPage());
+      }
+    }
+
     function enterApp(user) {
       state.user = user;
       document.getElementById("userNameText").textContent = user.username;
@@ -2827,17 +2905,13 @@
       document.getElementById("authScreen").classList.add("hidden");
       document.getElementById("appShell").classList.remove("hidden");
       restoreRouteFromHash();
+      ensurePageLoaded(state.page || "home");
       syncFromCloud().then(() => {
-        renderFundSection("nasdaq");
-        renderFundSection("sp500");
-        renderEtfTable();
-        renderFavoritesPage();
+        if (state.pageInited.nasdaq) renderFundSection("nasdaq");
+        if (state.pageInited.sp500) renderFundSection("sp500");
+        if (state.pageInited.etf) renderEtfTable();
+        if (state.page === "center") renderFavoritesPage();
       });
-      if (!state.loaded) {
-        state.loaded = true;
-        renderPeHighTable("spx"); renderPeRefChart(10); renderYearlyChart("both"); renderGrowthChart(); renderHoldings("ndx");
-        initFunds(); initMarket();
-      }
     }
 
     // ===== 格式化工具 =====
@@ -3440,7 +3514,8 @@
       const quotas = dates.map((_, idx) => (idx < changeIdx ? prevCap : capDisplay));
       const statuses = quotas.map(q => (q > 0 ? "open" : "stop"));
 
-      const curScale = typeof item.scale === "number" && item.scale > 0 ? item.scale : 10;
+      const parsedScale = parseFloat(String(item.scale ?? "").replace(/[^0-9.]/g, ""));
+      const curScale = !isNaN(parsedScale) && parsedScale > 0 ? parsedScale : 10;
       const scales = dates.map((_, idx) => {
         const frac = idx / (dates.length - 1);
         const base = curScale * (0.82 + 0.18 * frac);
@@ -3540,8 +3615,11 @@
       scaleCard.classList.toggle("hidden", !fcState.scale);
       if (fcState.scaleChart) { fcState.scaleChart.destroy(); fcState.scaleChart = null; }
       if (fcState.scale) {
-        const sctx = document.getElementById("fcScaleCanvas").getContext("2d");
-        fcState.scaleChart = new Chart(sctx, {
+        requestAnimationFrame(() => {
+          const canvasEl = document.getElementById("fcScaleCanvas");
+          if (!canvasEl) return;
+          const sctx = canvasEl.getContext("2d");
+          fcState.scaleChart = new Chart(sctx, {
           type: "line",
           data: {
             labels: series.dates,
@@ -3565,6 +3643,9 @@
               y: { grid: { color: gridColor }, ticks: { color: textColor, font: { size: 11 } } }
             }
           }
+        });
+          const sc = document.getElementById("fcModalScroll");
+          if (sc) sc.scrollTo({ top: sc.scrollHeight, behavior: "smooth" });
         });
       }
     }
@@ -3613,6 +3694,111 @@
     document.getElementById("fundChartModal").addEventListener("click", (e) => {
       if (e.target.id === "fundChartModal") e.currentTarget.classList.add("hidden");
     });
+
+    // ===== 3. 表头拖拽调整列顺序（本地保存 + 跟随用户云端同步） =====
+    const COL_ORDER_KEY = "qdii_col_order_v1";
+    function getSavedColOrder() {
+      try {
+        const raw = localStorage.getItem(COL_ORDER_KEY);
+        if (raw) return JSON.parse(raw);
+      } catch {}
+      const prefs = getPrefs();
+      return (prefs && prefs.colOrder) ? prefs.colOrder : {};
+    }
+
+    function saveColOrder(tableKey, orderArr) {
+      const all = getSavedColOrder();
+      all[tableKey] = orderArr;
+      localStorage.setItem(COL_ORDER_KEY, JSON.stringify(all));
+      const prefs = getPrefs();
+      prefs.colOrder = all;
+      localStorage.setItem(PREF_KEY, JSON.stringify(prefs));
+      syncToCloud({ prefs });
+    }
+
+    function getColKey(cell, idx) {
+      if (cell.dataset.colKey) return cell.dataset.colKey;
+      const cls = [...cell.classList].find(c => c.startsWith("col-") || c.startsWith("etf-col-"));
+      return cls || `col_idx_${idx}`;
+    }
+
+    function applyTableColOrder(tableEl, tableKey) {
+      if (!tableEl) return;
+      const headRow = tableEl.querySelector("thead tr");
+      if (!headRow) return;
+      const ths = [...headRow.children];
+      ths.forEach((th, idx) => {
+        if (!th.dataset.colKey) th.dataset.colKey = getColKey(th, idx);
+        th.setAttribute("draggable", "true");
+        th.title = th.title || "可左右拖拽调整列顺序";
+      });
+      const bodyRows = [...tableEl.querySelectorAll("tbody tr")];
+      bodyRows.forEach(tr => {
+        if (tr.children.length !== ths.length) return;
+        [...tr.children].forEach((td, idx) => {
+          if (!td.dataset.colKey) td.dataset.colKey = ths[idx].dataset.colKey;
+        });
+      });
+
+      const saved = getSavedColOrder()[tableKey];
+      if (Array.isArray(saved) && saved.length) {
+        const orderMap = new Map(saved.map((k, i) => [k, i]));
+        const sortByOrder = (cells) => [...cells].sort((a, b) => {
+          const ia = orderMap.has(a.dataset.colKey) ? orderMap.get(a.dataset.colKey) : 999;
+          const ib = orderMap.has(b.dataset.colKey) ? orderMap.get(b.dataset.colKey) : 999;
+          return ia - ib;
+        });
+        sortByOrder(headRow.children).forEach(th => headRow.appendChild(th));
+        bodyRows.forEach(tr => {
+          if (tr.children.length === headRow.children.length) {
+            sortByOrder(tr.children).forEach(td => tr.appendChild(td));
+          }
+        });
+      }
+
+      if (!tableEl.dataset.dragBound) {
+        tableEl.dataset.dragBound = "1";
+        let dragSrcKey = null;
+        headRow.addEventListener("dragstart", (e) => {
+          const th = e.target.closest("th");
+          if (!th) return;
+          dragSrcKey = th.dataset.colKey;
+          th.classList.add("col-dragging");
+          e.dataTransfer.effectAllowed = "move";
+          e.dataTransfer.setData("text/plain", dragSrcKey);
+        });
+        headRow.addEventListener("dragover", (e) => {
+          const th = e.target.closest("th");
+          if (!th || !dragSrcKey || th.dataset.colKey === dragSrcKey) return;
+          e.preventDefault();
+          e.dataTransfer.dropEffect = "move";
+          headRow.querySelectorAll("th").forEach(x => x.classList.toggle("col-drag-over", x === th));
+        });
+        headRow.addEventListener("dragleave", (e) => {
+          const th = e.target.closest("th");
+          if (th) th.classList.remove("col-drag-over");
+        });
+        headRow.addEventListener("drop", (e) => {
+          const targetTh = e.target.closest("th");
+          headRow.querySelectorAll("th").forEach(x => x.classList.remove("col-drag-over", "col-dragging"));
+          if (!targetTh || !dragSrcKey || targetTh.dataset.colKey === dragSrcKey) return;
+          e.preventDefault();
+          const curOrder = [...headRow.children].map(x => x.dataset.colKey);
+          const fromIdx = curOrder.indexOf(dragSrcKey);
+          const toIdx = curOrder.indexOf(targetTh.dataset.colKey);
+          if (fromIdx === -1 || toIdx === -1) return;
+          curOrder.splice(fromIdx, 1);
+          curOrder.splice(toIdx, 0, dragSrcKey);
+          saveColOrder(tableKey, curOrder);
+          applyTableColOrder(tableEl, tableKey);
+          dragSrcKey = null;
+        });
+        headRow.addEventListener("dragend", () => {
+          headRow.querySelectorAll("th").forEach(x => x.classList.remove("col-drag-over", "col-dragging"));
+          dragSrcKey = null;
+        });
+      }
+    }
 
     function toggleFav(code) {
       if (state.favs.has(code)) state.favs.delete(code); else state.favs.add(code);
@@ -3804,6 +3990,8 @@
         const obj = state.raw[b.dataset.trendSec].find(x => x.code === b.dataset.trendCode);
         if (obj) openFundChartModal(obj, b.dataset.trendSec);
       }));
+      const tbl = tbody.closest("table");
+      if (tbl) applyTableColOrder(tbl, sec);
 
       const pager = document.getElementById(`${sec}Pager`);
       let btns = `<button class="page-btn" data-p="${cfg.page - 1}" ${cfg.page <= 1 ? "disabled" : ""}>上一页</button>`;
@@ -3880,6 +4068,7 @@
       tbody.querySelectorAll("[data-etf-cmp]").forEach(b => b.addEventListener("click", () => {
         const obj = state.raw.etfs.find(x => x.code === b.dataset.etfCmp); if (obj) toggleCompare(obj);
       }));
+      applyTableColOrder(document.getElementById("etfTable"), "etf");
     }
 
     function renderHomeExtras() {
@@ -4016,7 +4205,12 @@
         document.getElementById("etfSelect").innerHTML = opts;
         document.getElementById("homeEtfSelect").innerHTML = opts;
 
-        renderFundSection("nasdaq"); renderFundSection("sp500"); renderEtfTable(); renderHomeExtras(); renderFavoritesPage(); renderTimeline();
+        if (state.page === "home" || state.pageInited.home) renderHomeExtras();
+        if (state.pageInited.nasdaq) renderFundSection("nasdaq");
+        if (state.pageInited.sp500) renderFundSection("sp500");
+        if (state.pageInited.etf) renderEtfTable();
+        if (state.pageInited.timeline) renderTimeline();
+        if (state.page === "center") renderFavoritesPage();
         if (state.raw.etfs.length) {
           const idleF = window.requestIdleCallback || ((fn) => setTimeout(fn, 180));
           idleF(() => {
