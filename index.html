@@ -337,6 +337,93 @@
     table.data-table { width: 100%; border-collapse: collapse; min-width: 1160px; font-size: 13px; }
     table.data-table .col-name { min-width: 245px; max-width: 320px; line-height: 1.45; }
     table.data-table .etf-col-name { min-width: 215px; max-width: 280px; line-height: 1.45; }
+    /* 最新公告链接与悬浮简略卡片 */
+    .notice-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      color: var(--text-2);
+      text-decoration: none;
+      padding: 3px 7px;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      transition: all 0.14s ease;
+      font-variant-numeric: tabular-nums;
+    }
+    .notice-link:hover {
+      color: var(--accent);
+      background: var(--accent-soft);
+      border-color: var(--border);
+    }
+    .notice-link svg {
+      width: 12px;
+      height: 12px;
+      opacity: 0.65;
+      flex-shrink: 0;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .notice-hover-card {
+      position: fixed;
+      z-index: 220;
+      width: 280px;
+      max-width: calc(100vw - 24px);
+      background: var(--surface);
+      border: 1px solid var(--border-strong);
+      border-radius: 12px;
+      box-shadow: var(--shadow-md);
+      padding: 12px 14px;
+      pointer-events: none;
+      opacity: 0;
+      transform: translateY(4px);
+      transition: opacity 0.14s ease, transform 0.14s ease;
+      font-size: 12.5px;
+      color: var(--text);
+    }
+    .notice-hover-card.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .nhc-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding-bottom: 8px;
+      margin-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .nhc-date { font-weight: 700; font-size: 13px; color: var(--text); }
+    .nhc-title {
+      font-size: 12px;
+      color: var(--text-2);
+      line-height: 1.45;
+      margin-bottom: 8px;
+      word-break: break-word;
+    }
+    .nhc-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 3px 0;
+      font-size: 12px;
+    }
+    .nhc-lbl { color: var(--text-3); flex-shrink: 0; }
+    .nhc-val { color: var(--text); font-weight: 600; text-align: right; }
+    .nhc-foot {
+      margin-top: 8px;
+      padding-top: 7px;
+      border-top: 1px dashed var(--border);
+      font-size: 11.5px;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
     .name-sub-mobile { display: none; align-items: center; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
     @media (max-width: 768px) {
       table.data-table.compact-mode { min-width: 0; }
@@ -1663,7 +1750,8 @@
     <button id="openCompareBtn" class="dock-btn" type="button">开始对比</button>
     <button id="clearCompareBtn" class="dock-clear" type="button">清空</button>
   </div>
-  <div id="compareModal" class="modal-backdrop hidden">
+  <div id="noticeHoverCard" class="notice-hover-card" role="tooltip" aria-hidden="true"></div>
+    <div id="compareModal" class="modal-backdrop hidden">
     <div class="modal-box">
       <div class="card-head" style="margin-bottom:0;"><div class="card-title">基金横向对比</div><button id="closeCompareBtn" class="chip-btn" type="button">关闭</button></div>
       <div id="compareTableWrap"></div>
@@ -2903,6 +2991,73 @@
     }
 
     // ===== 收藏与对比 =====
+    const noticeHoverCard = document.getElementById("noticeHoverCard");
+    function showNoticeHover(linkEl) {
+      if (!noticeHoverCard || !linkEl) return;
+      const code = linkEl.dataset.nCode;
+      const sec = linkEl.dataset.nSec;
+      const list = (state.raw && state.raw[sec]) || [];
+      const item = list.find(x => x.code === code);
+      if (!item) return;
+
+      const directSub = item.direct_source === "manual"
+        ? `已校准·${item.direct_note || ""}`
+        : (item.direct_source === "notice_diff" ? "渠道有差异" : "同代销");
+      const statusText = item.agency_status || (item.agency_limit_num === 0 ? "暂停申购" : "开放申购");
+      const statusTag = item.agency_limit_num === 0
+        ? `<span class="tag tag-stop">${statusText}</span>`
+        : (item.agency_limit_num > 0 && item.agency_limit_num < 999999999
+          ? `<span class="tag tag-warn">${statusText}</span>`
+          : `<span class="tag tag-ok">${statusText}</span>`);
+      const titleHtml = (item.notice_title || item.notice_summary)
+        ? `<div class="nhc-title">${item.notice_title || item.notice_summary}</div>`
+        : "";
+      const noteHtml = item.direct_note
+        ? `<div class="nhc-row"><span class="nhc-lbl">渠道备注</span><span class="nhc-val">${item.direct_note}</span></div>`
+        : "";
+
+      noticeHoverCard.innerHTML = `
+        <div class="nhc-head">
+          <span class="nhc-date">${item.notice_date || "--"} 公告摘要</span>
+          ${statusTag}
+        </div>
+        ${titleHtml}
+        <div class="nhc-row"><span class="nhc-lbl">代销额度</span><span class="nhc-val">${item.agency_limit_text || "--"}</span></div>
+        <div class="nhc-row"><span class="nhc-lbl">直销额度</span><span class="nhc-val">${item.direct_limit_text || "--"}（${directSub}）</span></div>
+        ${noteHtml}
+        <div class="nhc-foot">点击日期跳转天天基金 / 东方财富公告原文</div>
+      `;
+
+      const rect = linkEl.getBoundingClientRect();
+      noticeHoverCard.classList.add("show");
+      const cardW = noticeHoverCard.offsetWidth || 280;
+      const cardH = noticeHoverCard.offsetHeight || 140;
+      let left = rect.right - cardW;
+      if (left < 12) left = 12;
+      if (left + cardW > window.innerWidth - 12) left = window.innerWidth - cardW - 12;
+      let top = rect.top - cardH - 8;
+      if (top < 12) top = rect.bottom + 8;
+      noticeHoverCard.style.left = `${Math.round(left)}px`;
+      noticeHoverCard.style.top = `${Math.round(top)}px`;
+      noticeHoverCard.setAttribute("aria-hidden", "false");
+    }
+
+    function hideNoticeHover() {
+      if (!noticeHoverCard) return;
+      noticeHoverCard.classList.remove("show");
+      noticeHoverCard.setAttribute("aria-hidden", "true");
+    }
+
+    document.addEventListener("mouseover", (e) => {
+      const link = e.target.closest && e.target.closest(".notice-link");
+      if (link) showNoticeHover(link);
+    });
+    document.addEventListener("mouseout", (e) => {
+      const link = e.target.closest && e.target.closest(".notice-link");
+      if (link) hideNoticeHover();
+    });
+    window.addEventListener("scroll", hideNoticeHover, true);
+
     function toggleFav(code) {
       if (state.favs.has(code)) state.favs.delete(code); else state.favs.add(code);
       const arr = [...state.favs];
@@ -3072,7 +3227,11 @@
           <td class="col-1ycost num"><strong>${fmtPct(item.first_year_cost)}</strong><span class="sub-line">申${fmtPct(item.purchase_fee)}·服${fmtPct(item.service_fee)}</span></td>
           <td class="col-agency num">${limitBadge(item.agency_limit_text, item.agency_limit_num, "agency")}<span class="sub-line">${item.status}</span></td>
           <td class="col-direct num">${limitBadge(item.direct_limit_text, item.direct_limit_num, item.direct_source)}<span class="sub-line">${directSub}</span></td>
-          <td class="col-notice num" style="white-space:nowrap;color:var(--text-3);">${item.notice_date || "--"}</td>
+          <td class="col-notice num" style="white-space:nowrap;">${
+            item.notice_date
+              ? `<a class="notice-link" href="${item.notice_url || `https://fundf10.eastmoney.com/jjgg_${item.code}_5.html`}" target="_blank" rel="noopener" data-n-code="${item.code}" data-n-sec="${sec}">${item.notice_date}<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>`
+              : `<span style="color:var(--text-3);">--</span>`
+          }</td>
         </tr>`;
       }).join("") : `<tr><td colspan="12" style="text-align:center;color:var(--text-3);padding:36px;">暂无符合条件的基金</td></tr>`;
 
