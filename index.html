@@ -334,7 +334,18 @@
     .filter-pill.active { background: var(--accent); border-color: var(--accent); color: #fff; }
 
     .table-wrap { width: 100%; overflow-x: auto; }
-    table.data-table { width: 100%; border-collapse: collapse; min-width: 980px; font-size: 13px; }
+    table.data-table { width: 100%; border-collapse: collapse; min-width: 1160px; font-size: 13px; }
+    table.data-table .col-name { min-width: 245px; max-width: 320px; line-height: 1.45; }
+    table.data-table .etf-col-name { min-width: 215px; max-width: 280px; line-height: 1.45; }
+    .name-sub-mobile { display: none; align-items: center; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+    @media (max-width: 768px) {
+      table.data-table.compact-mode { min-width: 0; }
+      table.data-table.compact-mode .col-name,
+      table.data-table.compact-mode .etf-col-name { min-width: 0; max-width: none; }
+      table.data-table.compact-mode .name-sub-mobile { display: flex; }
+      table.data-table.compact-mode .col-notice,
+      table.data-table.compact-mode .etf-col-nav { display: none; }
+    }
     table.simple-table { width: 100%; min-width: 580px; border-collapse: collapse; font-size: 13px; }
     table.pe-hist-table { min-width: 680px; }
     table.pe-hist-table th,
@@ -1240,7 +1251,7 @@
                 <th class="col-opt" style="width:94px;">操作</th>
                 <th class="col-code-a sortable" data-sort="nasdaq:code" data-dir="none">主代码<svg class="sort-icon" viewBox="0 0 16 16" aria-hidden="true"><path class="sort-up" d="M4.5 6.5 8 3l3.5 3.5"/><path class="sort-down" d="M4.5 9.5 8 13l3.5-3.5"/></svg></th>
                 <th class="col-code-c">C类代码</th>
-                <th class="col-name sortable" data-sort="nasdaq:name" data-dir="none">基金名称 / 代码<svg class="sort-icon" viewBox="0 0 16 16" aria-hidden="true"><path class="sort-up" d="M4.5 6.5 8 3l3.5 3.5"/><path class="sort-down" d="M4.5 9.5 8 13l3.5-3.5"/></svg></th>
+                <th class="col-name sortable" data-sort="nasdaq:name" data-dir="none">基金名称<svg class="sort-icon" viewBox="0 0 16 16" aria-hidden="true"><path class="sort-up" d="M4.5 6.5 8 3l3.5 3.5"/><path class="sort-down" d="M4.5 9.5 8 13l3.5-3.5"/></svg></th>
                 <th class="col-mobile-quota">额度 (代销 / 直销)</th>
                 <th class="col-scale sortable" data-sort="nasdaq:scale" data-dir="none">规模(亿)<svg class="sort-icon" viewBox="0 0 16 16" aria-hidden="true"><path class="sort-up" d="M4.5 6.5 8 3l3.5 3.5"/><path class="sort-down" d="M4.5 9.5 8 13l3.5-3.5"/></svg></th>
                 <th class="col-ret1y sortable" data-sort="nasdaq:return_1y" data-dir="none">近1年收益<svg class="sort-icon" viewBox="0 0 16 16" aria-hidden="true"><path class="sort-up" d="M4.5 6.5 8 3l3.5 3.5"/><path class="sort-down" d="M4.5 9.5 8 13l3.5-3.5"/></svg></th>
@@ -1249,6 +1260,7 @@
                 <th class="col-1ycost sortable" data-sort="nasdaq:first_year_cost" data-dir="none">首年成本<svg class="sort-icon" viewBox="0 0 16 16" aria-hidden="true"><path class="sort-up" d="M4.5 6.5 8 3l3.5 3.5"/><path class="sort-down" d="M4.5 9.5 8 13l3.5-3.5"/></svg></th>
                 <th class="col-agency sortable sorted" data-sort="nasdaq:agency_limit_num" data-dir="desc">代销额度<svg class="sort-icon" viewBox="0 0 16 16" aria-hidden="true"><path class="sort-up" d="M4.5 6.5 8 3l3.5 3.5"/><path class="sort-down" d="M4.5 9.5 8 13l3.5-3.5"/></svg></th>
                 <th class="col-direct sortable" data-sort="nasdaq:direct_limit_num" data-dir="none">直销额度<svg class="sort-icon" viewBox="0 0 16 16" aria-hidden="true"><path class="sort-up" d="M4.5 6.5 8 3l3.5 3.5"/><path class="sort-down" d="M4.5 9.5 8 13l3.5-3.5"/></svg></th>
+                <th class="col-notice">最新公告</th>
               </tr></thead>
               <tbody id="nasdaqBody"></tbody>
             </table>
@@ -1301,7 +1313,7 @@
                 <th class="col-opt" style="width:94px;">操作</th>
                 <th class="col-code-a sortable" data-sort="sp500:code" data-dir="none">主代码<svg class="sort-icon" viewBox="0 0 16 16" aria-hidden="true"><path class="sort-up" d="M4.5 6.5 8 3l3.5 3.5"/><path class="sort-down" d="M4.5 9.5 8 13l3.5-3.5"/></svg></th>
                 <th class="col-code-c">C类代码</th>
-                <th class="col-name sortable" data-sort="sp500:name" data-dir="none">基金名称 / 代码<svg class="sort-icon" viewBox="0 0 16 16" aria-hidden="true"><path class="sort-up" d="M4.5 6.5 8 3l3.5 3.5"/><path class="sort-down" d="M4.5 9.5 8 13l3.5-3.5"/></svg></th>
+                <th class="col-name sortable" data-sort="sp500:name" data-dir="none">基金名称<svg class="sort-icon" viewBox="0 0 16 16" aria-hidden="true"><path class="sort-up" d="M4.5 6.5 8 3l3.5 3.5"/><path class="sort-down" d="M4.5 9.5 8 13l3.5-3.5"/></svg></th>
                 <th class="col-mobile-quota">额度 (代销 / 直销)</th>
                 <th class="col-scale sortable" data-sort="sp500:scale" data-dir="none">规模(亿)<svg class="sort-icon" viewBox="0 0 16 16" aria-hidden="true"><path class="sort-up" d="M4.5 6.5 8 3l3.5 3.5"/><path class="sort-down" d="M4.5 9.5 8 13l3.5-3.5"/></svg></th>
                 <th class="col-ret1y sortable" data-sort="sp500:return_1y" data-dir="none">近1年收益<svg class="sort-icon" viewBox="0 0 16 16" aria-hidden="true"><path class="sort-up" d="M4.5 6.5 8 3l3.5 3.5"/><path class="sort-down" d="M4.5 9.5 8 13l3.5-3.5"/></svg></th>
@@ -1310,6 +1322,7 @@
                 <th class="col-1ycost sortable" data-sort="sp500:first_year_cost" data-dir="none">首年成本<svg class="sort-icon" viewBox="0 0 16 16" aria-hidden="true"><path class="sort-up" d="M4.5 6.5 8 3l3.5 3.5"/><path class="sort-down" d="M4.5 9.5 8 13l3.5-3.5"/></svg></th>
                 <th class="col-agency sortable sorted" data-sort="sp500:agency_limit_num" data-dir="desc">代销额度<svg class="sort-icon" viewBox="0 0 16 16" aria-hidden="true"><path class="sort-up" d="M4.5 6.5 8 3l3.5 3.5"/><path class="sort-down" d="M4.5 9.5 8 13l3.5-3.5"/></svg></th>
                 <th class="col-direct sortable" data-sort="sp500:direct_limit_num" data-dir="none">直销额度<svg class="sort-icon" viewBox="0 0 16 16" aria-hidden="true"><path class="sort-up" d="M4.5 6.5 8 3l3.5 3.5"/><path class="sort-down" d="M4.5 9.5 8 13l3.5-3.5"/></svg></th>
+                <th class="col-notice">最新公告</th>
               </tr></thead>
               <tbody id="sp500Body"></tbody>
             </table>
@@ -1352,7 +1365,7 @@
               <thead><tr>
                 <th class="etf-col-opt" style="width:94px;">操作</th>
                 <th class="etf-col-code sortable" data-etf-sort="code" data-dir="none">代码<svg class="sort-icon" viewBox="0 0 16 16" aria-hidden="true"><path class="sort-up" d="M4.5 6.5 8 3l3.5 3.5"/><path class="sort-down" d="M4.5 9.5 8 13l3.5-3.5"/></svg></th>
-                <th>ETF 名称 / 代码</th>
+                <th class="etf-col-name">ETF 名称</th>
                 <th class="etf-col-mobile">溢价率 / 涨跌</th>
                 <th class="etf-col-index">跟踪指数</th>
                 <th class="etf-col-scale sortable" data-etf-sort="scale" data-dir="none">规模(亿)<svg class="sort-icon" viewBox="0 0 16 16" aria-hidden="true"><path class="sort-up" d="M4.5 6.5 8 3l3.5 3.5"/><path class="sort-down" d="M4.5 9.5 8 13l3.5-3.5"/></svg></th>
@@ -1361,6 +1374,7 @@
                 <th class="etf-col-fee sortable" data-etf-sort="mgmt_custody_fee" data-dir="none">运作费率<svg class="sort-icon" viewBox="0 0 16 16" aria-hidden="true"><path class="sort-up" d="M4.5 6.5 8 3l3.5 3.5"/><path class="sort-down" d="M4.5 9.5 8 13l3.5-3.5"/></svg></th>
                 <th class="etf-col-prem sortable sorted" data-etf-sort="premium" data-dir="desc">溢价率<svg class="sort-icon" viewBox="0 0 16 16" aria-hidden="true"><path class="sort-up" d="M4.5 6.5 8 3l3.5 3.5"/><path class="sort-down" d="M4.5 9.5 8 13l3.5-3.5"/></svg></th>
                 <th class="etf-col-turn sortable" data-etf-sort="turnover" data-dir="none">当日成交(亿)<svg class="sort-icon" viewBox="0 0 16 16" aria-hidden="true"><path class="sort-up" d="M4.5 6.5 8 3l3.5 3.5"/><path class="sort-down" d="M4.5 9.5 8 13l3.5-3.5"/></svg></th>
+                <th class="etf-col-nav">现价 / 净值</th>
               </tr></thead>
               <tbody id="etfBody"></tbody>
             </table>
@@ -3039,12 +3053,11 @@
           <td class="col-code-c num">${item.c_code !== "--" ? `<span class="code-c">${item.c_code}</span>` : `<span style="color:var(--text-3)">--</span>`}</td>
           <td class="col-name">
             <a class="fund-link" href="${item.notice_url}" target="_blank" rel="noopener">${item.name}</a>
-            <div style="display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-top:3px;">
+            <div class="name-sub-mobile">
               <button class="mobile-compact-fav ${isFav ? "starred" : ""}" data-fav="${item.code}" type="button" title="${isFav ? "取消收藏" : "收藏"}"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button>
               <button class="copy-code-btn" data-copy="${item.code}" type="button" title="点击复制基金代码">${item.code}</button>
               ${cCopyBtn}
             </div>
-            ${cfg.showDetail && item.notice_date ? `<span class="sub-line">最新公告 ${item.notice_date}</span>` : ""}
           </td>
           <td class="col-mobile-quota">
             <div class="mobile-quota-stack">
@@ -3059,6 +3072,7 @@
           <td class="col-1ycost num"><strong>${fmtPct(item.first_year_cost)}</strong><span class="sub-line">申${fmtPct(item.purchase_fee)}·服${fmtPct(item.service_fee)}</span></td>
           <td class="col-agency num">${limitBadge(item.agency_limit_text, item.agency_limit_num, "agency")}<span class="sub-line">${item.status}</span></td>
           <td class="col-direct num">${limitBadge(item.direct_limit_text, item.direct_limit_num, item.direct_source)}<span class="sub-line">${directSub}</span></td>
+          <td class="col-notice num" style="white-space:nowrap;color:var(--text-3);">${item.notice_date || "--"}</td>
         </tr>`;
       }).join("") : `<tr><td colspan="12" style="text-align:center;color:var(--text-3);padding:36px;">暂无符合条件的基金</td></tr>`;
 
@@ -3117,13 +3131,12 @@
             <button class="cmp-btn ${isCmp ? "active" : ""}" data-etf-cmp="${e.code}" type="button">${isCmp ? "已选" : "+对比"}</button>
           </div></td>
           <td class="etf-col-code num"><a class="code-badge" href="${e.detail_url}" target="_blank" rel="noopener">${e.code}</a></td>
-          <td>
+          <td class="etf-col-name">
             <a class="fund-link" href="${e.detail_url}" target="_blank" rel="noopener">${e.name}</a>
-            <div style="display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-top:3px;">
+            <div class="name-sub-mobile">
               <button class="mobile-compact-fav ${isFav ? "starred" : ""}" data-fav="${e.code}" type="button" title="${isFav ? "取消收藏" : "收藏"}"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button>
               <button class="copy-code-btn" data-copy="${e.code}" type="button" title="点击复制代码">${e.code}</button>
             </div>
-            ${cfg.showDetail ? `<span class="sub-line">现价 ${e.price ?? "--"} · 净值 ${e.nav ?? "--"} (${e.nav_date || "--"})</span>` : ""}
           </td>
           <td class="etf-col-mobile">
             <div class="mobile-quota-stack">
@@ -3138,6 +3151,7 @@
           <td class="etf-col-fee num">${fmtPct(e.mgmt_custody_fee)}</td>
           <td class="etf-col-prem num">${premRiskBadge(e.premium)}</td>
           <td class="etf-col-turn num">${e.turnover != null ? e.turnover.toFixed(2) : "--"}</td>
+          <td class="etf-col-nav num" style="white-space:nowrap;"><strong>${e.price ?? "--"}</strong><span class="sub-line">净值 ${e.nav ?? "--"} (${e.nav_date || "--"})</span></td>
         </tr>`;
       }).join("") : `<tr><td colspan="11" style="text-align:center;color:var(--text-3);padding:36px;">运行一次 Update QDII Fund Data 后即显示场内 ETF</td></tr>`;
       tbody.querySelectorAll("[data-copy]").forEach(b => b.addEventListener("click", () => copyText(b.dataset.copy, b)));
