@@ -308,7 +308,7 @@ export async function onRequestPost(context) {
       const pkRaw = await env.AUTH_KV.get(`passkey:${id}`);
       if (pkRaw) {
         const pk = JSON.parse(pkRaw);
-        list.push({ id: pk.id, label: pk.label || "设备通行密钥", created_at: pk.created_at || "" });
+        list.push({ id: pk.id, label: pk.label || "设备通行密钥", created_at: pk.created_at || "", last_used_at: pk.last_used_at || "" });
       }
     }
     return jsonRes({ ok: true, passkeys: list });
@@ -474,6 +474,9 @@ export async function onRequestPost(context) {
         { name: "ECDSA", hash: "SHA-256" }, pubKey, rawSig, signedData
       );
       if (!valid) return jsonRes({ ok: false, message: "通行密钥签名校验失败" }, 401);
+
+      pkRec.last_used_at = new Date().toISOString();
+      await env.AUTH_KV.put(`passkey:${id}`, JSON.stringify(pkRec));
 
       const role = isSuperAdmin(pkRec.username, env) ? "admin" : "user";
       const user = { username: pkRec.username, role, exp };

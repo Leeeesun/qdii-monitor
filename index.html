@@ -1967,6 +1967,77 @@
       tbody.querySelectorAll("[data-rm-fav]").forEach(b => b.addEventListener("click", () => toggleFav(b.dataset.rmFav)));
     }
 
+    function fmtLocalTime(iso) {
+      if (!iso) return "";
+      const d = new Date(iso);
+      if (isNaN(d.getTime())) return String(iso).replace("T", " ").slice(0, 16);
+      const pad = n => String(n).padStart(2, "0");
+      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    }
+
+    async function loadPasskeys() {
+      const token = localStorage.getItem(TOKEN_KEY);
+      const listEl = document.getElementById("passkeyList");
+      const stEl = document.getElementById("passkeyStatus");
+      if (!listEl) return;
+      listEl.innerHTML = `<div style="color:var(--text-3);font-size:13px;padding:12px 0;">加载中...</div>`;
+      if (stEl) stEl.textContent = "";
+      try {
+        const res = await fetch("/api/auth", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ action: "passkey_list" })
+        });
+        const data = await res.json();
+        if (!res.ok || !data.ok) {
+          listEl.innerHTML = `<div style="color:var(--danger);font-size:13px;">${data.message || "加载失败"}</div>`;
+          return;
+        }
+        const items = data.passkeys || [];
+        if (!items.length) {
+          listEl.innerHTML = `<div style="text-align:center;color:var(--text-3);font-size:13px;padding:18px 0;">当前尚未绑定任何通行密钥，可在上方点击“+ 新增通行密钥”</div>`;
+          return;
+        }
+        listEl.innerHTML = items.map(pk => {
+          const tail = pk.id.length > 10 ? `...${pk.id.slice(-8)}` : pk.id;
+          const created = fmtLocalTime(pk.created_at) || "未知";
+          const lastUsed = pk.last_used_at ? fmtLocalTime(pk.last_used_at) : "暂无使用记录";
+          return `<div class="pk-item">
+            <div>
+              <div class="pk-title">${pk.label || "设备通行密钥"}</div>
+              <div class="pk-meta">ID ${tail} · 添加时间：${created} · 最新使用：${lastUsed}</div>
+            </div>
+            <button class="fav-remove-btn" data-del-pk="${pk.id}" type="button">删除</button>
+          </div>`;
+        }).join("");
+        listEl.querySelectorAll("[data-del-pk]").forEach(b => b.addEventListener("click", async () => {
+          const pkId = b.dataset.delPk;
+          if (!confirm("确定要删除这把通行密钥吗？删除后该凭证将无法再用于免密登录。")) return;
+          b.disabled = true;
+          try {
+            const delRes = await fetch("/api/auth", {
+              method: "POST",
+              headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+              body: JSON.stringify({ action: "passkey_delete", id: pkId })
+            });
+            const delData = await delRes.json();
+            if (stEl) {
+              stEl.style.color = delData.ok ? "var(--ok)" : "var(--danger)";
+              stEl.textContent = delData.message || (delData.ok ? "已删除" : "删除失败");
+            }
+            await loadPasskeys();
+          } catch {
+            if (stEl) {
+              stEl.style.color = "var(--danger)";
+              stEl.textContent = "删除请求失败";
+            }
+          } finally { b.disabled = false; }
+        }));
+      } catch {
+        listEl.innerHTML = `<div style="color:var(--danger);font-size:13px;">无法连接服务</div>`;
+      }
+    }
+
     function openCenterSection(sub) {
       let target = sub || "bark";
       if (target === "invites" && !isUserAdmin(state.user)) {
