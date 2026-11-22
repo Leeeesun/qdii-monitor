@@ -3736,7 +3736,7 @@
       bodyRows.forEach(tr => {
         if (tr.children.length !== ths.length) return;
         [...tr.children].forEach((td, idx) => {
-          if (!td.dataset.colKey) td.dataset.colKey = ths[idx].dataset.colKey;
+          if (!td.dataset.colKey) td.dataset.colKey = getColKey(td, idx);
         });
       });
 
