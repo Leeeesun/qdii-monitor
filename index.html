@@ -335,7 +335,45 @@
 
     .table-wrap { width: 100%; overflow-x: auto; }
     table.data-table { width: 100%; border-collapse: collapse; min-width: 980px; font-size: 13px; }
-    table.simple-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    table.simple-table { width: 100%; min-width: 580px; border-collapse: collapse; font-size: 13px; }
+    table.pe-hist-table { min-width: 600px; }
+    table.pe-hist-table th,
+    table.pe-hist-table td:nth-child(2),
+    table.pe-hist-table td:nth-child(4),
+    table.pe-hist-table td:nth-child(5),
+    table.pe-hist-table td:nth-child(6) { white-space: nowrap; }
+    table.pe-hist-table td:nth-child(1),
+    table.pe-hist-table td:nth-child(3) {
+      min-width: 120px;
+      max-width: 156px;
+      line-height: 1.45;
+      white-space: normal;
+      word-break: keep-all;
+    }
+    .mobile-compact-fav {
+      display: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      color: var(--text-3);
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      padding: 0;
+      flex-shrink: 0;
+    }
+    .mobile-compact-fav svg { width: 13px; height: 13px; }
+    .mobile-compact-fav.starred {
+      color: #f59e0b;
+      border-color: rgba(245, 158, 11, 0.45);
+      background: rgba(245, 158, 11, 0.1);
+    }
+    .mobile-compact-fav.starred svg { fill: #f59e0b; stroke: #f59e0b; }
+    @media (max-width: 768px) {
+      table.data-table.compact-mode .mobile-compact-fav { display: inline-flex; }
+    }
     table.data-table th, table.simple-table th {
       text-align: left; padding: 11px 14px; font-size: 12px; font-weight: 600;
       color: var(--text-3); border-bottom: 1px solid var(--border); background: var(--surface-2); white-space: nowrap; user-select: none;
@@ -1010,7 +1048,7 @@
               </div>
             </div>
             <div class="table-wrap">
-              <table class="simple-table">
+              <table class="simple-table pe-hist-table">
                 <thead><tr><th>时期</th><th>当时 PE</th><th>背景</th><th>后续1年</th><th>最大回调</th><th>恢复时长</th></tr></thead>
                 <tbody id="peHighBody"></tbody>
               </table>
@@ -2999,7 +3037,8 @@
           <td class="col-code-c num">${item.c_code !== "--" ? `<span class="code-c">${item.c_code}</span>` : `<span style="color:var(--text-3)">--</span>`}</td>
           <td class="col-name">
             <a class="fund-link" href="${item.notice_url}" target="_blank" rel="noopener">${item.name}</a>
-            <div style="display:flex;align-items:center;flex-wrap:wrap;gap:6px;">
+            <div style="display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-top:3px;">
+              <button class="mobile-compact-fav ${isFav ? "starred" : ""}" data-fav="${item.code}" type="button" title="${isFav ? "取消收藏" : "收藏"}"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button>
               <button class="copy-code-btn" data-copy="${item.code}" type="button" title="点击复制基金代码">${item.code}</button>
               ${cCopyBtn}
             </div>
@@ -3078,7 +3117,8 @@
           <td class="etf-col-code num"><a class="code-badge" href="${e.detail_url}" target="_blank" rel="noopener">${e.code}</a></td>
           <td>
             <a class="fund-link" href="${e.detail_url}" target="_blank" rel="noopener">${e.name}</a>
-            <div style="display:flex;align-items:center;flex-wrap:wrap;gap:6px;">
+            <div style="display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-top:3px;">
+              <button class="mobile-compact-fav ${isFav ? "starred" : ""}" data-fav="${e.code}" type="button" title="${isFav ? "取消收藏" : "收藏"}"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button>
               <button class="copy-code-btn" data-copy="${e.code}" type="button" title="点击复制代码">${e.code}</button>
             </div>
             ${cfg.showDetail ? `<span class="sub-line">现价 ${e.price ?? "--"} · 净值 ${e.nav ?? "--"} (${e.nav_date || "--"})</span>` : ""}
