@@ -64,7 +64,9 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { overflow-y: scroll; scrollbar-gutter: stable; overflow-x: hidden; }
     body {
+      overflow-x: hidden;
       font-family: "Inter", -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Microsoft YaHei", sans-serif;
       background: var(--bg);
       color: var(--text);
@@ -528,22 +530,46 @@
     .center-side-sep { height: 1px; background: var(--border); margin: 6px 4px; }
     .center-content { min-width: 0; display: flex; flex-direction: column; gap: 16px; }
 
+    .center-content > *,
+    .center-content .card,
+    .center-content .modal-section,
+    .center-content .pref-item-card,
+    .center-content .pk-add-box,
+    .center-content .inv-toolbar,
+    .center-content .inv-import-box,
+    .center-content .oauth-card,
+    .center-content .pk-item,
+    .center-content .inv-row {
+      min-width: 0;
+      max-width: 100%;
+      box-sizing: border-box;
+    }
+    .pk-item, .inv-row, .oauth-card { flex-wrap: wrap; }
+    .pk-item > div, .inv-row > div, .oauth-info { min-width: 0; flex: 1 1 180px; }
+    .pk-meta, .inv-code-txt, .sub-line { overflow-wrap: anywhere; word-break: break-word; }
+
     @media (max-width: 820px) {
       .center-layout {
-        grid-template-columns: 116px minmax(0, 1fr);
-        gap: 10px;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 12px;
       }
       .center-sidebar {
-        top: 112px;
-        padding: 8px 6px;
+        position: static;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 6px;
+        padding: 10px;
       }
-      .center-side-group { padding: 6px 8px 2px; font-size: 10.5px; }
+      .center-side-group, .center-side-sep { display: none; }
       .center-side-item {
-        padding: 8px 8px;
-        font-size: 12px;
-        gap: 5px;
+        width: auto;
+        flex: 0 1 auto;
+        padding: 7px 11px;
+        font-size: 12.5px;
+        gap: 6px;
       }
-      .center-side-item svg { width: 13px; height: 13px; }
+      .center-side-item svg { width: 14px; height: 14px; }
+      .center-content .card-pad { padding: 14px; }
     }
 
     /* 移动端通用排序条（所有端均可按字段排序） */
@@ -1318,7 +1344,7 @@
               </div>
               <div class="modal-section" style="margin-top:0;">
                 <div class="inv-toolbar">
-                  <input id="invSingleInput" class="input" type="text" placeholder="输入自定义邀请码（如 VIP2026）" style="flex:1;min-width:150px;height:36px;background:var(--surface);" />
+                  <input id="invSingleInput" class="input" type="text" placeholder="输入自定义邀请码（如 VIP2026）" style="flex:1 1 160px;min-width:0;max-width:100%;height:36px;background:var(--surface);" />
                   <button id="invAddBtn" class="btn-solid-sm" type="button">添加</button>
                   <input id="invPrefixInput" class="input" type="text" value="QDII" placeholder="前缀" style="width:76px;height:36px;background:var(--surface);text-align:center;" title="生成前缀" />
                   <input id="invCountInput" class="input" type="number" value="5" min="1" max="50" style="width:66px;height:36px;background:var(--surface);text-align:center;" title="生成数量" />
@@ -1450,7 +1476,7 @@
                 </div>
                 <div class="modal-section" style="margin-top:0;">
                   <div class="pk-add-box">
-                    <input id="passkeyLabelInput" class="input" type="text" placeholder="备注名称（如 iPhone / MacBook / Bitwarden）" style="flex:1;min-width:180px;height:36px;background:var(--surface);" />
+                    <input id="passkeyLabelInput" class="input" type="text" placeholder="备注名称（如 iPhone / MacBook / Bitwarden）" style="flex:1 1 160px;min-width:0;max-width:100%;height:36px;background:var(--surface);" />
                     <button id="bindPasskeyBtn" class="btn-solid-sm" type="button">+ 新增通行密钥</button>
                   </div>
                   <div id="passkeyStatus" class="modal-hint"></div>
@@ -1491,7 +1517,7 @@
                   </div>
                 </div>
                 <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-                  <input id="bindEmailInput" class="input" type="email" placeholder="请输入要绑定的邮箱地址（如 name@example.com）" style="flex:1;min-width:220px;" />
+                  <input id="bindEmailInput" class="input" type="email" placeholder="请输入要绑定的邮箱地址（如 name@example.com）" style="flex:1 1 180px;min-width:0;max-width:100%;" />
                   <button id="saveEmailBtn" class="btn-solid-sm" type="button">保存邮箱</button>
                 </div>
                 <div id="emailStatusMsg" class="modal-hint" style="margin-top:8px;display:none;"></div>
