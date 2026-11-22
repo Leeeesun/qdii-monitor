@@ -135,46 +135,13 @@ async function getAuthedUser(request, env) {
 
 async function loadInviteRegistry(env) {
   const raw = await env.AUTH_KV.get("invites_registry");
-  let list = [];
-  if (raw) {
-    try {
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed)) list = parsed;
-    } catch {}
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
   }
-  const map = new Map(list.map(item => [String(item.code || "").toUpperCase(), item]));
-
-  // 合并环境变量 INVITE_CODES 中尚未录入注册表的邀请码，方便管理员统一查看和管理
-  const envCodes = String(env.INVITE_CODES || "")
-    .split(/[,，\s]+/)
-    .map(c => c.trim().toUpperCase())
-    .filter(Boolean);
-  let dirty = false;
-  for (const code of envCodes) {
-    if (!map.has(code)) {
-      const usedRaw = await env.AUTH_KV.get(`used_invite:${code}`);
-      let usedInfo = null;
-      if (usedRaw) {
-        try { usedInfo = JSON.parse(usedRaw); } catch {}
-      }
-      const item = {
-        code,
-        source: "env",
-        status: usedInfo ? "used" : "unused",
-        created_at: "",
-        created_by: "环境变量",
-        used_by: usedInfo ? usedInfo.used_by : "",
-        used_at: usedInfo ? usedInfo.used_at : ""
-      };
-      map.set(code, item);
-      dirty = true;
-    }
-  }
-  const merged = [...map.values()];
-  if (dirty) {
-    await env.AUTH_KV.put("invites_registry", JSON.stringify(merged));
-  }
-  return merged;
 }
 
 async function saveInviteRegistry(env, list) {
