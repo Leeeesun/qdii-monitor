@@ -481,6 +481,147 @@
       display: flex; flex-direction: column; gap: 8px;
     }
 
+    /* ===== 个人中心独立页面（左侧固定导航 + 右侧内容区） ===== */
+    .center-layout {
+      display: grid;
+      grid-template-columns: 230px minmax(0, 1fr);
+      gap: 20px;
+      align-items: start;
+    }
+    .center-sidebar {
+      position: sticky;
+      top: 76px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .center-side-group {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-3);
+      padding: 8px 12px 4px;
+      letter-spacing: 0.03em;
+    }
+    .center-side-item {
+      width: 100%;
+      border: none;
+      background: transparent;
+      color: var(--text-2);
+      padding: 9px 12px;
+      border-radius: 9px;
+      font-size: 13.5px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.14s ease;
+    }
+    .center-side-item:hover { background: var(--surface-2); color: var(--text); }
+    .center-side-item.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+    .center-side-sep { height: 1px; background: var(--border); margin: 6px 4px; }
+    .center-content { min-width: 0; display: flex; flex-direction: column; gap: 16px; }
+
+    @media (max-width: 820px) {
+      .center-layout {
+        grid-template-columns: 116px minmax(0, 1fr);
+        gap: 10px;
+      }
+      .center-sidebar {
+        top: 112px;
+        padding: 8px 6px;
+      }
+      .center-side-group { padding: 6px 8px 2px; font-size: 10.5px; }
+      .center-side-item {
+        padding: 8px 8px;
+        font-size: 12px;
+        gap: 5px;
+      }
+      .center-side-item svg { width: 13px; height: 13px; }
+    }
+
+    /* 移动端通用排序条（所有端均可按字段排序） */
+    .mobile-sort-bar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      padding-top: 2px;
+    }
+    .sort-chip {
+      height: 28px;
+      padding: 0 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      color: var(--text-2);
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      transition: all 0.14s ease;
+    }
+    .sort-chip:hover { border-color: var(--border-strong); color: var(--text); }
+    .sort-chip.active { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); font-weight: 600; }
+
+    /* 场内 ETF 手机端精简列控制 */
+    @media (max-width: 768px) {
+      table.data-table.compact-mode .etf-col-opt,
+      table.data-table.compact-mode .etf-col-code,
+      table.data-table.compact-mode .etf-col-index,
+      table.data-table.compact-mode .etf-col-scale,
+      table.data-table.compact-mode .etf-col-ret1y,
+      table.data-table.compact-mode .etf-col-chg,
+      table.data-table.compact-mode .etf-col-fee,
+      table.data-table.compact-mode .etf-col-prem,
+      table.data-table.compact-mode .etf-col-turn { display: none; }
+      table.data-table.compact-mode .etf-col-mobile { display: table-cell; }
+    }
+    @media (min-width: 769px) {
+      .etf-col-mobile { display: none; }
+    }
+
+    /* 登录与安全页：第三方绑定按钮与表单网格 */
+    .sec-form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+    @media (max-width: 640px) {
+      .sec-form-grid { grid-template-columns: minmax(0, 1fr); }
+    }
+    .oauth-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+    @media (max-width: 640px) {
+      .oauth-grid { grid-template-columns: minmax(0, 1fr); }
+    }
+    .oauth-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 13px 15px;
+      border-radius: 11px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+    }
+    .oauth-info { display: flex; align-items: center; gap: 10px; }
+    .oauth-icon {
+      width: 34px; height: 34px; border-radius: 9px; background: var(--surface);
+      border: 1px solid var(--border); display: grid; place-items: center;
+    }
+
     .pk-add-box {
       display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
       padding: 12px; border-radius: 10px; background: var(--surface-2); border: 1px dashed var(--border-strong);
@@ -618,17 +759,17 @@
               <svg viewBox="0 0 24 24" style="width:13px;height:13px;opacity:0.7;"><polyline points="6 9 12 15 18 9"/></svg>
             </button>
             <div id="userDropdown" class="user-dropdown hidden" role="menu">
-              <button id="menuSettingsBtn" class="user-menu-item" type="button" role="menuitem">
+              <button class="user-menu-item" data-center-go="bark" type="button" role="menuitem">
                 <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
                 <span>设置</span>
               </button>
-              <button id="menuFavBtn" class="user-menu-item" type="button" role="menuitem">
+              <button class="user-menu-item" data-center-go="favorites" type="button" role="menuitem">
                 <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                <span>收藏夹管理</span>
+                <span>收藏夹</span>
               </button>
-              <button id="bindPasskeyBtn" class="user-menu-item" type="button" role="menuitem">
-                <svg viewBox="0 0 24 24"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/></svg>
-                <span>通行密钥</span>
+              <button class="user-menu-item" data-center-go="security" type="button" role="menuitem">
+                <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                <span>登录与安全</span>
               </button>
               <div class="user-menu-sep"></div>
               <button id="logoutBtn" class="user-menu-item danger" type="button" role="menuitem">
@@ -978,6 +1119,17 @@
               <button class="filter-pill" data-q="buy1k" type="button">额度 ≥ 1,000 元</button>
               <button class="filter-pill" data-q="fav" type="button">仅看收藏</button>
             </div>
+            <div class="mobile-sort-bar" data-sortbar="nasdaq">
+              <span style="font-size:12px;color:var(--text-3);">排序：</span>
+              <button class="sort-chip active" data-sort-chip="nasdaq:agency_limit_num" type="button">代销额度 ↓</button>
+              <button class="sort-chip" data-sort-chip="nasdaq:direct_limit_num" type="button">直销额度 ↕</button>
+              <button class="sort-chip" data-sort-chip="nasdaq:return_1y" type="button">近1年收益 ↕</button>
+              <button class="sort-chip" data-sort-chip="nasdaq:daily_chg" type="button">昨日涨跌 ↕</button>
+              <button class="sort-chip" data-sort-chip="nasdaq:scale" type="button">规模 ↕</button>
+              <button class="sort-chip" data-sort-chip="nasdaq:mgmt_custody_fee" type="button">运作费率 ↕</button>
+              <button class="sort-chip" data-sort-chip="nasdaq:first_year_cost" type="button">首年成本 ↕</button>
+              <button class="sort-chip" data-sort-chip="nasdaq:code" type="button">代码 ↕</button>
+            </div>
             <div id="nasdaqBuyBanner" class="quota-banner"></div>
           </div>
           <div class="table-wrap">
@@ -1028,6 +1180,17 @@
               <button class="filter-pill" data-q="buy1k" type="button">额度 ≥ 1,000 元</button>
               <button class="filter-pill" data-q="fav" type="button">仅看收藏</button>
             </div>
+            <div class="mobile-sort-bar" data-sortbar="sp500">
+              <span style="font-size:12px;color:var(--text-3);">排序：</span>
+              <button class="sort-chip active" data-sort-chip="sp500:agency_limit_num" type="button">代销额度 ↓</button>
+              <button class="sort-chip" data-sort-chip="sp500:direct_limit_num" type="button">直销额度 ↕</button>
+              <button class="sort-chip" data-sort-chip="sp500:return_1y" type="button">近1年收益 ↕</button>
+              <button class="sort-chip" data-sort-chip="sp500:daily_chg" type="button">昨日涨跌 ↕</button>
+              <button class="sort-chip" data-sort-chip="sp500:scale" type="button">规模 ↕</button>
+              <button class="sort-chip" data-sort-chip="sp500:mgmt_custody_fee" type="button">运作费率 ↕</button>
+              <button class="sort-chip" data-sort-chip="sp500:first_year_cost" type="button">首年成本 ↕</button>
+              <button class="sort-chip" data-sort-chip="sp500:code" type="button">代码 ↕</button>
+            </div>
             <div id="sp500BuyBanner" class="quota-banner"></div>
           </div>
           <div class="table-wrap">
@@ -1064,20 +1227,38 @@
             <div class="toolbar-row">
               <div class="search-box"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg><input id="etfSearch" class="search-input" type="text" placeholder="搜索场内 ETF 名称或代码..." /></div>
               <div class="pill-group">
+                <button id="etfDetailBtn" class="filter-pill" type="button">详细信息</button>
                 <button class="filter-pill active" data-etf-idx="ALL" type="button">全部指数</button>
                 <button class="filter-pill" data-etf-idx="纳斯达克" type="button">纳斯达克</button>
                 <button class="filter-pill" data-etf-idx="标普" type="button">标普 500</button>
                 <button id="etfLowPremBtn" class="filter-pill" type="button">低溢价/折价 (&lt;1%)</button>
               </div>
             </div>
+            <div class="mobile-sort-bar" data-etf-sortbar="1">
+              <span style="font-size:12px;color:var(--text-3);">排序：</span>
+              <button class="sort-chip active" data-etf-chip="premium" type="button">溢价率 ↓</button>
+              <button class="sort-chip" data-etf-chip="chg_pct" type="button">场内涨跌 ↕</button>
+              <button class="sort-chip" data-etf-chip="return_1y" type="button">近1年收益 ↕</button>
+              <button class="sort-chip" data-etf-chip="scale" type="button">规模 ↕</button>
+              <button class="sort-chip" data-etf-chip="turnover" type="button">成交额 ↕</button>
+              <button class="sort-chip" data-etf-chip="mgmt_custody_fee" type="button">运作费率 ↕</button>
+              <button class="sort-chip" data-etf-chip="code" type="button">代码 ↕</button>
+            </div>
           </div>
           <div class="table-wrap">
-            <table class="data-table">
+            <table id="etfTable" class="data-table">
               <thead><tr>
-                <th style="width:94px;">操作</th><th class="sortable" data-etf-sort="code">代码 ↕</th><th>ETF 名称</th><th>跟踪指数</th>
-                <th class="sortable" data-etf-sort="scale">规模(亿) ↕</th><th class="sortable" data-etf-sort="return_1y">近1年收益 ↕</th>
-                <th class="sortable" data-etf-sort="chg_pct">场内涨跌 ↕</th><th class="sortable" data-etf-sort="mgmt_custody_fee">运作费率 ↕</th>
-                <th class="sortable sorted" data-etf-sort="premium">溢价率 ↓</th><th class="sortable" data-etf-sort="turnover">当日成交(亿) ↕</th>
+                <th class="etf-col-opt" style="width:94px;">操作</th>
+                <th class="etf-col-code sortable" data-etf-sort="code">代码 ↕</th>
+                <th>ETF 名称 / 代码</th>
+                <th class="etf-col-mobile">溢价率 / 涨跌</th>
+                <th class="etf-col-index">跟踪指数</th>
+                <th class="etf-col-scale sortable" data-etf-sort="scale">规模(亿) ↕</th>
+                <th class="etf-col-ret1y sortable" data-etf-sort="return_1y">近1年收益 ↕</th>
+                <th class="etf-col-chg sortable" data-etf-sort="chg_pct">场内涨跌 ↕</th>
+                <th class="etf-col-fee sortable" data-etf-sort="mgmt_custody_fee">运作费率 ↕</th>
+                <th class="etf-col-prem sortable sorted" data-etf-sort="premium">溢价率 ↓</th>
+                <th class="etf-col-turn sortable" data-etf-sort="turnover">当日成交(亿) ↕</th>
               </tr></thead>
               <tbody id="etfBody"></tbody>
             </table>
@@ -1091,10 +1272,276 @@
           <div class="chart-box"><canvas id="etfPremChart"></canvas></div>
         </section>
       </div>
+
+      <!-- ===== 板块 6：独立个人中心页（左侧固定列表：设置 / 收藏夹 / 登录与安全） ===== -->
+      <div id="page-center" class="view-pane hidden">
+        <div class="sec-title-row">
+          <div class="sec-title">账号与系统中心</div>
+          <div class="sec-meta">左侧列表一键切换 · 设置、收藏夹与登录安全独立管理</div>
+        </div>
+
+        <div class="center-layout">
+          <aside class="center-sidebar" aria-label="中心功能列表">
+            <div class="center-side-group">系统设置</div>
+            <button id="sideInviteBtn" class="center-side-item hidden" data-csub="invites" type="button">
+              <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9h10M7 13h6"/></svg>
+              <span>邀请码管理</span>
+            </button>
+            <button class="center-side-item active" data-csub="bark" type="button">
+              <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+              <span>BARK推送管理</span>
+            </button>
+
+            <div class="center-side-sep"></div>
+            <div class="center-side-group">我的资产</div>
+            <button class="center-side-item" data-csub="favorites" type="button">
+              <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              <span>收藏夹</span>
+            </button>
+
+            <div class="center-side-sep"></div>
+            <div class="center-side-group">账号安全</div>
+            <button class="center-side-item" data-csub="security" type="button">
+              <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              <span>登录与安全</span>
+            </button>
+          </aside>
+
+          <div class="center-content">
+            <!-- 子页面 A：邀请码管理（仅超级管理员可见与可操作） -->
+            <section id="csub-invites" class="card card-pad hidden">
+              <div class="card-head">
+                <div>
+                  <div class="card-title">邀请码管理（超级管理员）</div>
+                  <div class="card-sub">支持手动添加、随机生成、批量导入导出与使用记录追踪</div>
+                </div>
+              </div>
+              <div class="modal-section" style="margin-top:0;">
+                <div class="inv-toolbar">
+                  <input id="invSingleInput" class="input" type="text" placeholder="输入自定义邀请码（如 VIP2026）" style="flex:1;min-width:150px;height:36px;background:var(--surface);" />
+                  <button id="invAddBtn" class="btn-solid-sm" type="button">添加</button>
+                  <input id="invPrefixInput" class="input" type="text" value="QDII" placeholder="前缀" style="width:76px;height:36px;background:var(--surface);text-align:center;" title="生成前缀" />
+                  <input id="invCountInput" class="input" type="number" value="5" min="1" max="50" style="width:66px;height:36px;background:var(--surface);text-align:center;" title="生成数量" />
+                  <button id="invGenBtn" class="btn-secondary" type="button">生成</button>
+                </div>
+
+                <div class="inv-import-box">
+                  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+                    <span style="font-size:12.5px;font-weight:600;">批量导入与导出</span>
+                    <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                      <label class="chip-btn" style="cursor:pointer;">
+                        <span>选择 TXT/CSV 文件</span>
+                        <input id="invFileInput" type="file" accept=".txt,.csv" style="display:none;" />
+                      </label>
+                      <button id="invCopyUnusedBtn" class="chip-btn" type="button">复制未使用</button>
+                      <button id="invExportBtn" class="chip-btn" type="button">导出 CSV</button>
+                    </div>
+                  </div>
+                  <div style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;">
+                    <textarea id="invBatchTextarea" class="pref-tpl-ta" style="min-height:52px;flex:1;" placeholder="支持粘贴多个邀请码（每行一个或用逗号/空格分隔），点击右侧导入"></textarea>
+                    <button id="invImportBtn" class="btn-secondary" type="button">导入</button>
+                  </div>
+                </div>
+
+                <div class="inv-stats-row">
+                  <div class="pill-group" id="invFilterGroup">
+                    <button class="filter-pill active" data-inv-filter="all" type="button">全部</button>
+                    <button class="filter-pill" data-inv-filter="unused" type="button">未使用</button>
+                    <button class="filter-pill" data-inv-filter="used" type="button">已使用</button>
+                  </div>
+                  <span id="invSummaryText">加载中...</span>
+                </div>
+
+                <div id="invStatusMsg" class="modal-hint" style="display:none;"></div>
+                <div id="invListWrap" class="inv-list" style="max-height:460px;"></div>
+              </div>
+            </section>
+
+            <!-- 子页面 B：BARK推送管理 -->
+            <section id="csub-bark" class="card card-pad">
+              <div class="card-head">
+                <div>
+                  <div class="card-title">BARK 推送管理</div>
+                  <div class="card-sub">自定义推送地址、各提醒项独立推送时间与独立消息模板</div>
+                </div>
+              </div>
+              <div class="modal-section" style="margin-top:0;">
+                <div class="field" style="margin-bottom:0;">
+                  <label for="cfgBarkUrl">Bark 推送链接</label>
+                  <input id="cfgBarkUrl" class="input" type="url" placeholder="https://bark.youranzi.de/你的Key" />
+                </div>
+
+                <div class="pref-item-card">
+                  <div class="pref-item-head">
+                    <label class="pref-switch-lbl"><input id="optQuotaEnabled" type="checkbox" /><span>1. 基金额度变化提醒</span></label>
+                    <button class="btn-link-reset" data-reset-tpl="quota" type="button">恢复默认模板</button>
+                  </div>
+                  <div class="pref-row-2">
+                    <div><span class="pref-mini-lbl">推送时间（北京时间）</span><input id="timeQuota" class="input" type="time" style="height:36px;" /></div>
+                    <div><span class="pref-mini-lbl">支持占位符：{count} {details}</span><textarea id="tplQuota" class="pref-tpl-ta"></textarea></div>
+                  </div>
+                </div>
+
+                <div class="pref-item-card">
+                  <div class="pref-item-head">
+                    <label class="pref-switch-lbl"><input id="optEtfPremEnabled" type="checkbox" /><span>2. 场内 ETF 高溢价预警</span></label>
+                    <button class="btn-link-reset" data-reset-tpl="etf_premium" type="button">恢复默认模板</button>
+                  </div>
+                  <div class="pref-row-2">
+                    <div><span class="pref-mini-lbl">推送时间（北京时间）</span><input id="timeEtfPrem" class="input" type="time" style="height:36px;" /></div>
+                    <div><span class="pref-mini-lbl">支持占位符：{count} {details}</span><textarea id="tplEtfPrem" class="pref-tpl-ta"></textarea></div>
+                  </div>
+                </div>
+
+                <div class="pref-item-card">
+                  <div class="pref-item-head">
+                    <label class="pref-switch-lbl"><input id="optMarketRecapEnabled" type="checkbox" /><span>3. 美股收盘复盘与情绪</span></label>
+                    <button class="btn-link-reset" data-reset-tpl="market_recap" type="button">恢复默认模板</button>
+                  </div>
+                  <div class="pref-row-2">
+                    <div><span class="pref-mini-lbl">推送时间（北京时间）</span><input id="timeMarketRecap" class="input" type="time" style="height:36px;" /></div>
+                    <div><span class="pref-mini-lbl">支持占位符：{ndx} {chg} {vix} {fg} {light}</span><textarea id="tplMarketRecap" class="pref-tpl-ta"></textarea></div>
+                  </div>
+                </div>
+
+                <div id="settingsStatus" class="modal-hint" style="color:var(--ok);display:none;"></div>
+                <div class="modal-actions">
+                  <button id="testBarkBtn" class="btn-secondary" type="button">测试推送</button>
+                  <button id="saveSettingsBtn" class="btn-solid-sm" type="button">保存设置</button>
+                </div>
+              </div>
+            </section>
+
+            <!-- 子页面 C：收藏夹列表 -->
+            <section id="csub-favorites" class="card hidden">
+              <div class="card-pad" style="padding-bottom:14px;">
+                <div class="card-head" style="margin-bottom:0;border-bottom:none;padding-bottom:0;">
+                  <div>
+                    <div class="card-title">我的收藏夹 <span id="favPageBadge" class="sec-pill">0 只</span></div>
+                    <div class="card-sub">按列表展示已收藏的场外基金与场内 ETF，支持点击复制代码与取消收藏</div>
+                  </div>
+                </div>
+              </div>
+              <div class="table-wrap">
+                <table class="simple-table">
+                  <thead>
+                    <tr>
+                      <th>基金 / ETF 名称</th>
+                      <th>类型</th>
+                      <th>近1年收益</th>
+                      <th>最新额度 / 溢价率</th>
+                      <th style="width:92px;">操作</th>
+                    </tr>
+                  </thead>
+                  <tbody id="favListTableBody"></tbody>
+                </table>
+              </div>
+            </section>
+
+            <!-- 子页面 D：登录与安全（通行密钥、修改密码、绑定邮箱、GitHub/Google绑定） -->
+            <div id="csub-security" class="hidden" style="display:flex;flex-direction:column;gap:16px;">
+              <!-- 1. 通行密钥 -->
+              <section class="card card-pad">
+                <div class="card-head">
+                  <div>
+                    <div class="card-title">通行密钥（Passkey）</div>
+                    <div class="card-sub">使用面容 ID、触控 ID 或 Bitwarden 等设备密钥实现免密登录</div>
+                  </div>
+                </div>
+                <div class="modal-section" style="margin-top:0;">
+                  <div class="pk-add-box">
+                    <input id="passkeyLabelInput" class="input" type="text" placeholder="备注名称（如 iPhone / MacBook / Bitwarden）" style="flex:1;min-width:180px;height:36px;background:var(--surface);" />
+                    <button id="bindPasskeyBtn" class="btn-solid-sm" type="button">+ 新增通行密钥</button>
+                  </div>
+                  <div id="passkeyStatus" class="modal-hint"></div>
+                  <div id="passkeyList" class="fav-manage-list" style="margin-top:0;"></div>
+                </div>
+              </section>
+
+              <!-- 2. 修改密码 -->
+              <section class="card card-pad">
+                <div class="card-head">
+                  <div>
+                    <div class="card-title">修改登录密码</div>
+                    <div class="card-sub">修改后请使用新密码登录，当前设备 7 天登录态仍有效</div>
+                  </div>
+                </div>
+                <div class="sec-form-grid">
+                  <div class="field" style="margin-bottom:0;">
+                    <label for="oldPasswordInput">当前密码</label>
+                    <input id="oldPasswordInput" class="input" type="password" placeholder="请输入当前密码" />
+                  </div>
+                  <div class="field" style="margin-bottom:0;">
+                    <label for="newPasswordInput">新密码（至少 6 位）</label>
+                    <input id="newPasswordInput" class="input" type="password" placeholder="请输入新密码" />
+                  </div>
+                </div>
+                <div id="pwdStatusMsg" class="modal-hint" style="margin-top:10px;display:none;"></div>
+                <div class="modal-actions" style="margin-top:12px;">
+                  <button id="savePasswordBtn" class="btn-solid-sm" type="button">更新密码</button>
+                </div>
+              </section>
+
+              <!-- 3. 修改绑定邮箱 -->
+              <section class="card card-pad">
+                <div class="card-head">
+                  <div>
+                    <div class="card-title">绑定邮箱</div>
+                    <div class="card-sub">用于账号信息备注与后续安全验证</div>
+                  </div>
+                </div>
+                <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+                  <input id="bindEmailInput" class="input" type="email" placeholder="请输入要绑定的邮箱地址（如 name@example.com）" style="flex:1;min-width:220px;" />
+                  <button id="saveEmailBtn" class="btn-solid-sm" type="button">保存邮箱</button>
+                </div>
+                <div id="emailStatusMsg" class="modal-hint" style="margin-top:8px;display:none;"></div>
+              </section>
+
+              <!-- 4. 第三方账号绑定（GitHub / Google） -->
+              <section class="card card-pad">
+                <div class="card-head">
+                  <div>
+                    <div class="card-title">第三方账号关联</div>
+                    <div class="card-sub">关联 GitHub 或 Google 账号（需配置 OAuth 客户端密钥后启用跳转）</div>
+                  </div>
+                </div>
+                <div class="oauth-grid">
+                  <div class="oauth-card">
+                    <div class="oauth-info">
+                      <div class="oauth-icon">
+                        <svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+                      </div>
+                      <div>
+                        <div style="font-size:13.5px;font-weight:600;">GitHub</div>
+                        <div id="githubBindState" class="sub-line">暂未配置 OAuth 回调</div>
+                      </div>
+                    </div>
+                    <button id="bindGithubBtn" class="btn-secondary" type="button">绑定 GitHub</button>
+                  </div>
+
+                  <div class="oauth-card">
+                    <div class="oauth-info">
+                      <div class="oauth-icon">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 3"/></svg>
+                      </div>
+                      <div>
+                        <div style="font-size:13.5px;font-weight:600;">Google</div>
+                        <div id="googleBindState" class="sub-line">暂未配置 OAuth 回调</div>
+                      </div>
+                    </div>
+                    <button id="bindGoogleBtn" class="btn-secondary" type="button">绑定 Google</button>
+                  </div>
+                </div>
+                <div id="oauthStatusMsg" class="modal-hint" style="margin-top:8px;display:none;"></div>
+              </section>
+            </div>
+          </div>
+        </div>
+      </div>
     </main>
   </div>
 
-  <!-- 底部悬浮对比栏 & 弹窗 -->
+  <!-- 底部悬浮对比栏 & 横向对比弹窗 -->
   <div id="compareDock" class="compare-dock hidden">
     <span id="compareCount">已选 0 只对比</span>
     <button id="openCompareBtn" class="dock-btn" type="button">开始对比</button>
@@ -1104,136 +1551,6 @@
     <div class="modal-box">
       <div class="card-head" style="margin-bottom:0;"><div class="card-title">基金横向对比</div><button id="closeCompareBtn" class="chip-btn" type="button">关闭</button></div>
       <div id="compareTableWrap"></div>
-    </div>
-  </div>
-  <div id="favModal" class="modal-backdrop hidden">
-    <div class="modal-box" style="max-width:620px;">
-      <div class="card-head" style="margin-bottom:0;">
-        <div class="card-title">收藏夹管理</div>
-        <button id="closeFavBtn" class="chip-btn" type="button">关闭</button>
-      </div>
-      <div id="favManageBody" class="fav-manage-list"></div>
-    </div>
-  </div>
-  <div id="settingsModal" class="modal-backdrop hidden">
-    <div class="modal-box" style="max-width:720px;">
-      <div class="card-head" style="margin-bottom:0;">
-        <div class="card-title">系统设置</div>
-        <button id="closeSettingsBtn" class="chip-btn" type="button">关闭</button>
-      </div>
-
-      <div id="settingsTabs" class="settings-tabs hidden">
-        <button class="settings-tab active" data-stab="push" type="button">推送选项与模板</button>
-        <button class="settings-tab" data-stab="invites" type="button">邀请码管理（超管）</button>
-      </div>
-
-      <!-- Tab 1: 推送选项与模板 -->
-      <div id="stab-push" class="modal-section">
-        <div class="field" style="margin-bottom:0;">
-          <label for="cfgBarkUrl">Bark 推送链接</label>
-          <input id="cfgBarkUrl" class="input" type="url" placeholder="https://bark.youranzi.de/你的Key" />
-        </div>
-
-        <div class="pref-item-card">
-          <div class="pref-item-head">
-            <label class="pref-switch-lbl"><input id="optQuotaEnabled" type="checkbox" /><span>1. 基金额度变化提醒</span></label>
-            <button class="btn-link-reset" data-reset-tpl="quota" type="button">恢复默认模板</button>
-          </div>
-          <div class="pref-row-2">
-            <div><span class="pref-mini-lbl">推送时间（北京时间）</span><input id="timeQuota" class="input" type="time" style="height:35px;" /></div>
-            <div><span class="pref-mini-lbl">支持占位符：{count} {details}</span><textarea id="tplQuota" class="pref-tpl-ta"></textarea></div>
-          </div>
-        </div>
-
-        <div class="pref-item-card">
-          <div class="pref-item-head">
-            <label class="pref-switch-lbl"><input id="optEtfPremEnabled" type="checkbox" /><span>2. 场内 ETF 高溢价预警</span></label>
-            <button class="btn-link-reset" data-reset-tpl="etf_premium" type="button">恢复默认模板</button>
-          </div>
-          <div class="pref-row-2">
-            <div><span class="pref-mini-lbl">推送时间（北京时间）</span><input id="timeEtfPrem" class="input" type="time" style="height:35px;" /></div>
-            <div><span class="pref-mini-lbl">支持占位符：{count} {details}</span><textarea id="tplEtfPrem" class="pref-tpl-ta"></textarea></div>
-          </div>
-        </div>
-
-        <div class="pref-item-card">
-          <div class="pref-item-head">
-            <label class="pref-switch-lbl"><input id="optMarketRecapEnabled" type="checkbox" /><span>3. 美股收盘复盘与情绪</span></label>
-            <button class="btn-link-reset" data-reset-tpl="market_recap" type="button">恢复默认模板</button>
-          </div>
-          <div class="pref-row-2">
-            <div><span class="pref-mini-lbl">推送时间（北京时间）</span><input id="timeMarketRecap" class="input" type="time" style="height:35px;" /></div>
-            <div><span class="pref-mini-lbl">支持占位符：{ndx} {chg} {vix} {fg} {light}</span><textarea id="tplMarketRecap" class="pref-tpl-ta"></textarea></div>
-          </div>
-        </div>
-
-        <div id="settingsStatus" class="modal-hint" style="color:var(--ok);display:none;"></div>
-        <div class="modal-actions">
-          <button id="testBarkBtn" class="btn-secondary" type="button">测试推送</button>
-          <button id="saveSettingsBtn" class="btn-solid-sm" type="button">保存设置</button>
-        </div>
-      </div>
-
-      <!-- Tab 2: 邀请码管理与使用记录（超级管理员） -->
-      <div id="stab-invites" class="modal-section hidden">
-        <!-- 添加 & 随机生成 -->
-        <div class="inv-toolbar">
-          <input id="invSingleInput" class="input" type="text" placeholder="输入自定义邀请码（如 VIP2026）" style="flex:1;min-width:150px;height:35px;background:var(--surface);" />
-          <button id="invAddBtn" class="btn-solid-sm" type="button" style="height:35px;">+ 添加</button>
-          <input id="invPrefixInput" class="input" type="text" value="QDII" placeholder="前缀" style="width:76px;height:35px;background:var(--surface);text-align:center;" title="生成前缀" />
-          <input id="invCountInput" class="input" type="number" value="5" min="1" max="50" style="width:66px;height:35px;background:var(--surface);text-align:center;" title="生成数量" />
-          <button id="invGenBtn" class="btn-secondary" type="button" style="height:35px;">随机生成</button>
-        </div>
-
-        <!-- 批量导入 / 导出 -->
-        <div class="inv-import-box">
-          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
-            <span style="font-size:12.5px;font-weight:600;">批量导入与导出</span>
-            <div style="display:flex;gap:6px;flex-wrap:wrap;">
-              <label class="chip-btn" style="cursor:pointer;">
-                <span>选择 TXT/CSV 文件</span>
-                <input id="invFileInput" type="file" accept=".txt,.csv" style="display:none;" />
-              </label>
-              <button id="invCopyUnusedBtn" class="chip-btn" type="button">复制未使用</button>
-              <button id="invExportBtn" class="chip-btn" type="button">导出 CSV</button>
-            </div>
-          </div>
-          <div style="display:flex;gap:8px;align-items:flex-end;flex-wrap:wrap;">
-            <textarea id="invBatchTextarea" class="pref-tpl-ta" style="min-height:48px;flex:1;" placeholder="支持粘贴多个邀请码（每行一个或用逗号/空格分隔），点击右侧批量导入"></textarea>
-            <button id="invImportBtn" class="btn-secondary" type="button" style="height:36px;">批量导入</button>
-          </div>
-        </div>
-
-        <!-- 状态筛选与统计 -->
-        <div class="inv-stats-row">
-          <div class="pill-group" id="invFilterGroup">
-            <button class="filter-pill active" data-inv-filter="all" type="button">全部</button>
-            <button class="filter-pill" data-inv-filter="unused" type="button">未使用</button>
-            <button class="filter-pill" data-inv-filter="used" type="button">已使用</button>
-          </div>
-          <span id="invSummaryText">加载中...</span>
-        </div>
-
-        <div id="invStatusMsg" class="modal-hint" style="display:none;"></div>
-        <div id="invListWrap" class="inv-list"></div>
-      </div>
-    </div>
-  </div>
-
-  <div id="passkeyModal" class="modal-backdrop hidden">
-    <div class="modal-box" style="max-width:580px;">
-      <div class="card-head" style="margin-bottom:0;">
-        <div class="card-title">通行密钥管理</div>
-        <button id="closePasskeyBtn" class="chip-btn" type="button">关闭</button>
-      </div>
-      <div class="modal-section">
-        <div class="pk-add-box">
-          <input id="passkeyLabelInput" class="input" type="text" placeholder="备注名称（如 iPhone / MacBook / Bitwarden）" style="flex:1;min-width:180px;height:36px;background:var(--surface);" />
-          <button id="bindPasskeyBtn" class="btn-solid-sm" type="button">+ 新增通行密钥</button>
-        </div>
-        <div id="passkeyStatus" class="modal-hint"></div>
-        <div id="passkeyList" class="fav-manage-list" style="margin-top:0;"></div>
-      </div>
     </div>
   </div>
 
@@ -1295,7 +1612,7 @@
         nasdaq: { search: "", quick: "all", mergeAC: true, showDetail: window.innerWidth > 768, sortKey: "agency_limit_num", sortDir: "desc", page: 1 },
         sp500: { search: "", quick: "all", mergeAC: true, showDetail: window.innerWidth > 768, sortKey: "agency_limit_num", sortDir: "desc", page: 1 }
       },
-      etf: { search: "", idx: "ALL", lowPremOnly: false, sortKey: "premium", sortDir: "desc" }
+      etf: { search: "", idx: "ALL", lowPremOnly: false, showDetail: window.innerWidth > 768, sortKey: "premium", sortDir: "desc" }
     };
 
     if (localStorage.getItem("qdii-theme") === "dark") document.documentElement.setAttribute("data-theme", "dark");
@@ -1540,18 +1857,148 @@
       document.getElementById("tplMarketRecap").value = p.options.market_recap.template || DEFAULT_TPLS.market_recap;
     }
 
+    document.querySelectorAll("[data-reset-tpl]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const k = btn.dataset.resetTpl;
+        const map = { quota: "tplQuota", etf_premium: "tplEtfPrem", market_recap: "tplMarketRecap" };
+        if (map[k]) document.getElementById(map[k]).value = DEFAULT_TPLS[k];
+      });
+    });
+
+    document.getElementById("saveSettingsBtn").addEventListener("click", () => {
+      const next = {
+        barkUrl: document.getElementById("cfgBarkUrl").value.trim() || DEFAULT_BARK,
+        options: {
+          quota: {
+            enabled: document.getElementById("optQuotaEnabled").checked,
+            time: document.getElementById("timeQuota").value || "09:30",
+            template: document.getElementById("tplQuota").value.trim() || DEFAULT_TPLS.quota
+          },
+          etf_premium: {
+            enabled: document.getElementById("optEtfPremEnabled").checked,
+            time: document.getElementById("timeEtfPrem").value || "10:00",
+            template: document.getElementById("tplEtfPrem").value.trim() || DEFAULT_TPLS.etf_premium
+          },
+          market_recap: {
+            enabled: document.getElementById("optMarketRecapEnabled").checked,
+            time: document.getElementById("timeMarketRecap").value || "08:00",
+            template: document.getElementById("tplMarketRecap").value.trim() || DEFAULT_TPLS.market_recap
+          }
+        }
+      };
+      localStorage.setItem(PREF_KEY, JSON.stringify(next));
+      syncToCloud({ prefs: next });
+      const st = document.getElementById("settingsStatus");
+      st.style.display = "block";
+      st.style.color = "var(--ok)";
+      st.textContent = "已保存推送选项、独立推送时间与模板（已同步云端）";
+    });
+
+    document.getElementById("testBarkBtn").addEventListener("click", async () => {
+      const barkUrl = (document.getElementById("cfgBarkUrl").value.trim() || DEFAULT_BARK).replace(/\/+$/, "");
+      const tpl = document.getElementById("tplQuota").value.trim() || DEFAULT_TPLS.quota;
+      const preview = tpl
+        .replace("{count}", "2")
+        .replace("{details}", "景顺长城纳指(161130) 代销：100 元 -> 1,000 元");
+      const st = document.getElementById("settingsStatus");
+      st.style.display = "block";
+      st.style.color = "var(--text-2)";
+      st.textContent = "正在发送模板测试通知...";
+      try {
+        await fetch(`${barkUrl}/`, {
+          method: "POST", mode: "no-cors",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ title: "QDII 推送模板测试", body: preview, group: "QDII监控" })
+        });
+        st.style.color = "var(--ok)";
+        st.textContent = "测试推送请求已发出，请留意手机 Bark 通知";
+      } catch {
+        st.style.color = "var(--danger)";
+        st.textContent = "测试推送发送失败，请检查 Bark 链接格式";
+      }
+    });
+
     let inviteCache = [];
     let inviteFilter = "all";
 
-    function switchSettingsTab(tabName) {
-      document.querySelectorAll(".settings-tab").forEach(b => b.classList.toggle("active", b.dataset.stab === tabName));
-      document.getElementById("stab-push").classList.toggle("hidden", tabName !== "push");
-      document.getElementById("stab-invites").classList.toggle("hidden", tabName !== "invites");
-      if (tabName === "invites") loadInvites();
+    function renderFavoritesPage() {
+      const allMap = new Map();
+      state.raw.nasdaq.forEach(x => allMap.set(x.code, { ...x, _cat: "纳指场外" }));
+      state.raw.sp500.forEach(x => allMap.set(x.code, { ...x, _cat: "标普场外" }));
+      state.raw.etfs.forEach(x => allMap.set(x.code, { ...x, _cat: "场内 ETF" }));
+
+      const codes = [...state.favs];
+      const badge = document.getElementById("favPageBadge");
+      if (badge) badge.textContent = `${codes.length} 只`;
+      const tbody = document.getElementById("favListTableBody");
+      if (!tbody) return;
+
+      if (!codes.length) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--text-3);padding:32px;">暂无收藏标的，可在纳指基金、标普基金或场内 ETF 列表中点击 ☆ 添加</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = codes.map(code => {
+        const item = allMap.get(code);
+        if (!item) {
+          return `<tr>
+            <td><span class="code-badge">${code}</span> <span style="margin-left:6px;color:var(--text-2);">已收藏标的</span></td>
+            <td>--</td><td>--</td><td>--</td>
+            <td><button class="fav-remove-btn" data-rm-fav="${code}" type="button">取消收藏</button></td>
+          </tr>`;
+        }
+        const link = item.notice_url || item.detail_url || "#";
+        const statusCell = item._cat === "场内 ETF"
+          ? `溢价 ${premRiskBadge(item.premium)}`
+          : `代销 ${limitBadge(item.agency_limit_text, item.agency_limit_num, "agency")} · 直销 ${limitBadge(item.direct_limit_text, item.direct_limit_num, item.direct_source)}`;
+        return `<tr>
+          <td>
+            <a class="fund-link" href="${link}" target="_blank" rel="noopener">${item.name}</a>
+            <div><button class="copy-code-btn" data-copy="${code}" type="button" title="点击复制代码">${code}</button></div>
+          </td>
+          <td><span class="code-c">${item._cat}</span></td>
+          <td class="num">${miniRetHtml(item.return_1y)}</td>
+          <td class="num">${statusCell}</td>
+          <td><button class="fav-remove-btn" data-rm-fav="${code}" type="button">取消收藏</button></td>
+        </tr>`;
+      }).join("");
+
+      tbody.querySelectorAll("[data-copy]").forEach(b => b.addEventListener("click", () => copyText(b.dataset.copy, b)));
+      tbody.querySelectorAll("[data-rm-fav]").forEach(b => b.addEventListener("click", () => toggleFav(b.dataset.rmFav)));
     }
 
-    document.querySelectorAll(".settings-tab").forEach(b => {
-      b.addEventListener("click", () => switchSettingsTab(b.dataset.stab));
+    function openCenterSection(sub) {
+      let target = sub || "bark";
+      if (target === "invites" && !isUserAdmin(state.user)) {
+        target = "bark";
+      }
+      switchPage("center");
+      document.querySelectorAll("[data-csub]").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.csub === target);
+      });
+      ["invites", "bark", "favorites", "security"].forEach(id => {
+        const panel = document.getElementById(`csub-${id}`);
+        if (!panel) return;
+        if (id === "invites" && !isUserAdmin(state.user)) {
+          panel.classList.add("hidden");
+          return;
+        }
+        panel.classList.toggle("hidden", id !== target);
+      });
+      if (target === "invites" && isUserAdmin(state.user)) loadInvites();
+      if (target === "bark") fillSettingsForm(getPrefs());
+      if (target === "favorites") renderFavoritesPage();
+      if (target === "security") loadPasskeys();
+    }
+
+    document.querySelectorAll("[data-center-go]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        closeUserMenu();
+        openCenterSection(btn.dataset.centerGo);
+      });
+    });
+    document.querySelectorAll("[data-csub]").forEach(btn => {
+      btn.addEventListener("click", () => openCenterSection(btn.dataset.csub));
     });
 
     function showInvMsg(text, ok = true) {
@@ -1581,9 +2028,7 @@
 
       wrap.innerHTML = filtered.map(inv => {
         const isUsed = inv.status === "used";
-        const tag = isUsed
-          ? `<span class="tag tag-stop">已使用</span>`
-          : `<span class="tag tag-ok">未使用</span>`;
+        const tag = isUsed ? `<span class="tag tag-stop">已使用</span>` : `<span class="tag tag-ok">未使用</span>`;
         const usedAt = inv.used_at ? inv.used_at.replace("T", " ").slice(0, 16) : "";
         const createdAt = inv.created_at ? inv.created_at.replace("T", " ").slice(0, 16) : "";
         const usageLine = isUsed
@@ -1621,15 +2066,14 @@
             inviteCache = data.invites || [];
             renderInviteList();
             showInvMsg(data.message || "已删除");
-          } else {
-            showInvMsg(data.message || "删除失败", false);
-          }
+          } else showInvMsg(data.message || "删除失败", false);
         } catch { showInvMsg("请求失败", false); }
         finally { b.disabled = false; }
       }));
     }
 
     async function loadInvites() {
+      if (!isUserAdmin(state.user)) return;
       const token = localStorage.getItem(TOKEN_KEY);
       if (!token) return;
       document.getElementById("invListWrap").innerHTML = `<div style="color:var(--text-3);font-size:13px;padding:14px 0;">加载邀请码列表中...</div>`;
@@ -1705,7 +2149,7 @@
       const reader = new FileReader();
       reader.onload = () => {
         document.getElementById("invBatchTextarea").value = String(reader.result || "");
-        showInvMsg(`已读取文件 ${file.name}，请点击“批量导入”`);
+        showInvMsg(`已读取文件 ${file.name}，请点击“导入”`);
       };
       reader.readAsText(file, "utf-8");
       e.target.value = "";
@@ -1755,181 +2199,66 @@
       a.click();
     });
 
-    document.getElementById("menuSettingsBtn").addEventListener("click", () => {
-      closeUserMenu();
-      fillSettingsForm(getPrefs());
-      document.getElementById("settingsStatus").style.display = "none";
-      document.getElementById("invStatusMsg").style.display = "none";
-      switchSettingsTab("push");
-      document.getElementById("settingsModal").classList.remove("hidden");
-    });
-    document.getElementById("closeSettingsBtn").addEventListener("click", () => document.getElementById("settingsModal").classList.add("hidden"));
-    document.getElementById("settingsModal").addEventListener("click", (e) => { if (e.target.id === "settingsModal") e.currentTarget.classList.add("hidden"); });
-
-    document.querySelectorAll("[data-reset-tpl]").forEach(btn => {
-      btn.addEventListener("click", () => {
-        const k = btn.dataset.resetTpl;
-        const map = { quota: "tplQuota", etf_premium: "tplEtfPrem", market_recap: "tplMarketRecap" };
-        if (map[k]) document.getElementById(map[k]).value = DEFAULT_TPLS[k];
-      });
-    });
-
-    document.getElementById("saveSettingsBtn").addEventListener("click", () => {
-      const next = {
-        barkUrl: document.getElementById("cfgBarkUrl").value.trim() || DEFAULT_BARK,
-        options: {
-          quota: {
-            enabled: document.getElementById("optQuotaEnabled").checked,
-            time: document.getElementById("timeQuota").value || "09:30",
-            template: document.getElementById("tplQuota").value.trim() || DEFAULT_TPLS.quota
-          },
-          etf_premium: {
-            enabled: document.getElementById("optEtfPremEnabled").checked,
-            time: document.getElementById("timeEtfPrem").value || "10:00",
-            template: document.getElementById("tplEtfPrem").value.trim() || DEFAULT_TPLS.etf_premium
-          },
-          market_recap: {
-            enabled: document.getElementById("optMarketRecapEnabled").checked,
-            time: document.getElementById("timeMarketRecap").value || "08:00",
-            template: document.getElementById("tplMarketRecap").value.trim() || DEFAULT_TPLS.market_recap
-          }
-        }
-      };
-      localStorage.setItem(PREF_KEY, JSON.stringify(next));
-      syncToCloud({ prefs: next });
-      const st = document.getElementById("settingsStatus");
+    // 登录与安全：修改密码、修改绑定邮箱、GitHub/Google 绑定按钮
+    document.getElementById("savePasswordBtn").addEventListener("click", async () => {
+      const oldPassword = document.getElementById("oldPasswordInput").value;
+      const newPassword = document.getElementById("newPasswordInput").value;
+      const st = document.getElementById("pwdStatusMsg");
       st.style.display = "block";
-      st.style.color = "var(--ok)";
-      st.textContent = "已保存推送选项、独立推送时间与模板";
-    });
-
-    document.getElementById("testBarkBtn").addEventListener("click", async () => {
-      const barkUrl = (document.getElementById("cfgBarkUrl").value.trim() || DEFAULT_BARK).replace(/\/+$/, "");
-      const tpl = document.getElementById("tplQuota").value.trim() || DEFAULT_TPLS.quota;
-      const preview = tpl
-        .replace("{count}", "2")
-        .replace("{details}", "景顺长城纳指(161130) 代销：100 元 -> 1,000 元");
-      const st = document.getElementById("settingsStatus");
-      st.style.display = "block";
-      st.style.color = "var(--text-2)";
-      st.textContent = "正在发送模板测试通知...";
-      try {
-        await fetch(`${barkUrl}/`, {
-          method: "POST", mode: "no-cors",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ title: "QDII 推送模板测试", body: preview, group: "QDII监控" })
-        });
-        st.style.color = "var(--ok)";
-        st.textContent = "测试推送请求已发出，请留意手机 Bark 通知";
-      } catch {
+      if (!oldPassword || newPassword.length < 6) {
         st.style.color = "var(--danger)";
-        st.textContent = "测试推送发送失败，请检查 Bark 链接格式";
+        st.textContent = "请输入当前密码，且新密码不少于 6 位";
+        return;
       }
-    });
-
-    // 通行密钥管理弹窗（列表、新增、删除）
-    async function loadPasskeys() {
       const token = localStorage.getItem(TOKEN_KEY);
-      const listEl = document.getElementById("passkeyList");
-      const stEl = document.getElementById("passkeyStatus");
-      listEl.innerHTML = `<div style="color:var(--text-3);font-size:13px;padding:12px 0;">加载中...</div>`;
-      stEl.textContent = "";
       try {
         const res = await fetch("/api/auth", {
           method: "POST",
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-          body: JSON.stringify({ action: "passkey_list" })
+          body: JSON.stringify({ action: "change_password", old_password: oldPassword, new_password: newPassword })
         });
         const data = await res.json();
-        if (!res.ok || !data.ok) {
-          listEl.innerHTML = `<div style="color:var(--danger);font-size:13px;">${data.message || "加载失败"}</div>`;
-          return;
+        st.style.color = data.ok ? "var(--ok)" : "var(--danger)";
+        st.textContent = data.message || (data.ok ? "密码已更新" : "修改失败");
+        if (data.ok) {
+          document.getElementById("oldPasswordInput").value = "";
+          document.getElementById("newPasswordInput").value = "";
         }
-        const items = data.passkeys || [];
-        if (!items.length) {
-          listEl.innerHTML = `<div style="text-align:center;color:var(--text-3);font-size:13px;padding:18px 0;">当前尚未绑定任何通行密钥，可在上方点击“+ 新增通行密钥”</div>`;
-          return;
-        }
-        listEl.innerHTML = items.map(pk => {
-          const tail = pk.id.length > 10 ? `...${pk.id.slice(-8)}` : pk.id;
-          const dt = pk.created_at ? pk.created_at.replace("T", " ").slice(0, 16) : "";
-          return `<div class="pk-item">
-            <div>
-              <div class="pk-title">${pk.label || "设备通行密钥"}</div>
-              <div class="pk-meta">ID ${tail}${dt ? " · 添加于 " + dt : ""}</div>
-            </div>
-            <button class="fav-remove-btn" data-del-pk="${pk.id}" type="button">删除</button>
-          </div>`;
-        }).join("");
-        listEl.querySelectorAll("[data-del-pk]").forEach(b => b.addEventListener("click", async () => {
-          const pkId = b.dataset.delPk;
-          if (!confirm("确定要删除这把通行密钥吗？删除后该凭证将无法再用于免密登录。")) return;
-          b.disabled = true;
-          try {
-            const delRes = await fetch("/api/auth", {
-              method: "POST",
-              headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-              body: JSON.stringify({ action: "passkey_delete", id: pkId })
-            });
-            const delData = await delRes.json();
-            stEl.style.color = delData.ok ? "var(--ok)" : "var(--danger)";
-            stEl.textContent = delData.message || (delData.ok ? "已删除" : "删除失败");
-            await loadPasskeys();
-          } catch {
-            stEl.style.color = "var(--danger)";
-            stEl.textContent = "删除请求失败";
-          } finally { b.disabled = false; }
-        }));
       } catch {
-        listEl.innerHTML = `<div style="color:var(--danger);font-size:13px;">无法连接服务</div>`;
+        st.style.color = "var(--danger)";
+        st.textContent = "请求失败，请稍后重试";
       }
-    }
-
-    document.getElementById("bindPasskeyBtn").addEventListener("click", () => {
-      closeUserMenu();
-      document.getElementById("passkeyModal").classList.remove("hidden");
-      loadPasskeys();
     });
-    document.getElementById("closePasskeyBtn").addEventListener("click", () => document.getElementById("passkeyModal").classList.add("hidden"));
-    document.getElementById("passkeyModal").addEventListener("click", (e) => { if (e.target.id === "passkeyModal") e.currentTarget.classList.add("hidden"); });
 
-    function openFavManager() {
-      closeUserMenu();
-      const allItems = [...state.raw.nasdaq, ...state.raw.sp500, ...state.raw.etfs];
-      const byCode = new Map(allItems.map(x => [x.code, x]));
-      const codes = [...state.favs];
-      const wrap = document.getElementById("favManageBody");
-      if (!codes.length) {
-        wrap.innerHTML = `<div style="text-align:center;color:var(--text-3);padding:24px 0;">暂无收藏标的，可在基金或场内 ETF 列表中点击 ☆ 添加</div>`;
-      } else {
-        wrap.innerHTML = codes.map(code => {
-          const info = byCode.get(code);
-          const name = info ? info.name : "已收藏标的";
-          const extra = info && info.agency_limit_text
-            ? `代销 ${info.agency_limit_text} · 直销 ${info.direct_limit_text}`
-            : (info && info.premium != null ? `溢价 ${info.premium}%` : "");
-          return `<div class="fav-manage-row">
-            <div>
-              <div><span class="code-badge">${code}</span> <strong style="margin-left:6px;">${name}</strong></div>
-              ${extra ? `<div class="sub-line" style="margin-top:4px;">${extra}</div>` : ""}
-            </div>
-            <button class="fav-remove-btn" data-rm-fav="${code}" type="button">取消收藏</button>
-          </div>`;
-        }).join("");
-        wrap.querySelectorAll("[data-rm-fav]").forEach(btn => {
-          btn.addEventListener("click", () => {
-            toggleFav(btn.dataset.rmFav);
-            openFavManager();
-          });
+    document.getElementById("saveEmailBtn").addEventListener("click", async () => {
+      const email = document.getElementById("bindEmailInput").value.trim();
+      const st = document.getElementById("emailStatusMsg");
+      st.style.display = "block";
+      const token = localStorage.getItem(TOKEN_KEY);
+      try {
+        const res = await fetch("/api/auth", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ action: "update_email", email })
         });
+        const data = await res.json();
+        st.style.color = data.ok ? "var(--ok)" : "var(--danger)";
+        st.textContent = data.message || (data.ok ? "邮箱已更新" : "更新失败");
+        if (data.ok && state.user) state.user.email = email;
+      } catch {
+        st.style.color = "var(--danger)";
+        st.textContent = "请求失败，请稍后重试";
       }
-      document.getElementById("favModal").classList.remove("hidden");
-    }
+    });
 
-    document.getElementById("menuFavBtn").addEventListener("click", openFavManager);
-    document.getElementById("closeFavBtn").addEventListener("click", () => document.getElementById("favModal").classList.add("hidden"));
-    document.getElementById("favModal").addEventListener("click", (e) => {
-      if (e.target.id === "favModal") e.currentTarget.classList.add("hidden");
+    ["bindGithubBtn", "bindGoogleBtn"].forEach(id => {
+      document.getElementById(id).addEventListener("click", () => {
+        const provider = id === "bindGithubBtn" ? "GitHub" : "Google";
+        const st = document.getElementById("oauthStatusMsg");
+        st.style.display = "block";
+        st.style.color = "var(--warn)";
+        st.textContent = `已预留 ${provider} 绑定入口：需在 Cloudflare 环境变量配置 ${provider.toUpperCase()}_CLIENT_ID 与回调地址后即可启用授权。`;
+      });
     });
 
     document.getElementById("logoutBtn").addEventListener("click", () => {
@@ -1989,18 +2318,71 @@
       return !!(user && (user.role === "admin" || String(user.username || "").toLowerCase() === "lesun"));
     }
 
+    function applyAdminVisibility(user) {
+      const admin = isUserAdmin(user);
+      document.getElementById("adminRoleBadge").classList.toggle("hidden", !admin);
+      const sideInv = document.getElementById("sideInviteBtn");
+      if (sideInv) sideInv.classList.toggle("hidden", !admin);
+      if (!admin) {
+        const invPanel = document.getElementById("csub-invites");
+        if (invPanel) invPanel.classList.add("hidden");
+      }
+    }
+
+    async function syncFromCloud() {
+      const token = localStorage.getItem(TOKEN_KEY);
+      if (!token) return;
+      try {
+        const res = await fetch("/api/auth", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ action: "sync_get" })
+        });
+        const data = await res.json();
+        if (!res.ok || !data.ok) return;
+        if (state.user) {
+          if (data.role) state.user.role = data.role;
+          if (typeof data.email === "string") state.user.email = data.email;
+          applyAdminVisibility(state.user);
+          const emailInp = document.getElementById("bindEmailInput");
+          if (emailInp && typeof data.email === "string") emailInp.value = data.email;
+        }
+        if (Array.isArray(data.favorites)) {
+          state.favs = new Set(data.favorites);
+          localStorage.setItem(FAV_KEY, JSON.stringify([...state.favs]));
+        }
+        if (data.prefs && typeof data.prefs === "object") {
+          localStorage.setItem(PREF_KEY, JSON.stringify(data.prefs));
+          fillSettingsForm(getPrefs());
+        }
+      } catch {}
+    }
+
+    async function syncToCloud(partial = {}) {
+      const token = localStorage.getItem(TOKEN_KEY);
+      if (!token) return;
+      try {
+        await fetch("/api/auth", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ action: "sync_set", ...partial })
+        });
+      } catch {}
+    }
+
     function enterApp(user) {
       state.user = user;
-      const admin = isUserAdmin(user);
       document.getElementById("userNameText").textContent = user.username;
-      document.getElementById("adminRoleBadge").classList.toggle("hidden", !admin);
-      document.getElementById("settingsTabs").classList.toggle("hidden", !admin);
+      applyAdminVisibility(user);
+      const emailInp = document.getElementById("bindEmailInput");
+      if (emailInp) emailInp.value = user.email || "";
       document.getElementById("authScreen").classList.add("hidden");
       document.getElementById("appShell").classList.remove("hidden");
       syncFromCloud().then(() => {
         renderFundSection("nasdaq");
         renderFundSection("sp500");
         renderEtfTable();
+        renderFavoritesPage();
       });
       if (!state.loaded) {
         state.loaded = true;
@@ -2008,15 +2390,6 @@
         initFunds(); initMarket();
       }
     }
-
-    function switchPage(p) {
-      state.page = p;
-      document.querySelectorAll(".nav-btn").forEach(b => b.classList.toggle("active", b.dataset.page === p));
-      ["home", "intro", "nasdaq", "sp500", "etf"].forEach(id => document.getElementById(`page-${id}`).classList.toggle("hidden", id !== p));
-      window.scrollTo({ top: 0, behavior: "smooth" });
-      setTimeout(rerenderVisibleCharts, 40);
-    }
-    document.querySelectorAll(".nav-btn").forEach(b => b.addEventListener("click", () => switchPage(b.dataset.page)));
 
     // ===== 格式化工具 =====
     const fmtPct = (v) => (v === null || v === undefined ? "--" : `${Number(v).toFixed(2)}%`);
@@ -2310,7 +2683,7 @@
       const arr = [...state.favs];
       localStorage.setItem(FAV_KEY, JSON.stringify(arr));
       syncToCloud({ favorites: arr });
-      renderFundSection("nasdaq"); renderFundSection("sp500"); renderEtfTable();
+      renderFundSection("nasdaq"); renderFundSection("sp500"); renderEtfTable(); renderFavoritesPage();
     }
     function toggleCompare(item) {
       const idx = state.compare.findIndex(x => x.code === item.code);
@@ -2495,8 +2868,20 @@
       }));
     }
 
+    function syncEtfDetailBtn() {
+      const btn = document.getElementById("etfDetailBtn");
+      const table = document.getElementById("etfTable");
+      const isDetail = state.etf.showDetail;
+      if (btn) {
+        btn.classList.toggle("active", isDetail);
+        btn.textContent = isDetail ? "简略信息" : "详细信息";
+      }
+      if (table) table.classList.toggle("compact-mode", !isDetail);
+    }
+
     function renderEtfTable() {
       const cfg = state.etf;
+      syncEtfDetailBtn();
       const filtered = state.raw.etfs.filter(e => {
         if (cfg.idx !== "ALL" && !e.index.includes(cfg.idx)) return false;
         if (cfg.lowPremOnly && (e.premium === null || e.premium === undefined || e.premium >= 1)) return false;
@@ -2515,21 +2900,34 @@
       tbody.innerHTML = filtered.length ? filtered.map(e => {
         const isFav = state.favs.has(e.code), isCmp = state.compare.some(x => x.code === e.code);
         return `<tr>
-          <td><div class="row-actions">
+          <td class="etf-col-opt"><div class="row-actions">
             <button class="star-btn ${isFav ? "starred" : ""}" data-fav="${e.code}" type="button"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></button>
             <button class="cmp-btn ${isCmp ? "active" : ""}" data-etf-cmp="${e.code}" type="button">${isCmp ? "已选" : "+对比"}</button>
           </div></td>
-          <td class="num"><a class="code-badge" href="${e.detail_url}" target="_blank" rel="noopener">${e.code}</a></td>
-          <td><a class="fund-link" href="${e.detail_url}" target="_blank" rel="noopener">${e.name}</a><span class="sub-line">现价 ${e.price ?? "--"} · 净值 ${e.nav ?? "--"} (${e.nav_date || "--"})</span></td>
-          <td style="color:var(--text-2);">${e.index}</td>
-          <td class="num">${e.scale != null ? e.scale.toFixed(2) : "--"}</td>
-          <td class="num">${miniRetHtml(e.return_1y)}</td>
-          <td class="num">${fmtSigned(e.chg_pct)}</td>
-          <td class="num">${fmtPct(e.mgmt_custody_fee)}</td>
-          <td class="num">${premRiskBadge(e.premium)}</td>
-          <td class="num">${e.turnover != null ? e.turnover.toFixed(2) : "--"}</td>
+          <td class="etf-col-code num"><a class="code-badge" href="${e.detail_url}" target="_blank" rel="noopener">${e.code}</a></td>
+          <td>
+            <a class="fund-link" href="${e.detail_url}" target="_blank" rel="noopener">${e.name}</a>
+            <div style="display:flex;align-items:center;flex-wrap:wrap;gap:6px;">
+              <button class="copy-code-btn" data-copy="${e.code}" type="button" title="点击复制代码">${e.code}</button>
+            </div>
+            ${cfg.showDetail ? `<span class="sub-line">现价 ${e.price ?? "--"} · 净值 ${e.nav ?? "--"} (${e.nav_date || "--"})</span>` : ""}
+          </td>
+          <td class="etf-col-mobile">
+            <div class="mobile-quota-stack">
+              <div class="mobile-quota-line"><span class="mobile-quota-lbl">溢价</span>${premRiskBadge(e.premium)}</div>
+              <div class="mobile-quota-line"><span class="mobile-quota-lbl">涨跌</span>${fmtSigned(e.chg_pct)}</div>
+            </div>
+          </td>
+          <td class="etf-col-index" style="color:var(--text-2);">${e.index}</td>
+          <td class="etf-col-scale num">${e.scale != null ? e.scale.toFixed(2) : "--"}</td>
+          <td class="etf-col-ret1y num">${miniRetHtml(e.return_1y)}</td>
+          <td class="etf-col-chg num">${fmtSigned(e.chg_pct)}</td>
+          <td class="etf-col-fee num">${fmtPct(e.mgmt_custody_fee)}</td>
+          <td class="etf-col-prem num">${premRiskBadge(e.premium)}</td>
+          <td class="etf-col-turn num">${e.turnover != null ? e.turnover.toFixed(2) : "--"}</td>
         </tr>`;
-      }).join("") : `<tr><td colspan="10" style="text-align:center;color:var(--text-3);padding:36px;">运行一次 Update QDII Fund Data 后即显示场内 ETF</td></tr>`;
+      }).join("") : `<tr><td colspan="11" style="text-align:center;color:var(--text-3);padding:36px;">运行一次 Update QDII Fund Data 后即显示场内 ETF</td></tr>`;
+      tbody.querySelectorAll("[data-copy]").forEach(b => b.addEventListener("click", () => copyText(b.dataset.copy, b)));
       tbody.querySelectorAll("[data-fav]").forEach(b => b.addEventListener("click", () => toggleFav(b.dataset.fav)));
       tbody.querySelectorAll("[data-etf-cmp]").forEach(b => b.addEventListener("click", () => {
         const obj = state.raw.etfs.find(x => x.code === b.dataset.etfCmp); if (obj) toggleCompare(obj);
@@ -2582,13 +2980,34 @@
       document.querySelectorAll("[data-merge]").forEach(b => b.addEventListener("click", () => { const s = b.dataset.merge; state.sec[s].mergeAC = !state.sec[s].mergeAC; b.classList.toggle("active", state.sec[s].mergeAC); state.sec[s].page = 1; renderFundSection(s); }));
       document.querySelectorAll("[data-detail]").forEach(b => b.addEventListener("click", () => { const s = b.dataset.detail; state.sec[s].showDetail = !state.sec[s].showDetail; renderFundSection(s); }));
       document.querySelectorAll("[data-quick]").forEach(g => g.querySelectorAll("button").forEach(b => b.addEventListener("click", () => { g.querySelectorAll("button").forEach(x => x.classList.remove("active")); b.classList.add("active"); state.sec[g.dataset.quick].quick = b.dataset.q; state.sec[g.dataset.quick].page = 1; renderFundSection(g.dataset.quick); })));
+      function applyFundSort(sec, key) {
+        const cfg = state.sec[sec];
+        if (cfg.sortKey === key) cfg.sortDir = cfg.sortDir === "asc" ? "desc" : "asc";
+        else {
+          cfg.sortKey = key;
+          cfg.sortDir = (key === "mgmt_custody_fee" || key === "first_year_cost" || key === "code" || key === "name") ? "asc" : "desc";
+        }
+        const arrow = cfg.sortDir === "asc" ? "↑" : "↓";
+        document.querySelectorAll(`[data-sort^="${sec}:"]`).forEach(th => {
+          const isMatch = th.dataset.sort === `${sec}:${key}`;
+          th.classList.toggle("sorted", isMatch);
+          th.textContent = th.textContent.replace(/[↑↓↕]/g, isMatch ? arrow : "↕");
+        });
+        document.querySelectorAll(`[data-sort-chip^="${sec}:"]`).forEach(chip => {
+          const isMatch = chip.dataset.sortChip === `${sec}:${key}`;
+          chip.classList.toggle("active", isMatch);
+          chip.textContent = chip.textContent.replace(/[↑↓↕]/g, isMatch ? arrow : "↕");
+        });
+        cfg.page = 1;
+        renderFundSection(sec);
+      }
       document.querySelectorAll("[data-sort]").forEach(th => th.addEventListener("click", () => {
-        const [s, k] = th.dataset.sort.split(":"), cfg = state.sec[s];
-        if (cfg.sortKey === k) cfg.sortDir = cfg.sortDir === "asc" ? "desc" : "asc";
-        else { cfg.sortKey = k; cfg.sortDir = (k === "mgmt_custody_fee" || k === "first_year_cost") ? "asc" : "desc"; }
-        th.closest("tr").querySelectorAll("th.sortable").forEach(x => { x.classList.remove("sorted"); x.textContent = x.textContent.replace(/[↑↓↕]/g, "↕"); });
-        th.classList.add("sorted"); th.textContent = th.textContent.replace("↕", cfg.sortDir === "asc" ? "↑" : "↓");
-        renderFundSection(s);
+        const [s, k] = th.dataset.sort.split(":");
+        applyFundSort(s, k);
+      }));
+      document.querySelectorAll("[data-sort-chip]").forEach(chip => chip.addEventListener("click", () => {
+        const [s, k] = chip.dataset.sortChip.split(":");
+        applyFundSort(s, k);
       }));
       document.querySelectorAll("[data-export]").forEach(b => b.addEventListener("click", () => {
         const s = b.dataset.export, rows = [["代码", "名称", "规模(亿)", "近1年(%)", "运作费率(%)", "首年成本(%)", "代销额度", "直销额度"]];
@@ -2603,14 +3022,28 @@
         e.currentTarget.classList.toggle("active", state.etf.lowPremOnly);
         renderEtfTable();
       });
-      document.querySelectorAll("[data-etf-sort]").forEach(th => th.addEventListener("click", () => {
-        const k = th.dataset.etfSort;
+      function applyEtfSort(k) {
         if (state.etf.sortKey === k) state.etf.sortDir = state.etf.sortDir === "asc" ? "desc" : "asc";
-        else { state.etf.sortKey = k; state.etf.sortDir = k === "mgmt_custody_fee" ? "asc" : "desc"; }
-        th.closest("tr").querySelectorAll("th.sortable").forEach(x => { x.classList.remove("sorted"); x.textContent = x.textContent.replace(/[↑↓↕]/g, "↕"); });
-        th.classList.add("sorted"); th.textContent = th.textContent.replace("↕", state.etf.sortDir === "asc" ? "↑" : "↓");
+        else { state.etf.sortKey = k; state.etf.sortDir = (k === "mgmt_custody_fee" || k === "code") ? "asc" : "desc"; }
+        const arrow = state.etf.sortDir === "asc" ? "↑" : "↓";
+        document.querySelectorAll("[data-etf-sort]").forEach(th => {
+          const isMatch = th.dataset.etfSort === k;
+          th.classList.toggle("sorted", isMatch);
+          th.textContent = th.textContent.replace(/[↑↓↕]/g, isMatch ? arrow : "↕");
+        });
+        document.querySelectorAll("[data-etf-chip]").forEach(chip => {
+          const isMatch = chip.dataset.etfChip === k;
+          chip.classList.toggle("active", isMatch);
+          chip.textContent = chip.textContent.replace(/[↑↓↕]/g, isMatch ? arrow : "↕");
+        });
         renderEtfTable();
-      }));
+      }
+      document.querySelectorAll("[data-etf-sort]").forEach(th => th.addEventListener("click", () => applyEtfSort(th.dataset.etfSort)));
+      document.querySelectorAll("[data-etf-chip]").forEach(chip => chip.addEventListener("click", () => applyEtfSort(chip.dataset.etfChip)));
+      document.getElementById("etfDetailBtn").addEventListener("click", () => {
+        state.etf.showDetail = !state.etf.showDetail;
+        renderEtfTable();
+      });
       document.getElementById("etfSelect").addEventListener("change", e => renderEtfPremChart(e.target.value, "etfPremChart", "etfPremStats", "etfPrem"));
       document.getElementById("homeEtfSelect").addEventListener("change", e => renderEtfPremChart(e.target.value, "homeEtfChart", "homeEtfStats", "homeEtf"));
 
@@ -2637,7 +3070,7 @@
         document.getElementById("etfSelect").innerHTML = opts;
         document.getElementById("homeEtfSelect").innerHTML = opts;
 
-        renderFundSection("nasdaq"); renderFundSection("sp500"); renderEtfTable(); renderHomeExtras();
+        renderFundSection("nasdaq"); renderFundSection("sp500"); renderEtfTable(); renderHomeExtras(); renderFavoritesPage();
         if (state.raw.etfs.length) {
           const idleF = window.requestIdleCallback || ((fn) => setTimeout(fn, 180));
           idleF(() => {

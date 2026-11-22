@@ -121,6 +121,15 @@ async function getAuthedUser(request, env) {
   const user = await verifyToken(token, secret);
   if (!user) return null;
   user.role = isSuperAdmin(user.username, env) ? "admin" : "user";
+  if (env.AUTH_KV) {
+    try {
+      const uRaw = await env.AUTH_KV.get(`user:${user.username.toLowerCase()}`);
+      if (uRaw) {
+        const uRec = JSON.parse(uRaw);
+        user.email = uRec.email || "";
+      }
+    } catch {}
+  }
   return user;
 }
 
@@ -485,6 +494,7 @@ export async function onRequestPost(context) {
     return jsonRes({
       ok: true,
       role: curUser.role,
+      email: uRec.email || "",
       prefs: uRec.prefs || null,
       favorites: Array.isArray(uRec.favorites) ? uRec.favorites : null
     });
@@ -603,6 +613,47 @@ export async function onRequestPost(context) {
     await env.AUTH_KV.delete(`used_invite:${code}`);
     await saveInviteRegistry(env, next);
     return jsonRes({ ok: true, message: `已删除邀请码 ${code}`, invites: next });
+  }
+
+  // ===== 15. 登录与安全：修改密码 =====
+  if (action === "change_password") {
+    const curUser = await getAuthedUser(request, env);
+    if (!curUser) return jsonRes({ ok: false, message: "登录已失效" }, 401);
+    const oldPass = String(body.old_password || "");
+    const newPass = String(body.new_password || "");
+    if (newPass.length < 6) {
+      return jsonRes({ ok: false, message: "新密码长度至少需要 6 位" }, 400);
+    }
+    const uKey = `user:${curUser.username.toLowerCase()}`;
+    const uRaw = await env.AUTH_KV.get(uKey);
+    if (!uRaw) return jsonRes({ ok: false, message: "用户记录不存在" }, 404);
+    const uRec = JSON.parse(uRaw);
+    const oldHash = await hashPassword(oldPass, uRec.salt);
+    if (oldHash !== uRec.hash) {
+      return jsonRes({ ok: false, message: "当前密码不正确" }, 401);
+    }
+    const newSalt = toHex(crypto.getRandomValues(new Uint8Array(8)));
+    uRec.salt = newSalt;
+    uRec.hash = await hashPassword(newPass, newSalt);
+    await env.AUTH_KV.put(uKey, JSON.stringify(uRec));
+    return jsonRes({ ok: true, message: "密码修改成功" });
+  }
+
+  // ===== 16. 登录与安全：修改绑定邮箱 =====
+  if (action === "update_email") {
+    const curUser = await getAuthedUser(request, env);
+    if (!curUser) return jsonRes({ ok: false, message: "登录已失效" }, 401);
+    const email = String(body.email || "").trim();
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return jsonRes({ ok: false, message: "请输入有效的邮箱地址" }, 400);
+    }
+    const uKey = `user:${curUser.username.toLowerCase()}`;
+    const uRaw = await env.AUTH_KV.get(uKey);
+    if (!uRaw) return jsonRes({ ok: false, message: "用户记录不存在" }, 404);
+    const uRec = JSON.parse(uRaw);
+    uRec.email = email;
+    await env.AUTH_KV.put(uKey, JSON.stringify(uRec));
+    return jsonRes({ ok: true, email, message: email ? "绑定邮箱已更新" : "已解绑邮箱" });
   }
 
   return jsonRes({ ok: false, message: "未知操作" }, 400);
