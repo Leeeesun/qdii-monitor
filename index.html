@@ -2038,12 +2038,16 @@
       }
     }
 
-    function openCenterSection(sub) {
+    function openCenterSection(sub, updateHash = true) {
       let target = sub || "bark";
       if (target === "invites" && !isUserAdmin(state.user)) {
         target = "bark";
       }
-      switchPage("center");
+      switchPage("center", false);
+      if (updateHash) {
+        const nextHash = `#center/${target}`;
+        if (window.location.hash !== nextHash) history.replaceState(null, "", nextHash);
+      }
       document.querySelectorAll("[data-csub]").forEach(btn => {
         btn.classList.toggle("active", btn.dataset.csub === target);
       });
@@ -2385,17 +2389,38 @@
       } catch {}
     }
 
-    function switchPage(p) {
+    function switchPage(p, updateHash = true) {
       state.page = p;
       document.querySelectorAll(".nav-btn").forEach(b => b.classList.toggle("active", b.dataset.page === p));
       ["home", "intro", "nasdaq", "sp500", "etf", "center"].forEach(id => {
         const el = document.getElementById(`page-${id}`);
         if (el) el.classList.toggle("hidden", id !== p);
       });
+      if (updateHash && p !== "center") {
+        const nextHash = `#${p}`;
+        if (window.location.hash !== nextHash) history.replaceState(null, "", nextHash);
+      }
       window.scrollTo({ top: 0, behavior: "smooth" });
       setTimeout(rerenderVisibleCharts, 40);
     }
     document.querySelectorAll(".nav-btn").forEach(b => b.addEventListener("click", () => switchPage(b.dataset.page)));
+
+    function restoreRouteFromHash() {
+      const raw = (window.location.hash || "").replace(/^#/, "").trim();
+      if (!raw) return;
+      if (raw === "center" || raw.startsWith("center/")) {
+        const sub = raw.split("/")[1] || "bark";
+        const validSubs = ["invites", "bark", "favorites", "security"];
+        openCenterSection(validSubs.includes(sub) ? sub : "bark", false);
+        return;
+      }
+      if (["home", "intro", "nasdaq", "sp500", "etf"].includes(raw)) {
+        switchPage(raw, false);
+      }
+    }
+    window.addEventListener("hashchange", () => {
+      if (state.user) restoreRouteFromHash();
+    });
 
     function isUserAdmin(user) {
       return !!(user && (user.role === "admin" || String(user.username || "").toLowerCase() === "lesun"));
@@ -2461,6 +2486,7 @@
       if (emailInp) emailInp.value = user.email || "";
       document.getElementById("authScreen").classList.add("hidden");
       document.getElementById("appShell").classList.remove("hidden");
+      restoreRouteFromHash();
       syncFromCloud().then(() => {
         renderFundSection("nasdaq");
         renderFundSection("sp500");
