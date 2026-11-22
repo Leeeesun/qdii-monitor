@@ -336,19 +336,21 @@
     .table-wrap { width: 100%; overflow-x: auto; }
     table.data-table { width: 100%; border-collapse: collapse; min-width: 980px; font-size: 13px; }
     table.simple-table { width: 100%; min-width: 580px; border-collapse: collapse; font-size: 13px; }
-    table.pe-hist-table { min-width: 600px; }
+    table.pe-hist-table { min-width: 680px; }
     table.pe-hist-table th,
     table.pe-hist-table td:nth-child(2),
     table.pe-hist-table td:nth-child(4),
     table.pe-hist-table td:nth-child(5),
     table.pe-hist-table td:nth-child(6) { white-space: nowrap; }
-    table.pe-hist-table td:nth-child(1),
-    table.pe-hist-table td:nth-child(3) {
-      min-width: 120px;
-      max-width: 156px;
-      line-height: 1.45;
+    table.pe-hist-table td:nth-child(1) {
+      min-width: 140px;
+      line-height: 1.5;
       white-space: normal;
-      word-break: keep-all;
+    }
+    table.pe-hist-table td:nth-child(3) {
+      min-width: 160px;
+      line-height: 1.5;
+      white-space: normal;
     }
     .mobile-compact-fav {
       display: none;
@@ -1037,8 +1039,8 @@
           <div class="chart-box"><canvas id="drawdownChart"></canvas></div>
         </section>
 
-        <!-- 7. 历史PE高位与后续表现 + PE历史参考 -->
-        <div class="grid-2">
+        <!-- 7. 历史PE高位与后续表现 + PE历史参考（上下两行独立展示） -->
+        <div style="display:flex;flex-direction:column;gap:20px;margin-bottom:20px;">
           <section class="card card-pad">
             <div class="card-head">
               <div class="card-title">历史 PE 高位 <svg class="inline-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg> 后续表现</div>
