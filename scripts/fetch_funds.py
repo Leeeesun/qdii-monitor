@@ -14,7 +14,7 @@ EXCLUDE_KW = r"美元|美钞|美汇|现汇|现钞|港币|港股|香港|中国|�
 
 LIMIT_TITLE_KWS = [
     "大额申购", "暂停申购", "恢复申购", "申购限额",
-    "金额限制", "限制申购", "申购上限", "限额"
+    "金额限制", "限制申购", "申购上限", "限额", "暂停", "节假日"
 ]
 
 TRACKED_ETFS = [
@@ -122,6 +122,51 @@ def parse_cn_amount(num_str, unit):
         return None
 
 
+def _norm_cn_date(y, m, d):
+    try:
+        return f"{int(y):04d}-{int(m):02d}-{int(d):02d}"
+    except Exception:
+        return ""
+
+
+def extract_schedule_from_text(text, title="", pub_date=""):
+    """从公告正文/标题中精准解析生效日期(effective_date)与自动恢复日期(resume_date)"""
+    combined = re.sub(r"\s+", "", f"{title}。{text or ''}")
+    effective_date = ""
+    resume_date = ""
+    no_further_notice = bool(re.search(r"不再(?:另行|单独)公告", combined))
+    is_holiday_suspend = bool(re.search(r"(?:节假日|休市|非港股通|境外主要投资市场)", combined) and "暂停" in combined)
+
+    # 1. 解析生效/暂停开始日期
+    eff_pats = [
+        r"(?:因|于|自)(\d{4})年(\d{1,2})月(\d{1,2})日(?:起|为境外|为非|暂停|将暂停|起暂停|起调整|起限制)",
+        r"(\d{4})年(\d{1,2})月(\d{1,2})日[^。；]{0,20}?(?:暂停申购|暂停办理|将暂停)"
+    ]
+    for pat in eff_pats:
+        m = re.search(pat, combined)
+        if m:
+            effective_date = _norm_cn_date(m.group(1), m.group(2), m.group(3))
+            break
+
+    # 2. 解析恢复办理日期
+    res_pats = [
+        r"(?:并于|自|于)(\d{4})年(\d{1,2})月(\d{1,2})日(?:起)?恢复(?:办理)?(?:上述|申购|正常)",
+        r"恢复(?:办理)?[^。；]{0,18}?(\d{4})年(\d{1,2})月(\d{1,2})日"
+    ]
+    for pat in res_pats:
+        m = re.search(pat, combined)
+        if m:
+            resume_date = _norm_cn_date(m.group(1), m.group(2), m.group(3))
+            break
+
+    return {
+        "effective_date": effective_date,
+        "resume_date": resume_date,
+        "no_further_notice": no_further_notice,
+        "is_holiday_suspend": is_holiday_suspend
+    }
+
+
 def extract_limit_from_text(text, share_class=""):
     if not text:
         return None
@@ -180,25 +225,36 @@ def fetch_latest_limit_notice(code, share_class, notices_cache, need_body=False)
                 title = item.get("TITLE", "")
                 if any(k in title for k in LIMIT_TITLE_KWS):
                     art_code = item.get("ID", "")
+                    pub_date = str(item.get("PUBLISHDATE", ""))[:10]
                     has_diff = ("直销" in title or "代销" in title or "非直销" in title)
+                    need_schedule = any(k in title for k in ("暂停", "节假日", "恢复", "休市"))
                     parsed_limit = None
-                    if need_body or has_diff:
+                    body = ""
+                    if need_body or has_diff or need_schedule:
                         body = fetch_notice_content(art_code, notices_cache)
                         parsed_limit = extract_limit_from_text(body, share_class)
+                    sched = extract_schedule_from_text(body, title, pub_date)
                     return {
                         "title": title,
-                        "date": str(item.get("PUBLISHDATE", ""))[:10],
+                        "date": pub_date,
                         "has_channel_diff": has_diff,
-                        "parsed_limit": parsed_limit
+                        "parsed_limit": parsed_limit,
+                        "effective_date": sched["effective_date"],
+                        "resume_date": sched["resume_date"],
+                        "no_further_notice": sched["no_further_notice"],
+                        "is_holiday_suspend": sched["is_holiday_suspend"]
                     }
             if items:
                 break
         except Exception:
             pass
-    return {"title": "", "date": "", "has_channel_diff": False, "parsed_limit": None}
+    return {
+        "title": "", "date": "", "has_channel_diff": False, "parsed_limit": None,
+        "effective_date": "", "resume_date": "", "no_further_notice": False, "is_holiday_suspend": False
+    }
 
 
-def fetch_pingzhong_extra(code):
+def fetch_pingzhong_extra(code, full_nav=False):
     url = f"https://fund.eastmoney.com/pingzhongdata/{code}.js"
     ret_1y, scale_yi, nav_map = None, None, {}
     try:
@@ -215,7 +271,9 @@ def fetch_pingzhong_extra(code):
                 scale_yi = round(float(series[-1]["y"]), 2)
         m_nav = re.search(r"var\s+Data_netWorthTrend\s*=\s*(\[.*?\]);", txt)
         if m_nav:
-            arr = json.loads(m_nav.group(1))[-120:]
+            arr = json.loads(m_nav.group(1))
+            if not full_nav:
+                arr = arr[-120:]
             tz_bj = timezone(timedelta(hours=8))
             for item in arr:
                 d_str = datetime.fromtimestamp(item["x"] / 1000, tz_bj).strftime("%Y-%m-%d")
@@ -291,10 +349,11 @@ def fetch_etf_quotes_fast():
 
 
 def fetch_etf_kline_fast(mkt, code):
-    url = f"https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param={mkt}{code},day,,,100,"
+    # 拉取近 1500 个交易日（约 6 年）以支持 15天/30天/90天/365天/全部 溢价率走势
+    url = f"https://web.ifzq.gtimg.cn/appstock/app/fqkline/get?param={mkt}{code},day,,,1500,"
     kline = []
     try:
-        res = requests.get(url, headers=HEADERS, timeout=6)
+        res = requests.get(url, headers=HEADERS, timeout=8)
         data = res.json().get("data", {}).get(f"{mkt}{code}", {})
         rows = data.get("day") or data.get("qfqday") or []
         for r in rows:
@@ -331,7 +390,7 @@ def fetch_etf_list(fees_cache, today_utc):
             except Exception:
                 fee_info = fee_info or {"mgmt_custody_fee": 0.6, "scale": None}
 
-        ret_1y, scale_fb, nav_map = fetch_pingzhong_extra(code)
+        ret_1y, scale_fb, nav_map = fetch_pingzhong_extra(code, full_nav=True)
         scale_val = fee_info.get("scale") if fee_info.get("scale") is not None else scale_fb
 
         kline = fetch_etf_kline_fast(mkt, code)
@@ -353,10 +412,11 @@ def fetch_etf_list(fees_cache, today_utc):
             premium = prem_vals[-1]
 
         prem_stats = {"min": None, "max": None, "percentile": None}
-        if prem_vals and premium is not None:
-            prem_stats["min"] = min(prem_vals)
-            prem_stats["max"] = max(prem_vals)
-            prem_stats["percentile"] = int(round(sum(1 for v in prem_vals if v <= premium) / len(prem_vals) * 100))
+        tail90 = prem_vals[-90:]
+        if tail90 and premium is not None:
+            prem_stats["min"] = min(tail90)
+            prem_stats["max"] = max(tail90)
+            prem_stats["percentile"] = int(round(sum(1 for v in tail90 if v <= premium) / len(tail90) * 100))
 
         etf_results.append({
             "code": code, "name": meta["name"], "index": meta["index"],
@@ -364,7 +424,7 @@ def fetch_etf_list(fees_cache, today_utc):
             "chg_pct": chg_pct, "premium": premium, "scale": scale_val,
             "return_1y": ret_1y, "mgmt_custody_fee": fee_info.get("mgmt_custody_fee", 0.0),
             "turnover": turnover, "detail_url": f"https://fund.eastmoney.com/{code}.html",
-            "premium_history": {"dates": prem_dates[-90:], "values": prem_vals[-90:], "stats": prem_stats}
+            "premium_history": {"dates": prem_dates, "values": prem_vals, "stats": prem_stats}
         })
 
     etf_results.sort(key=lambda x: (x["premium"] if x["premium"] is not None else -999), reverse=True)
@@ -421,7 +481,6 @@ def _hhmm_to_mins(hhmm, fallback):
 
 
 def send_bark_quota_alert(changes, now_bj):
-    """按配置的推送开关、独立推送时间与独立推送模板（默认用默认模板）发送 Bark 通知"""
     if not changes:
         return
 
@@ -473,6 +532,7 @@ def main():
     fees_cache = load_json(CACHE_FILE, {})
     notices_cache = fees_cache.get("__notices__", {})
     prev_limits = fees_cache.get("__last_limits__", {})
+    normal_limits = fees_cache.get("__normal_limits__", {})
     direct_overrides = load_json(OVERRIDE_FILE, {})
 
     purchase_df = fetch_with_retry(ak.fund_purchase_em)
@@ -501,6 +561,9 @@ def main():
 
     filtered = df[(is_nasdaq | is_sp500) & not_excluded & ~is_pure_etf].copy()
     today_utc = datetime.now(timezone.utc)
+    tz_bj = timezone(timedelta(hours=8))
+    now_bj = datetime.now(tz_bj)
+    today_bj_str = now_bj.strftime("%Y-%m-%d")
 
     nasdaq_list, sp500_list = [], []
     new_limits = {}
@@ -526,6 +589,44 @@ def main():
                 agency_text, status_str = f"{agency_num:,} 元", "其他平台可买(据公告)"
             else:
                 agency_text, status_str = "限大额(见公告)", "天天未代销·其他平台可买"
+
+        # ===== 精准生效时间与到期自动恢复逻辑 =====
+        eff_date = notice.get("effective_date") or ""
+        res_date = notice.get("resume_date") or ""
+        notice_schedule = ""
+        saved_normal = normal_limits.get(code)
+
+        if eff_date and res_date:
+            if today_bj_str < eff_date:
+                # 预告期：未到暂停生效日，保持暂停前原额度
+                notice_schedule = f"预告：{eff_date[5:]} 暂停，{res_date[5:]} 恢复"
+                if agency_num == 0 and saved_normal and saved_normal.get("agency_num", 0) != 0:
+                    agency_num = saved_normal["agency_num"]
+                    agency_text = saved_normal["agency_text"]
+                    status_str = saved_normal.get("status", "开放申购")
+            elif eff_date <= today_bj_str < res_date:
+                # 生效暂停期
+                agency_num, agency_text, status_str = 0, "暂停申购", "节假日/临时暂停"
+                notice_schedule = f"暂停中：{res_date[5:]} 自动恢复原额度"
+            elif today_bj_str >= res_date:
+                # 已到恢复日：若仍显示暂停（因不再另行公告），自动恢复暂停前额度
+                if agency_num == 0 and saved_normal and saved_normal.get("agency_num", 0) != 0:
+                    agency_num = saved_normal["agency_num"]
+                    agency_text = saved_normal["agency_text"]
+                    status_str = saved_normal.get("status", "开放申购")
+                    notice_schedule = f"{res_date[5:]} 已自动恢复原额度"
+                elif notice.get("no_further_notice"):
+                    notice_schedule = f"{res_date[5:]} 已恢复申购"
+        elif eff_date and today_bj_str < eff_date:
+            notice_schedule = f"预告：{eff_date[5:]} 起生效"
+
+        # 记录非暂停状态下的正常额度，供节假日/临时暂停到期后精准还原
+        if agency_num != 0:
+            normal_limits[code] = {
+                "agency_num": agency_num,
+                "agency_text": agency_text,
+                "status": status_str
+            }
 
         fee_info = fees_cache.get(code)
         need_refresh = True
@@ -605,6 +706,8 @@ def main():
             "first_year_cost": first_year_cost,
             "nav_date": str(row["日期"]) if pd.notna(row["日期"]) else "",
             "notice_title": notice["title"], "notice_date": notice["date"],
+            "effective_date": eff_date, "resume_date": res_date,
+            "notice_schedule": notice_schedule,
             "notice_url": f"https://fundf10.eastmoney.com/jjgg_{code}_5.html"
         }
         (nasdaq_list if category == "nasdaq" else sp500_list).append(record)
@@ -616,12 +719,11 @@ def main():
     etf_list = fetch_etf_list(fees_cache, today_utc)
     active_top5 = build_active_top5(purchase_df, rank_df)
 
-    tz_bj = timezone(timedelta(hours=8))
-    now_bj = datetime.now(tz_bj)
     send_bark_quota_alert(changes, now_bj)
 
     fees_cache["__notices__"] = notices_cache
     fees_cache["__last_limits__"] = new_limits
+    fees_cache["__normal_limits__"] = normal_limits
     with open(CACHE_FILE, "w", encoding="utf-8") as f:
         json.dump(fees_cache, f, ensure_ascii=False, indent=2)
 

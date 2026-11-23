@@ -593,6 +593,54 @@
       background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
       padding: 0; box-shadow: var(--shadow-md);
     }
+    /* 弹窗右上角矢量 SVG 关闭按钮 */
+    .modal-close-btn {
+      width: 32px; height: 32px; border-radius: 50%;
+      border: 1px solid var(--border); background: var(--surface-2); color: var(--text-2);
+      display: inline-flex; align-items: center; justify-content: center;
+      cursor: pointer; flex-shrink: 0; transition: all 0.16s ease; padding: 0;
+    }
+    .modal-close-btn:hover {
+      background: var(--danger-bg); border-color: rgba(220, 38, 38, 0.35); color: var(--danger);
+      transform: rotate(90deg);
+    }
+    .modal-close-btn svg { width: 15px; height: 15px; stroke-width: 2.2; }
+
+    /* 右下角滑入/滑出小胶囊通知 (Toast) */
+    .toast-stack {
+      position: fixed; right: 20px; bottom: 24px; z-index: 320;
+      display: flex; flex-direction: column; align-items: flex-end; gap: 10px;
+      pointer-events: none; max-width: calc(100vw - 32px);
+    }
+    .toast-pill {
+      pointer-events: auto;
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 9px 16px; border-radius: 999px;
+      background: var(--text); color: var(--bg);
+      font-size: 13px; font-weight: 500; line-height: 1.35;
+      box-shadow: var(--shadow-md);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transform: translateX(120%);
+      opacity: 0;
+      transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.24s ease;
+    }
+    .toast-pill.show { transform: translateX(0); opacity: 1; }
+    .toast-pill.hide { transform: translateX(120%); opacity: 0; }
+    .toast-pill svg { width: 15px; height: 15px; flex-shrink: 0; stroke-width: 2.2; }
+    .toast-pill.ok svg { color: #4ade80; }
+    .toast-pill.warn svg { color: #fbbf24; }
+    .toast-pill.error svg { color: #f87171; }
+    .toast-pill.info svg { color: #60a5fa; }
+    .mini-pills { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+    .mini-pill {
+      height: 25px; padding: 0 9px; font-size: 11.5px; font-weight: 500;
+      border-radius: 999px; border: 1px solid var(--border);
+      background: var(--surface); color: var(--text-2); cursor: pointer;
+      transition: all 0.14s ease;
+    }
+    .mini-pill:hover { border-color: var(--border-strong); color: var(--text); }
+    .mini-pill.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
     .modal-head {
       padding: 18px 22px 14px; border-bottom: 1px solid var(--border);
       display: flex; align-items: center; justify-content: space-between; gap: 12px;
@@ -1157,8 +1205,17 @@
 
           <section class="card card-pad">
             <div class="card-head">
-              <div class="card-title">近 15 日走势对比</div>
-              <span class="card-sub">以区间首日为基准 · 累计涨跌幅 (%)</span>
+              <div>
+                <div id="cmpRangeTitle" class="card-title">近 90 日走势对比</div>
+                <div class="card-sub">以区间首日为基准 · 累计涨跌幅 (%)</div>
+              </div>
+              <div class="mini-pills" id="cmpRangeGroup">
+                <button class="mini-pill" data-cmp-range="15d" type="button">15天</button>
+                <button class="mini-pill" data-cmp-range="30d" type="button">30天</button>
+                <button class="mini-pill active" data-cmp-range="90d" type="button">90天</button>
+                <button class="mini-pill" data-cmp-range="365d" type="button">365天</button>
+                <button class="mini-pill" data-cmp-range="all" type="button">全部</button>
+              </div>
             </div>
             <div class="chart-box-sm"><canvas id="chart15d"></canvas></div>
           </section>
@@ -1201,10 +1258,19 @@
           <section class="card card-pad">
             <div class="card-head">
               <div>
-                <div class="card-title">场内 ETF 溢价走势（近 90 日）</div>
+                <div id="homeEtfTitle" class="card-title">场内 ETF 溢价走势（近 90 天）</div>
                 <div id="homeEtfStats" class="card-sub" style="margin-top:2px;">同日收盘价 / 同日净值</div>
               </div>
-              <select id="homeEtfSelect" class="filter-pill" style="max-width:190px;"></select>
+              <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                <div class="mini-pills" id="homeEtfRangeGroup">
+                  <button class="mini-pill" data-hetf-range="15" type="button">15天</button>
+                  <button class="mini-pill" data-hetf-range="30" type="button">30天</button>
+                  <button class="mini-pill active" data-hetf-range="90" type="button">90天</button>
+                  <button class="mini-pill" data-hetf-range="365" type="button">365天</button>
+                  <button class="mini-pill" data-hetf-range="all" type="button">全部</button>
+                </div>
+                <select id="homeEtfSelect" class="filter-pill" style="max-width:170px;"></select>
+              </div>
             </div>
             <div class="chart-box-sm"><canvas id="homeEtfChart"></canvas></div>
           </section>
@@ -1214,12 +1280,21 @@
         <section class="card card-pad" style="margin-bottom:18px;">
           <div class="card-head">
             <div>
-              <div class="card-title">年度动态回撤图谱（近 252 个交易日）</div>
+              <div id="ddTitle" class="card-title">动态回撤图谱（近 252 个交易日）</div>
               <div id="ddStats" class="chart-stats"></div>
             </div>
-            <div class="pill-group">
-              <button class="filter-pill active" data-dd-target="ndx" type="button">纳斯达克 100</button>
-              <button class="filter-pill" data-dd-target="spx" type="button">标普 500</button>
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+              <div class="mini-pills" id="ddRangeGroup">
+                <button class="mini-pill active" data-dd-range="252d" type="button">近252个交易日</button>
+                <button class="mini-pill" data-dd-range="3y" type="button">近3年</button>
+                <button class="mini-pill" data-dd-range="5y" type="button">近5年</button>
+                <button class="mini-pill" data-dd-range="10y" type="button">近10年</button>
+                <button class="mini-pill" data-dd-range="all" type="button">成立以来</button>
+              </div>
+              <div class="pill-group">
+                <button class="filter-pill active" data-dd-target="ndx" type="button">纳斯达克 100</button>
+                <button class="filter-pill" data-dd-target="spx" type="button">标普 500</button>
+              </div>
             </div>
           </div>
           <div class="chart-box"><canvas id="drawdownChart"></canvas></div>
@@ -1557,8 +1632,17 @@
         </section>
         <section class="card card-pad">
           <div class="card-head">
-            <div><div class="card-title">溢价率历史走势（近 90 个交易日）</div><div id="etfPremStats" class="chart-stats"></div></div>
-            <select id="etfSelect" class="filter-pill" style="padding-right:16px;"></select>
+            <div><div id="etfPremTitle" class="card-title">溢价率历史走势（近 90 天）</div><div id="etfPremStats" class="chart-stats"></div></div>
+            <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+              <div class="mini-pills" id="etfPremRangeGroup">
+                <button class="mini-pill" data-etfp-range="15" type="button">15天</button>
+                <button class="mini-pill" data-etfp-range="30" type="button">30天</button>
+                <button class="mini-pill active" data-etfp-range="90" type="button">90天</button>
+                <button class="mini-pill" data-etfp-range="365" type="button">365天</button>
+                <button class="mini-pill" data-etfp-range="all" type="button">全部</button>
+              </div>
+              <select id="etfSelect" class="filter-pill" style="padding-right:16px;"></select>
+            </div>
           </div>
           <div class="chart-box"><canvas id="etfPremChart"></canvas></div>
         </section>
@@ -1876,10 +1960,11 @@
     <button id="openCompareBtn" class="dock-btn" type="button">开始对比</button>
     <button id="clearCompareBtn" class="dock-clear" type="button">清空</button>
   </div>
+  <div id="toastStack" class="toast-stack" aria-live="polite"></div>
   <div id="noticeHoverCard" class="notice-hover-card" role="tooltip" aria-hidden="true"></div>
     <div id="compareModal" class="modal-backdrop hidden">
     <div class="modal-box">
-      <div class="modal-head"><div class="card-title">基金横向对比</div><button id="closeCompareBtn" class="chip-btn" type="button">关闭</button></div>
+      <div class="modal-head"><div class="card-title">基金横向对比</div><button id="closeCompareBtn" class="modal-close-btn" type="button" aria-label="关闭" title="关闭"><svg viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
       <div class="modal-scroll"><div id="compareTableWrap"></div></div>
     </div>
   </div>
@@ -1890,7 +1975,7 @@
           <div id="fcModalTitle" class="card-title">基金走势与额度联动图</div>
           <div id="fcModalSub" class="card-sub">--</div>
         </div>
-        <button id="closeFundChartBtn" class="chip-btn" type="button">关闭</button>
+        <button id="closeFundChartBtn" class="modal-close-btn" type="button" aria-label="关闭" title="关闭"><svg viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
       </div>
       <div id="fcModalScroll" class="modal-scroll">
       <div id="fcKpiGrid" class="fc-kpi-grid" style="margin-top:0;"></div>
@@ -1970,7 +2055,7 @@
       authMode: "login", page: "home",
       raw: { nasdaq: [], sp500: [], etfs: [], active_top5: [] },
       market: null, charts: {},
-      activeDd: "ndx", activeHold: "ndx", activeFx: "ndx", activeYr: "both", activePeRange: 10,
+      activeDd: "ndx", activeDdRange: "252d", activeCmpRange: "90d", activeHomeEtfRange: "90", activeEtfPremRange: "90", activeHold: "ndx", activeFx: "ndx", activeYr: "both", activePeRange: 10,
       loaded: false,
       favs: new Set(JSON.parse(localStorage.getItem(FAV_KEY) || "[]")),
       compare: [],
@@ -1993,6 +2078,28 @@
       const s = getComputedStyle(document.documentElement);
       return { text: s.getPropertyValue("--text-3").trim(), grid: s.getPropertyValue("--border").trim(), accent: s.getPropertyValue("--accent").trim() };
     }
+    // ===== 右下角滑入/滑出小胶囊通知 (Toast) =====
+    function showToast(message, type = "ok") {
+      const stack = document.getElementById("toastStack");
+      if (!stack || !message) return;
+      const icons = {
+        ok: '<svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>',
+        warn: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
+        error: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>',
+        info: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>'
+      };
+      const el = document.createElement("div");
+      el.className = `toast-pill ${type}`;
+      el.innerHTML = `${icons[type] || icons.info}<span>${message}</span>`;
+      stack.appendChild(el);
+      requestAnimationFrame(() => el.classList.add("show"));
+      setTimeout(() => {
+        el.classList.remove("show");
+        el.classList.add("hide");
+        setTimeout(() => el.remove(), 340);
+      }, 2400);
+    }
+
     function destroyChart(key) { if (state.charts[key]) { state.charts[key].destroy(); state.charts[key] = null; } }
     function rerenderVisibleCharts() {
       if (state.page === "home") {
@@ -2257,7 +2364,7 @@
       const st = document.getElementById("settingsStatus");
       st.style.display = "block";
       st.style.color = "var(--ok)";
-      st.textContent = "已保存推送选项、独立推送时间与模板（已同步云端）";
+      st.style.display = "none"; showToast("已保存推送设置并同步云端", "ok");
     });
 
     document.getElementById("testBarkBtn").addEventListener("click", async () => {
@@ -2277,10 +2384,10 @@
           body: JSON.stringify({ title: "QDII 推送模板测试", body: preview, group: "QDII监控" })
         });
         st.style.color = "var(--ok)";
-        st.textContent = "测试推送请求已发出，请留意手机 Bark 通知";
+        st.style.display = "none"; showToast("测试推送已发出，请留意 Bark 通知", "ok");
       } catch {
         st.style.color = "var(--danger)";
-        st.textContent = "测试推送发送失败，请检查 Bark 链接格式";
+        st.style.display = "none"; showToast("测试推送失败，请检查 Bark 链接", "error");
       }
     });
 
@@ -3035,9 +3142,15 @@
     }
 
     // ===== 动态市场图表 =====
-    function render15dChart() {
-      const c = state.market && state.market.compare_15d;
+    function render15dChart(rangeKey) {
+      if (rangeKey) state.activeCmpRange = rangeKey;
+      const rk = state.activeCmpRange || "90d";
+      const views = state.market && state.market.compare_views;
+      const c = (views && views[rk]) || (state.market && state.market.compare_15d);
       if (!c || !c.dates.length) return;
+      const titleMap = { "15d": "近 15 日走势对比", "30d": "近 30 日走势对比", "90d": "近 90 日走势对比", "365d": "近 365 日走势对比", "all": "全部历史走势对比" };
+      const tEl = document.getElementById("cmpRangeTitle");
+      if (tEl) tEl.textContent = titleMap[rk] || "走势对比";
       const t = chartTheme();
       destroyChart("c15d");
       state.charts.c15d = new Chart(document.getElementById("chart15d").getContext("2d"), {
@@ -3120,13 +3233,20 @@
       });
     }
 
-    function renderDrawdownChart(key) {
-      if (!state.market || !state.market.drawdown[key]) return;
-      state.activeDd = key;
-      const d = state.market.drawdown[key];
+    function renderDrawdownChart(key, rangeKey) {
+      if (key) state.activeDd = key;
+      if (rangeKey) state.activeDdRange = rangeKey;
+      const k = state.activeDd || "ndx";
+      const rk = state.activeDdRange || "252d";
+      const views = state.market && state.market.drawdown_views && state.market.drawdown_views[k];
+      const d = (views && views[rk]) || (state.market && state.market.drawdown && state.market.drawdown[k]);
+      if (!d || !d.dates || !d.dates.length) return;
+      const lblMap = { "252d": "近 252 个交易日", "3y": "近 3 年", "5y": "近 5 年", "10y": "近 10 年", "all": "成立以来" };
+      const tEl = document.getElementById("ddTitle");
+      if (tEl) tEl.textContent = `动态回撤图谱（${lblMap[rk] || "近 252 个交易日"}）`;
       document.getElementById("ddStats").innerHTML = `
         <span>当前回撤：<strong>${d.current_dd.toFixed(2)}%</strong></span>
-        <span>近一年最大回撤：<strong>${d.max_dd.toFixed(2)}%</strong>（${d.max_dd_date}）</span>
+        <span>区间最大回撤：<strong>${d.max_dd.toFixed(2)}%</strong>（${d.max_dd_date}）</span>
         <span>阶段峰值：<strong>${d.peak_price.toLocaleString()}</strong></span>
       `;
       const t = chartTheme();
@@ -3153,22 +3273,35 @@
       });
     }
 
-    function renderEtfPremChart(code, canvasId, statsId, chartKey) {
+    function renderEtfPremChart(code, canvasId, statsId, chartKey, rangeKey) {
       const etf = state.raw.etfs.find(x => x.code === code) || state.raw.etfs[0];
       if (!etf || !etf.premium_history || !etf.premium_history.dates.length) return;
-      const h = etf.premium_history, st = h.stats || {};
+      const rk = rangeKey || (chartKey === "homeEtf" ? state.activeHomeEtfRange : state.activeEtfPremRange) || "90";
+      const allDates = etf.premium_history.dates;
+      const allVals = etf.premium_history.values;
+      const cnt = rk === "all" ? allDates.length : Number(rk);
+      const dates = rk === "all" ? allDates : allDates.slice(-cnt);
+      const vals = rk === "all" ? allVals : allVals.slice(-cnt);
+      const minV = vals.length ? Math.min(...vals) : null;
+      const maxV = vals.length ? Math.max(...vals) : null;
+      const curP = etf.premium;
+      const pct = (vals.length && curP != null) ? Math.round(vals.filter(v => v <= curP).length / vals.length * 100) : null;
+      const lbl = rk === "all" ? "全部历史" : `近 ${rk} 天`;
+      const titleId = chartKey === "homeEtf" ? "homeEtfTitle" : "etfPremTitle";
+      const tEl = document.getElementById(titleId);
+      if (tEl) tEl.textContent = chartKey === "homeEtf" ? `场内 ETF 溢价走势（${lbl}）` : `溢价率历史走势（${lbl}）`;
       document.getElementById(statsId).innerHTML = `
-        <span>当前溢价：<strong>${etf.premium != null ? etf.premium.toFixed(2) + "%" : "--"}</strong></span>
-        <span>近90日区间：<strong>${st.min != null ? st.min.toFixed(2) + "% ~ " + st.max.toFixed(2) + "%" : "--"}</strong></span>
-        <span>历史分位：<strong>${st.percentile != null ? st.percentile + "%" : "--"}</strong></span>
+        <span>当前溢价：<strong>${curP != null ? curP.toFixed(2) + "%" : "--"}</strong></span>
+        <span>${lbl}区间：<strong>${minV != null ? minV.toFixed(2) + "% ~ " + maxV.toFixed(2) + "%" : "--"}</strong></span>
+        <span>区间分位：<strong>${pct != null ? pct + "%" : "--"}</strong></span>
       `;
       const t = chartTheme();
       destroyChart(chartKey);
       state.charts[chartKey] = new Chart(document.getElementById(canvasId).getContext("2d"), {
         type: "line",
         data: {
-          labels: h.dates,
-          datasets: [{ label: "溢价率 (%)", data: h.values, borderColor: t.accent, backgroundColor: t.accent + "20", borderWidth: 2, fill: "origin", pointRadius: 0, tension: 0.18 }]
+          labels: dates,
+          datasets: [{ label: "溢价率 (%)", data: vals, borderColor: t.accent, backgroundColor: t.accent + "20", borderWidth: 2, fill: "origin", pointRadius: 0, tension: 0.18 }]
         },
         options: {
           responsive: true, maintainAspectRatio: false, interaction: { mode: "index", intersect: false },
@@ -3222,9 +3355,12 @@
       const titleHtml = (item.notice_title || item.notice_summary)
         ? `<div class="nhc-title">${item.notice_title || item.notice_summary}</div>`
         : "";
-      const noteHtml = item.direct_note
-        ? `<div class="nhc-row"><span class="nhc-lbl">渠道备注</span><span class="nhc-val">${item.direct_note}</span></div>`
+      const schedHtml = item.notice_schedule
+        ? `<div class="nhc-row"><span class="nhc-lbl">执行排期</span><span class="nhc-val" style="color:var(--warn);">${item.notice_schedule}</span></div>`
         : "";
+      const noteHtml = schedHtml + (item.direct_note
+        ? `<div class="nhc-row"><span class="nhc-lbl">渠道备注</span><span class="nhc-val">${item.direct_note}</span></div>`
+        : "");
 
       noticeHoverCard.innerHTML = `
         <div class="nhc-head">
@@ -3801,7 +3937,7 @@
     }
 
     function toggleFav(code) {
-      if (state.favs.has(code)) state.favs.delete(code); else state.favs.add(code);
+      const added = !state.favs.has(code); if (added) state.favs.add(code); else state.favs.delete(code); showToast(added ? `已收藏 ${code}` : `已取消收藏 ${code}`, "ok");
       const arr = [...state.favs];
       localStorage.setItem(FAV_KEY, JSON.stringify(arr));
       syncToCloud({ favorites: arr });
@@ -3810,7 +3946,7 @@
     function toggleCompare(item) {
       const idx = state.compare.findIndex(x => x.code === item.code);
       if (idx >= 0) state.compare.splice(idx, 1);
-      else { if (state.compare.length >= 4) { alert("最多同时对比 4 只标的"); return; } state.compare.push(item); }
+      else { if (state.compare.length >= 4) { showToast("最多同时对比 4 只标的", "warn"); return; } state.compare.push(item); }
       document.getElementById("compareDock").classList.toggle("hidden", state.compare.length === 0);
       document.getElementById("compareCount").textContent = `已选 ${state.compare.length} 只对比`;
       renderFundSection("nasdaq"); renderFundSection("sp500"); renderEtfTable();
@@ -3860,14 +3996,8 @@
     }
 
     function copyText(text, btnEl) {
-      const done = () => {
-        if (!btnEl) return;
-        const orig = btnEl.dataset.rawLabel || btnEl.textContent;
-        btnEl.dataset.rawLabel = orig;
-        btnEl.classList.add("copied");
-        btnEl.textContent = `已复制 ${text}`;
-        setTimeout(() => { btnEl.classList.remove("copied"); btnEl.textContent = orig; }, 1200);
-      };
+      const label = text.includes("\n") ? `已复制 ${text.split("\n").length} 条内容` : `已复制 ${text}`;
+      const done = () => showToast(label, "ok");
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(text).then(done).catch(() => fallbackCopy(text, done));
       } else {
@@ -3973,7 +4103,7 @@
           <td class="col-direct num">${limitBadge(item.direct_limit_text, item.direct_limit_num, item.direct_source)}<span class="sub-line">${directSub}</span></td>
           <td class="col-notice num" style="white-space:nowrap;">${
             item.notice_date
-              ? `<a class="notice-link" href="${item.notice_url || `https://fundf10.eastmoney.com/jjgg_${item.code}_5.html`}" target="_blank" rel="noopener" data-n-code="${item.code}" data-n-sec="${sec}">${item.notice_date}<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>`
+              ? `<a class="notice-link" href="${item.notice_url || `https://fundf10.eastmoney.com/jjgg_${item.code}_5.html`}" target="_blank" rel="noopener" data-n-code="${item.code}" data-n-sec="${sec}">${item.notice_date}<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>${item.notice_schedule ? `<span class="sub-line" style="color:var(--warn);">${item.notice_schedule}</span>` : ""}`
               : `<span style="color:var(--text-3);">--</span>`
           }</td>
         </tr>`;
@@ -4183,6 +4313,28 @@
       document.getElementById("homeEtfSelect").addEventListener("change", e => renderEtfPremChart(e.target.value, "homeEtfChart", "homeEtfStats", "homeEtf"));
 
       document.querySelectorAll("[data-dd-target]").forEach(b => b.addEventListener("click", () => { document.querySelectorAll("[data-dd-target]").forEach(x => x.classList.remove("active")); b.classList.add("active"); renderDrawdownChart(b.dataset.ddTarget); }));
+      document.querySelectorAll("[data-dd-range]").forEach(b => b.addEventListener("click", () => {
+        document.querySelectorAll("[data-dd-range]").forEach(x => x.classList.remove("active"));
+        b.classList.add("active");
+        renderDrawdownChart(state.activeDd, b.dataset.ddRange);
+      }));
+      document.querySelectorAll("[data-cmp-range]").forEach(b => b.addEventListener("click", () => {
+        document.querySelectorAll("[data-cmp-range]").forEach(x => x.classList.remove("active"));
+        b.classList.add("active");
+        render15dChart(b.dataset.cmpRange);
+      }));
+      document.querySelectorAll("[data-hetf-range]").forEach(b => b.addEventListener("click", () => {
+        document.querySelectorAll("[data-hetf-range]").forEach(x => x.classList.remove("active"));
+        b.classList.add("active");
+        state.activeHomeEtfRange = b.dataset.hetfRange;
+        renderEtfPremChart(document.getElementById("homeEtfSelect").value, "homeEtfChart", "homeEtfStats", "homeEtf", state.activeHomeEtfRange);
+      }));
+      document.querySelectorAll("[data-etfp-range]").forEach(b => b.addEventListener("click", () => {
+        document.querySelectorAll("[data-etfp-range]").forEach(x => x.classList.remove("active"));
+        b.classList.add("active");
+        state.activeEtfPremRange = b.dataset.etfpRange;
+        renderEtfPremChart(document.getElementById("etfSelect").value, "etfPremChart", "etfPremStats", "etfPrem", state.activeEtfPremRange);
+      }));
       document.querySelectorAll("[data-hold]").forEach(b => b.addEventListener("click", () => { document.querySelectorAll("[data-hold]").forEach(x => x.classList.remove("active")); b.classList.add("active"); renderHoldings(b.dataset.hold); }));
       document.querySelectorAll("[data-fx-target]").forEach(b => b.addEventListener("click", () => { document.querySelectorAll("[data-fx-target]").forEach(x => x.classList.remove("active")); b.classList.add("active"); renderFxChart(b.dataset.fxTarget); }));
       document.querySelectorAll("[data-pe-hist]").forEach(b => b.addEventListener("click", () => { document.querySelectorAll("[data-pe-hist]").forEach(x => x.classList.remove("active")); b.classList.add("active"); renderPeHighTable(b.dataset.peHist); }));

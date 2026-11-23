@@ -89,23 +89,53 @@ def period_return(series, trading_days):
     return round((cur - prev) / prev * 100, 2)
 
 
-def build_drawdown_series(close_series, days=252):
-    sub = close_series.tail(days)
+def downsample_indices(n, max_points=320, keep_idx=None):
+    if n <= max_points:
+        return list(range(n))
+    step = (n - 1) / (max_points - 1)
+    idxs = sorted(set(int(round(i * step)) for i in range(max_points)))
+    if idxs[-1] != n - 1:
+        idxs.append(n - 1)
+    if keep_idx is not None and 0 <= keep_idx < n and keep_idx not in idxs:
+        idxs.append(keep_idx)
+        idxs.sort()
+    return idxs
+
+
+def build_drawdown_series(close_series, days=252, max_points=320):
+    sub = close_series.tail(days) if days is not None else close_series
+    if sub.empty:
+        return {"dates": [], "prices": [], "drawdowns": [], "current_dd": 0.0, "max_dd": 0.0, "max_dd_date": "", "peak_price": 0.0}
     rolling_max = sub.cummax()
     dd = ((sub - rolling_max) / rolling_max * 100).round(2)
     dates = [idx.strftime("%Y-%m-%d") for idx in sub.index]
     prices = [round(float(v), 2) for v in sub.values]
     dd_vals = [float(v) for v in dd.values]
     max_dd = min(dd_vals)
-    max_dd_date = dates[dd_vals.index(max_dd)]
+    max_idx = dd_vals.index(max_dd)
+    max_dd_date = dates[max_idx]
+    peak_price = round(float(rolling_max.iloc[-1]), 2)
+    current_dd = dd_vals[-1]
+
+    keep = downsample_indices(len(dates), max_points=max_points, keep_idx=max_idx)
     return {
-        "dates": dates,
-        "prices": prices,
-        "drawdowns": dd_vals,
-        "current_dd": dd_vals[-1],
+        "dates": [dates[i] for i in keep],
+        "prices": [prices[i] for i in keep],
+        "drawdowns": [dd_vals[i] for i in keep],
+        "current_dd": current_dd,
         "max_dd": max_dd,
         "max_dd_date": max_dd_date,
-        "peak_price": round(float(rolling_max.iloc[-1]), 2)
+        "peak_price": peak_price
+    }
+
+
+def build_drawdown_views(close_series):
+    return {
+        "252d": build_drawdown_series(close_series, days=252, max_points=260),
+        "3y": build_drawdown_series(close_series, days=252 * 3, max_points=300),
+        "5y": build_drawdown_series(close_series, days=252 * 5, max_points=320),
+        "10y": build_drawdown_series(close_series, days=252 * 10, max_points=340),
+        "all": build_drawdown_series(close_series, days=None, max_points=360)
     }
 
 
@@ -118,7 +148,6 @@ def build_monthly_returns(ndx_s, spx_s):
     if len(common) < 2:
         return {"labels": [], "ndx": [], "spx": [], "mtd_ndx": None, "mtd_spx": None}
 
-    # 最后一条为当前月 MTD，前 12 条为完整自然月
     mtd_ndx = round(float(ndx_ret.loc[common[-1]]), 2)
     mtd_spx = round(float(spx_ret.loc[common[-1]]), 2)
     full_idx = common[:-1][-12:]
@@ -131,15 +160,30 @@ def build_monthly_returns(ndx_s, spx_s):
     }
 
 
-def build_15d_compare(ndx_s, spx_s):
-    common = ndx_s.index.intersection(spx_s.index)[-15:]
+def build_compare_window(ndx_s, spx_s, days=15, max_points=260):
+    common = ndx_s.index.intersection(spx_s.index)
+    if days is not None:
+        common = common[-days:]
     if len(common) < 2:
         return {"dates": [], "ndx": [], "spx": []}
-    n0, s0 = float(ndx_s.loc[common[0]]), float(spx_s.loc[common[0]])
+    keep = downsample_indices(len(common), max_points=max_points)
+    sub_idx = [common[i] for i in keep]
+    n0, s0 = float(ndx_s.loc[sub_idx[0]]), float(spx_s.loc[sub_idx[0]])
+    fmt = "%m/%d" if (days is not None and days <= 90) else "%Y-%m-%d"
     return {
-        "dates": [d.strftime("%m/%d") for d in common],
-        "ndx": [round((float(ndx_s.loc[d]) / n0 - 1) * 100, 2) for d in common],
-        "spx": [round((float(spx_s.loc[d]) / s0 - 1) * 100, 2) for d in common]
+        "dates": [d.strftime(fmt) for d in sub_idx],
+        "ndx": [round((float(ndx_s.loc[d]) / n0 - 1) * 100, 2) for d in sub_idx],
+        "spx": [round((float(spx_s.loc[d]) / s0 - 1) * 100, 2) for d in sub_idx]
+    }
+
+
+def build_compare_views(ndx_s, spx_s):
+    return {
+        "15d": build_compare_window(ndx_s, spx_s, days=15, max_points=30),
+        "30d": build_compare_window(ndx_s, spx_s, days=30, max_points=60),
+        "90d": build_compare_window(ndx_s, spx_s, days=90, max_points=120),
+        "365d": build_compare_window(ndx_s, spx_s, days=252, max_points=260),
+        "all": build_compare_window(ndx_s, spx_s, days=None, max_points=320)
     }
 
 
@@ -280,8 +324,9 @@ def generate_ai_commentary(payload):
 def main():
     os.makedirs("data", exist_ok=True)
 
-    ndx_s = get_close_series("^NDX", "2y")
-    spx_s = get_close_series("^GSPC", "2y")
+    # 拉取全历史日线以支持 15天/30天/90天/365天/全部 以及 近252日/3年/5年/10年/成立以来 回撤图谱
+    ndx_s = get_close_series("^NDX", "max")
+    spx_s = get_close_series("^GSPC", "max")
     vix_s = get_close_series("^VIX", "3mo")
     vxn_s = get_close_series("^VXN", "3mo")
     tnx_s = get_close_series("^TNX", "1mo")
@@ -307,10 +352,8 @@ def main():
     tnx_cur = round(float(tnx_s.iloc[-1]), 2) if not tnx_s.empty else 0.0
     tnx_chg_bp = round(float(tnx_s.iloc[-1] - tnx_s.iloc[-2]) * 100, 1) if len(tnx_s) >= 2 else 0.0
 
-    # 估值 PE（SPY 代理标普500，QQQ 代理纳指100）
     spx_pe = fetch_etf_pe("SPY", 23.6)
     ndx_pe = fetch_etf_pe("QQQ", 27.0)
-    # 标普500 1950-2025 历史 PE 参考分位近似映射
     spx_pe_pct = int(min(98, max(5, round((spx_pe - 10) / 18 * 100))))
 
     mag7_list = []
@@ -325,8 +368,12 @@ def main():
     ma200_bias = round((ndx_stat["close"] - ma200) / ma200 * 100, 2)
     rsi14 = calc_rsi(ndx_s, 14)
 
-    ndx_dd_data = build_drawdown_series(ndx_s, days=252)
-    spx_dd_data = build_drawdown_series(spx_s, days=252)
+    ndx_dd_views = build_drawdown_views(ndx_s)
+    spx_dd_views = build_drawdown_views(spx_s)
+    ndx_dd_data = ndx_dd_views["252d"]
+    spx_dd_data = spx_dd_views["252d"]
+    compare_views = build_compare_views(ndx_s, spx_s)
+
     fg = fetch_cnn_fear_greed()
     fg_score = fg["score"]
 
@@ -392,8 +439,10 @@ def main():
         },
         "commentary": commentary,
         "drawdown": {"ndx": ndx_dd_data, "spx": spx_dd_data},
+        "drawdown_views": {"ndx": ndx_dd_views, "spx": spx_dd_views},
         "monthly_returns": build_monthly_returns(ndx_s, spx_s),
-        "compare_15d": build_15d_compare(ndx_s, spx_s),
+        "compare_15d": compare_views["15d"],
+        "compare_views": compare_views,
         "fx_impact": build_fx_impact()
     }
 
