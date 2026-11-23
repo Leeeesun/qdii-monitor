@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-23 17:22:11",
+  "updated_at": "2026-11-24 03:25:58",
   "nasdaq": [
     {
       "code": "021000",
@@ -12,7 +12,7 @@
       "direct_limit_num": 200,
       "direct_source": "same_as_agency",
       "direct_note": "未见渠道区分公告，默认同代销",
-      "return_1y": 1.52,
+      "return_1y": -1.72,
       "daily_chg": null,
       "scale": 40.79,
       "mgmt_fee": 0.5,
@@ -99,7 +99,7 @@
       "direct_limit_num": 100,
       "direct_source": "same_as_agency",
       "direct_note": "未见渠道区分公告，默认同代销",
-      "return_1y": 1.49,
+      "return_1y": -1.73,
       "daily_chg": null,
       "scale": 1.62,
       "mgmt_fee": 0.5,
@@ -128,8 +128,8 @@
       "direct_limit_num": 10,
       "direct_source": "same_as_agency",
       "direct_note": "未见渠道区分公告，默认同代销",
-      "return_1y": 2.02,
-      "daily_chg": -2.01,
+      "return_1y": -1.26,
+      "daily_chg": -5.12,
       "scale": 32.03,
       "mgmt_fee": 0.5,
       "custody_fee": 0.1,
@@ -138,7 +138,7 @@
       "purchase_fee_orig": 1.2,
       "service_fee": 0.0,
       "first_year_cost": 0.72,
-      "nav_date": "2026-11-19",
+      "nav_date": "2026-11-20",
       "notice_title": "摩根纳斯达克100指数型发起式证券投资基金(QDII)调整大额申购、定期定额投资及转换转入业务限制金额的公告",
       "notice_date": "2026-07-27",
       "effective_date": "",
@@ -157,8 +157,8 @@
       "direct_limit_num": 10,
       "direct_source": "same_as_agency",
       "direct_note": "未见渠道区分公告，默认同代销",
-      "return_1y": 1.44,
-      "daily_chg": -2.09,
+      "return_1y": -1.8,
+      "daily_chg": -5.34,
       "scale": 46.49,
       "mgmt_fee": 0.5,
       "custody_fee": 0.15,
@@ -167,7 +167,7 @@
       "purchase_fee_orig": 0.0,
       "service_fee": 0.1,
       "first_year_cost": 0.75,
-      "nav_date": "2026-11-19",
+      "nav_date": "2026-11-20",
       "notice_title": "关于调整南方纳斯达克100指数发起式证券投资基金(QDII)申购、定投及转换转入业务金额限制的公告",
       "notice_date": "2026-07-08",
       "effective_date": "",
@@ -186,8 +186,8 @@
       "direct_limit_num": 10,
       "direct_source": "same_as_agency",
       "direct_note": "未见渠道区分公告，默认同代销",
-      "return_1y": 1.54,
-      "daily_chg": -2.08,
+      "return_1y": -1.7,
+      "daily_chg": -5.34,
       "scale": 67.32,
       "mgmt_fee": 0.5,
       "custody_fee": 0.15,
@@ -196,7 +196,7 @@
       "purchase_fee_orig": 1.2,
       "service_fee": 0.0,
       "first_year_cost": 0.77,
-      "nav_date": "2026-11-19",
+      "nav_date": "2026-11-20",
       "notice_title": "关于调整南方纳斯达克100指数发起式证券投资基金(QDII)申购、定投及转换转入业务金额限制的公告",
       "notice_date": "2026-07-08",
       "effective_date": "",
@@ -215,8 +215,8 @@
       "direct_limit_num": 10,
       "direct_source": "same_as_agency",
       "direct_note": "未见渠道区分公告，默认同代销",
-      "return_1y": 1.37,
-      "daily_chg": -2.05,
+      "return_1y": -1.81,
+      "daily_chg": -5.26,
       "scale": 14.46,
       "mgmt_fee": 0.5,
       "custody_fee": 0.15,
@@ -225,7 +225,7 @@
       "purchase_fee_orig": 1.2,
       "service_fee": 0.0,
       "first_year_cost": 0.77,
-      "nav_date": "2026-11-19",
+      "nav_date": "2026-11-20",
       "notice_title": "宝盈纳斯达克100指数型发起式证券投资基金(QDII)调整大额申购、定期定额投资业务限制金额的公告",
       "notice_date": "2026-09-24",
       "effective_date": "",
@@ -244,8 +244,8 @@
       "direct_limit_num": 10,
       "direct_source": "same_as_agency",
       "direct_note": "未见渠道区分公告，默认同代销",
-      "return_1y": 1.71,
-      "daily_chg": -2.01,
+      "return_1y": -1.55,
+      "daily_chg": -5.12,
       "scale": 11.09,
       "mgmt_fee": 0.5,
       "custody_fee": 0.1,
@@ -254,7 +254,7 @@
       "purchase_fee_orig": 0.0,
       "service_fee": 0.3,
       "first_year_cost": 0.9,
-      "nav_date": "2026-11-19",
+      "nav_date": "2026-11-20",
       "notice_title": "摩根纳斯达克100指数型发起式证券投资基金(QDII)调整大额申购、定期定额投资及转换转入业务限制金额的公告",
       "notice_date": "2026-07-27",
       "effective_date": "",
@@ -273,8 +273,8 @@
       "direct_limit_num": 10,
       "direct_source": "same_as_agency",
       "direct_note": "未见渠道区分公告，默认同代销",
-      "return_1y": 1.11,
-      "daily_chg": -2.05,
+      "return_1y": -2.05,
+      "daily_chg": -5.26,
       "scale": 5.52,
       "mgmt_fee": 0.5,
       "custody_fee": 0.15,
@@ -283,7 +283,7 @@
       "purchase_fee_orig": 0.0,
       "service_fee": 0.25,
       "first_year_cost": 0.9,
-      "nav_date": "2026-11-19",
+      "nav_date": "2026-11-20",
       "notice_title": "宝盈纳斯达克100指数型发起式证券投资基金(QDII)调整大额申购、定期定额投资业务限制金额的公告",
       "notice_date": "2026-09-24",
       "effective_date": "",
@@ -302,8 +302,8 @@
       "direct_limit_num": 10,
       "direct_source": "same_as_agency",
       "direct_note": "未见渠道区分公告，默认同代销",
-      "return_1y": -0.26,
-      "daily_chg": -2.2,
+      "return_1y": -3.56,
+      "daily_chg": -5.52,
       "scale": 49.58,
       "mgmt_fee": 0.8,
       "custody_fee": 0.2,
@@ -312,7 +312,7 @@
       "purchase_fee_orig": 1.2,
       "service_fee": 0.0,
       "first_year_cost": 1.12,
-      "nav_date": "2026-11-19",
+      "nav_date": "2026-11-20",
       "notice_title": "关于大成纳斯达克100交易型开放式指数证券投资基金联接基金(QDII)调整大额申购(含定期定额申购)的公告",
       "notice_date": "2026-06-03",
       "effective_date": "",
@@ -331,8 +331,8 @@
       "direct_limit_num": 10,
       "direct_source": "same_as_agency",
       "direct_note": "未见渠道区分公告，默认同代销",
-      "return_1y": 1.14,
-      "daily_chg": -1.98,
+      "return_1y": -2.19,
+      "daily_chg": -5.12,
       "scale": 43.74,
       "mgmt_fee": 0.8,
       "custody_fee": 0.2,
@@ -341,7 +341,7 @@
       "purchase_fee_orig": 1.2,
       "service_fee": 0.0,
       "first_year_cost": 1.12,
-      "nav_date": "2026-11-19",
+      "nav_date": "2026-11-20",
       "notice_title": "建信纳斯达克100指数型证券投资基金(QDII)暂停大额申购、定期定额投资公告",
       "notice_date": "2026-08-19",
       "effective_date": "2026-08-20",
@@ -360,8 +360,8 @@
       "direct_limit_num": 10,
       "direct_source": "same_as_agency",
       "direct_note": "未见渠道区分公告，默认同代销",
-      "return_1y": -0.55,
-      "daily_chg": -2.2,
+      "return_1y": -3.84,
+      "daily_chg": -5.52,
       "scale": 11.15,
       "mgmt_fee": 0.8,
       "custody_fee": 0.2,
@@ -370,7 +370,7 @@
       "purchase_fee_orig": 0.0,
       "service_fee": 0.3,
       "first_year_cost": 1.3,
-      "nav_date": "2026-11-19",
+      "nav_date": "2026-11-20",
       "notice_title": "关于大成纳斯达克100交易型开放式指数证券投资基金联接基金(QDII)调整大额申购(含定期定额申购)的公告",
       "notice_date": "2026-06-03",
       "effective_date": "",
@@ -389,8 +389,8 @@
       "direct_limit_num": 10,
       "direct_source": "same_as_agency",
       "direct_note": "未见渠道区分公告，默认同代销",
-      "return_1y": 0.84,
-      "daily_chg": -1.98,
+      "return_1y": -2.48,
+      "daily_chg": -5.12,
       "scale": 23.61,
       "mgmt_fee": 0.8,
       "custody_fee": 0.2,
@@ -399,7 +399,7 @@
       "purchase_fee_orig": 0.0,
       "service_fee": 0.3,
       "first_year_cost": 1.3,
-      "nav_date": "2026-11-19",
+      "nav_date": "2026-11-20",
       "notice_title": "建信纳斯达克100指数型证券投资基金(QDII)暂停大额申购、定期定额投资公告",
       "notice_date": "2026-08-19",
       "effective_date": "2026-08-20",
@@ -418,8 +418,8 @@
       "direct_limit_num": 10,
       "direct_source": "same_as_agency",
       "direct_note": "未见渠道区分公告，默认同代销",
-      "return_1y": 0.85,
-      "daily_chg": -1.98,
+      "return_1y": -2.48,
+      "daily_chg": -5.12,
       "scale": 1.15,
       "mgmt_fee": 0.8,
       "custody_fee": 0.2,
@@ -428,7 +428,7 @@
       "purchase_fee_orig": 0.0,
       "service_fee": 0.3,
       "first_year_cost": 1.3,
-      "nav_date": "2026-11-19",
+      "nav_date": "2026-11-20",
       "notice_title": "建信纳斯达克100指数型证券投资基金(QDII)暂停大额申购、定期定额投资公告",
       "notice_date": "2026-08-19",
       "effective_date": "2026-08-20",
@@ -447,8 +447,8 @@
       "direct_limit_num": 5,
       "direct_source": "same_as_agency",
       "direct_note": "未见渠道区分公告，默认同代销",
-      "return_1y": 2.31,
-      "daily_chg": -2.06,
+      "return_1y": -0.95,
+      "daily_chg": -5.28,
       "scale": 14.86,
       "mgmt_fee": 0.5,
       "custody_fee": 0.15,
@@ -457,7 +457,7 @@
       "purchase_fee_orig": 1.0,
       "service_fee": 0.0,
       "first_year_cost": 0.75,
-      "nav_date": "2026-11-19",
+      "nav_date": "2026-11-20",
       "notice_title": "关于万家纳斯达克100指数型发起式证券投资基金(QDII)调整大额申购(含定期定额投资)业务金额限制的公告",
       "notice_date": "2026-10-21",
       "effective_date": "",
@@ -476,8 +476,8 @@
       "direct_limit_num": 5,
       "direct_source": "same_as_agency",
       "direct_note": "未见渠道区分公告，默认同代销",
-      "return_1y": 1.65,
-      "daily_chg": -2.07,
+      "return_1y": -1.6,
+      "daily_chg": -5.31,
       "scale": 0.62,
       "mgmt_fee": 0.5,
       "custody_fee": 0.15,
@@ -486,7 +486,7 @@
       "purchase_fee_orig": 0.0,
       "service_fee": 0.1,
       "first_year_cost": 0.75,
-      "nav_date": "2026-11-19",
+      "nav_date": "2026-11-20",
       "notice_title": "华泰柏瑞纳斯达克100交易型开放式指数证券投资基金发起式联接基金(QDII)调整大额申购(含定期定额投资)业务的公告",
       "notice_date": "2026-09-22",
       "effective_date": "",
@@ -505,8 +505,8 @@
       "direct_limit_num": 5,
       "direct_source": "same_as_agency",
       "direct_note": "未见渠道区分公告，默认同代销",
-      "return_1y": 1.75,
-      "daily_chg": -2.07,
+      "return_1y": -1.5,
+      "daily_chg": -5.31,
       "scale": 8.12,
       "mgmt_fee": 0.5,
       "custody_fee": 0.15,
@@ -515,7 +515,7 @@
       "purchase_fee_orig": 1.2,
       "service_fee": 0.0,
       "first_year_cost": 0.77,
-      "nav_date": "2026-11-19",
+      "nav_date": "2026-11-20",
       "notice_title": "华泰柏瑞纳斯达克100交易型开放式指数证券投资基金发起式联接基金(QDII)调整大额申购(含定期定额投资)业务的公告",
       "notice_date": "2026-09-22",
       "effective_date": "",
@@ -534,8 +534,8 @@
       "direct_limit_num": 5,
       "direct_source": "same_as_agency",
       "direct_note": "未见渠道区分公告，默认同代销",
-      "return_1y": 2.1,
-      "daily_chg": -2.07,
+      "return_1y": -1.14,
+      "daily_chg": -5.28,
       "scale": 6.97,
       "mgmt_fee": 0.5,
       "custody_fee": 0.15,
@@ -544,7 +544,7 @@
       "purchase_fee_orig": 0.0,
       "service_fee": 0.2,
       "first_year_cost": 0.85,
-      "nav_date": "2026-11-19",
+      "nav_date": "2026-11-20",
       "notice_title": "关于万家纳斯达克100指数型发起式证券投资基金(QDII)调整大额申购(含定期定额投资)业务金额限制的公告",
       "notice_date": "2026-10-21",
       "effective_date": "",
@@ -563,8 +563,8 @@
       "direct_limit_num": 5,
       "direct_source": "same_as_agency",
       "direct_note": "未见渠道区分公告，默认同代销",
-      "return_1y": 1.49,
-      "daily_chg": -2.08,
+      "return_1y": -1.74,
+      "daily_chg": -5.3,
       "scale": 6.03,
       "mgmt_fee": 0.5,
       "custody_fee": 0.15,
@@ -573,7 +573,7 @@
       "purchase_fee_orig": 0.0,
       "service_fee": 0.25,
       "first_year_cost": 0.9,
-      "nav_date": "2026-11-19",
+      "nav_date": "2026-11-20",
       "notice_title": "华泰柏瑞纳斯达克100交易型开放式指数证券投资基金发起式联接基金(QDII)调整大额申购(含定期定额投资)业务的公告",
       "notice_date": "2026-09-22",
       "effective_date": "",
@@ -592,7 +592,7 @@
       "direct_limit_num": 0,
       "direct_source": "same_as_agency",
       "direct_note": "未见渠道区分公告，默认同代销",
-      "return_1y": 2.82,
+      "return_1y": -0.45,
       "daily_chg": null,
       "scale": 19.89,
       "mgmt_fee": 0.5,
@@ -621,7 +621,7 @@
       "direct_limit_num": 0,
       "direct_source": "same_as_agency",
       "direct_note": "未见渠道区分公告，默认同代销",
-      "return_1y": 1.7,
+      "return_1y": -1.54,
       "daily_chg": null,
       "scale": 32.44,
       "mgmt_fee": 0.5,
@@ -650,7 +650,7 @@
       "direct_limit_num": 0,
       "direct_source": "same_as_agency",
       "direct_note": "未见渠道区分公告，默认同代销",
-      "return_1y": 2.71,
+      "return_1y": -0.55,
       "daily_chg": null,
       "scale": 0.24,
       "mgmt_fee": 0.5,
@@ -679,7 +679,7 @@
       "direct_limit_num": 0,
       "direct_source": "same_as_agency",
       "direct_note": "未见渠道区分公告，默认同代销",
-      "return_1y": 2.14,
+      "return_1y": -1.09,
       "daily_chg": null,
       "scale": 17.41,
       "mgmt_fee": 0.5,
@@ -708,7 +708,7 @@
       "direct_limit_num": 0,
       "direct_source": "same_as_agency",
       "direct_note": "未见渠道区分公告，默认同代销",
-      "return_1y": 2.8,
+      "return_1y": -0.45,
       "daily_chg": null,
       "scale": 14.57,
       "mgmt_fee": 0.5,
@@ -737,7 +737,7 @@
       "direct_limit_num": 0,
       "direct_source": "same_as_agency",
       "direct_note": "未见渠道区分公告，默认同代销",
-      "return_1y": 0.26,
+      "return_1y": -3.02,
       "daily_chg": null,
       "scale": 4.66,
       "mgmt_fee": 0.5,
@@ -766,7 +766,7 @@
       "direct_limit_num": 0,
       "direct_source": "same_as_agency",
       "direct_note": "未见渠道区分公告，默认同代销",
-      "return_1y": 0.37,
+      "return_1y": -2.92,
       "daily_chg": null,
       "scale": 20.35,
       "mgmt_fee": 0.5,
@@ -795,7 +795,7 @@
       "direct_limit_num": 0,
       "direct_source": "same_as_agency",
       "direct_note": "未见渠道区分公告，默认同代销",
-      "return_1y": 2.37,
+      "return_1y": -0.8,
       "daily_chg": null,
       "scale": 23.23,
       "mgmt_fee": 0.5,
@@ -806,11 +806,11 @@
       "service_fee": 0.0,
       "first_year_cost": 0.77,
       "nav_date": "",
-      "notice_title": "关于暂停招商纳斯达克100交易型开放式指数证券投资基金发起式联接基金(QDII)申购(含定期定额投资)业务的公告",
-      "notice_date": "2026-10-14",
-      "effective_date": "2026-10-14",
-      "resume_date": "",
-      "notice_schedule": "",
+      "notice_title": "招商基金管理有限公司关于旗下部分基金2026年11月26日因境外主要投资市场节假日暂停申购、赎回、转换、定期定额投资业务的公告",
+      "notice_date": "2026-11-24",
+      "effective_date": "2026-11-26",
+      "resume_date": "2026-11-27",
+      "notice_schedule": "预告：11-26 暂停，11-27 恢复",
       "notice_url": "https://fundf10.eastmoney.com/jjgg_019547_5.html"
     },
     {
@@ -824,7 +824,7 @@
       "direct_limit_num": 0,
       "direct_source": "same_as_agency",
       "direct_note": "未见渠道区分公告，默认同代销",
-      "return_1y": 1.5,
+      "return_1y": -1.73,
       "daily_chg": null,
       "scale": 31.7,
       "mgmt_fee": 0.5,
@@ -853,7 +853,7 @@
       "direct_limit_num": 0,
       "direct_source": "same_as_agency",
       "direct_note": "未见渠道区分公告，默认同代销",
-      "return_1y": 2.65,
+      "return_1y": -0.6,
       "daily_chg": null,
       "scale": 1.63,
       "mgmt_fee": 0.5,
@@ -882,7 +882,7 @@
       "direct_limit_num": 0,
       "direct_source": "same_as_agency",
       "direct_note": "未见渠道区分公告，默认同代销",
-      "return_1y": 2.57,
+      "return_1y": -0.7,
       "daily_chg": null,
       "scale": 15.39,
       "mgmt_fee": 0.5,
@@ -911,7 +911,7 @@
       "direct_limit_num": 0,
       "direct_source": "same_as_agency",
       "direct_note": "未见渠道区分公告，默认同代销",
-      "return_1y": 1.82,
+      "return_1y": -1.4,
       "daily_chg": null,
       "scale": 1.65,
       "mgmt_fee": 0.5,
@@ -940,7 +940,7 @@
       "direct_limit_num": 0,
       "direct_source": "notice_diff",
       "direct_note": "关于在基金管理人直销电子交易平台暂停华夏纳斯达克100交易型开放式指数证券投资基金发起式联接基金(QDII)人民币申购业务的公告",
-      "return_1y": 1.85,
+      "return_1y": -1.29,
       "daily_chg": null,
       "scale": 3.26,
       "mgmt_fee": 0.6,
@@ -969,7 +969,7 @@
       "direct_limit_num": 0,
       "direct_source": "same_as_agency",
       "direct_note": "未见渠道区分公告，默认同代销",
-      "return_1y": 0.94,
+      "return_1y": -2.4,
       "daily_chg": null,
       "scale": 63.39,
       "mgmt_fee": 0.6,
@@ -998,7 +998,7 @@
       "direct_limit_num": 0,
       "direct_source": "same_as_agency",
       "direct_note": "未见渠道区分公告，默认同代销",
-      "return_1y": 2.49,
+      "return_1y": -0.75,
       "daily_chg": null,
       "scale": 6.69,
       "mgmt_fee": 0.5,
@@ -1027,7 +1027,7 @@
       "direct_limit_num": 0,
       "direct_source": "same_as_agency",
       "direct_note": "未见渠道区分公告，默认同代销",
-      "return_1y": 0.75,
+      "return_1y": -2.59,
       "daily_chg": null,
       "scale": 15.14,
       "mgmt_fee": 0.6,
@@ -1056,7 +1056,7 @@
       "direct_limit_num": 0,
       "direct_source": "same_as_agency",
       "direct_note": "未见渠道区分公告，默认同代销",
-      "return_1y": 1.79,
+      "return_1y": -1.51,
       "daily_chg": null,
       "scale": 28.82,
       "mgmt_fee": 0.8,
@@ -1085,7 +1085,7 @@
       "direct_limit_num": 0,
       "direct_source": "same_as_agency",
       "direct_note": "未见渠道区分公告，默认同代销",
-      "return_1y": -0.03,
+      "return_1y": -3.31,
       "daily_chg": null,
       "scale": 11.58,
       "mgmt_fee": 0.5,
@@ -1114,7 +1114,7 @@
       "direct_limit_num": 0,
       "direct_source": "same_as_agency",
       "direct_note": "未见渠道区分公告，默认同代销",
-      "return_1y": 1.96,
+      "return_1y": -1.19,
       "daily_chg": null,
       "scale": 14.46,
       "mgmt_fee": 0.5,
@@ -1125,11 +1125,11 @@
       "service_fee": 0.4,
       "first_year_cost": 1.05,
       "nav_date": "",
-      "notice_title": "关于暂停招商纳斯达克100交易型开放式指数证券投资基金发起式联接基金(QDII)申购(含定期定额投资)业务的公告",
-      "notice_date": "2026-10-14",
-      "effective_date": "2026-10-14",
-      "resume_date": "",
-      "notice_schedule": "",
+      "notice_title": "招商基金管理有限公司关于旗下部分基金2026年11月26日因境外主要投资市场节假日暂停申购、赎回、转换、定期定额投资业务的公告",
+      "notice_date": "2026-11-24",
+      "effective_date": "2026-11-26",
+      "resume_date": "2026-11-27",
+      "notice_schedule": "预告：11-26 暂停，11-27 恢复",
       "notice_url": "https://fundf10.eastmoney.com/jjgg_019548_5.html"
     },
     {
@@ -1143,7 +1143,7 @@
       "direct_limit_num": 0,
       "direct_source": "notice_diff",
       "direct_note": "关于在基金管理人直销电子交易平台暂停华夏纳斯达克100交易型开放式指数证券投资基金发起式联接基金(QDII)人民币申购业务的公告",
-      "return_1y": 1.54,
+      "return_1y": -1.59,
       "daily_chg": null,
       "scale": 1.64,
       "mgmt_fee": 0.6,
@@ -1172,7 +1172,7 @@
       "direct_limit_num": 0,
       "direct_source": "same_as_agency",
       "direct_note": "未见渠道区分公告，默认同代销",
-      "return_1y": 5.5,
+      "return_1y": 1.3,
       "daily_chg": null,
       "scale": 31.25,
       "mgmt_fee": 0.8,
@@ -1201,7 +1201,7 @@
       "direct_limit_num": 0,
       "direct_source": "same_as_agency",
       "direct_note": "未见渠道区分公告，默认同代销",
-      "return_1y": 0.68,
+      "return_1y": -2.64,
       "daily_chg": null,
       "scale": 122.81,
       "mgmt_fee": 0.8,
@@ -1230,7 +1230,7 @@
       "direct_limit_num": 0,
       "direct_source": "same_as_agency",
       "direct_note": "未见渠道区分公告，默认同代销",
-      "return_1y": 0.5,
+      "return_1y": -2.81,
       "daily_chg": null,
       "scale": 24.6,
       "mgmt_fee": 0.8,
@@ -1259,7 +1259,7 @@
       "direct_limit_num": 0,
       "direct_source": "same_as_agency",
       "direct_note": "未见渠道区分公告，默认同代销",
-      "return_1y": 0.49,
+      "return_1y": -2.82,
       "daily_chg": null,
       "scale": 64.63,
       "mgmt_fee": 0.8,
@@ -1288,7 +1288,7 @@
       "direct_limit_num": 0,
       "direct_source": "same_as_agency",
       "direct_note": "未见渠道区分公告，默认同代销",
-      "return_1y": 5.29,
+      "return_1y": 1.1,
       "daily_chg": null,
       "scale": 11.24,
       "mgmt_fee": 0.8,
@@ -1317,7 +1317,7 @@
       "direct_limit_num": 0,
       "direct_source": "same_as_agency",
       "direct_note": "未见渠道区分公告，默认同代销",
-      "return_1y": 5.09,
+      "return_1y": 0.9,
       "daily_chg": null,
       "scale": 15.24,
       "mgmt_fee": 0.8,
@@ -1348,8 +1348,8 @@
       "direct_limit_num": 500,
       "direct_source": "same_as_agency",
       "direct_note": "未见渠道区分公告，默认同代销",
-      "return_1y": 5.56,
-      "daily_chg": -1.62,
+      "return_1y": 4.17,
+      "daily_chg": -2.43,
       "scale": 25.94,
       "mgmt_fee": 1.1,
       "custody_fee": 0.2,
@@ -1358,7 +1358,7 @@
       "purchase_fee_orig": 1.7,
       "service_fee": 0.0,
       "first_year_cost": 3.0,
-      "nav_date": "2026-11-19",
+      "nav_date": "2026-11-20",
       "notice_title": "长信美国标准普尔100等权重指数增强型证券投资基金暂停大额申购(含定期定额投资)业务的公告",
       "notice_date": "2026-10-27",
       "effective_date": "2026-10-28",
@@ -1377,7 +1377,7 @@
       "direct_limit_num": 100,
       "direct_source": "same_as_agency",
       "direct_note": "未见渠道区分公告，默认同代销",
-      "return_1y": 2.26,
+      "return_1y": 0.07,
       "daily_chg": null,
       "scale": 1.83,
       "mgmt_fee": 0.6,
@@ -1406,8 +1406,8 @@
       "direct_limit_num": 50,
       "direct_source": "same_as_agency",
       "direct_note": "未见渠道区分公告，默认同代销",
-      "return_1y": 9.07,
-      "daily_chg": -1.6,
+      "return_1y": 8.19,
+      "daily_chg": -1.83,
       "scale": 8.83,
       "mgmt_fee": 1.0,
       "custody_fee": 0.2,
@@ -1416,7 +1416,7 @@
       "purchase_fee_orig": 1.5,
       "service_fee": 0.0,
       "first_year_cost": 1.35,
-      "nav_date": "2026-11-19",
+      "nav_date": "2026-11-20",
       "notice_title": "关于大成标普500等权重指数证券投资基金调整大额申购(含定期定额申购)的公告",
       "notice_date": "2026-10-15",
       "effective_date": "",
@@ -1435,8 +1435,8 @@
       "direct_limit_num": 50,
       "direct_source": "same_as_agency",
       "direct_note": "未见渠道区分公告，默认同代销",
-      "return_1y": 8.74,
-      "daily_chg": -1.6,
+      "return_1y": 7.86,
+      "daily_chg": -1.83,
       "scale": 2.81,
       "mgmt_fee": 1.0,
       "custody_fee": 0.2,
@@ -1445,7 +1445,7 @@
       "purchase_fee_orig": 0.0,
       "service_fee": 0.3,
       "first_year_cost": 1.5,
-      "nav_date": "2026-11-19",
+      "nav_date": "2026-11-20",
       "notice_title": "关于大成标普500等权重指数证券投资基金调整大额申购(含定期定额申购)的公告",
       "notice_date": "2026-10-15",
       "effective_date": "",
@@ -1464,8 +1464,8 @@
       "direct_limit_num": 10,
       "direct_source": "same_as_agency",
       "direct_note": "未见渠道区分公告，默认同代销",
-      "return_1y": 3.04,
-      "daily_chg": -1.81,
+      "return_1y": 0.84,
+      "daily_chg": -3.35,
       "scale": 59.31,
       "mgmt_fee": 0.5,
       "custody_fee": 0.15,
@@ -1474,7 +1474,7 @@
       "purchase_fee_orig": 1.2,
       "service_fee": 0.0,
       "first_year_cost": 0.77,
-      "nav_date": "2026-11-19",
+      "nav_date": "2026-11-20",
       "notice_title": "摩根标普500指数型发起式证券投资基金(QDII)调整大额申购、定期定额投资及转换转入业务限制金额的公告",
       "notice_date": "2026-07-27",
       "effective_date": "",
@@ -1493,8 +1493,8 @@
       "direct_limit_num": 10,
       "direct_source": "same_as_agency",
       "direct_note": "未见渠道区分公告，默认同代销",
-      "return_1y": 2.73,
-      "daily_chg": -1.82,
+      "return_1y": 0.53,
+      "daily_chg": -3.36,
       "scale": 19.88,
       "mgmt_fee": 0.5,
       "custody_fee": 0.15,
@@ -1503,7 +1503,7 @@
       "purchase_fee_orig": 0.0,
       "service_fee": 0.3,
       "first_year_cost": 0.95,
-      "nav_date": "2026-11-19",
+      "nav_date": "2026-11-20",
       "notice_title": "摩根标普500指数型发起式证券投资基金(QDII)调整大额申购、定期定额投资及转换转入业务限制金额的公告",
       "notice_date": "2026-07-27",
       "effective_date": "",
@@ -1522,7 +1522,7 @@
       "direct_limit_num": 0,
       "direct_source": "same_as_agency",
       "direct_note": "未见渠道区分公告，默认同代销",
-      "return_1y": 2.8,
+      "return_1y": 0.63,
       "daily_chg": null,
       "scale": 24.43,
       "mgmt_fee": 0.6,
@@ -1551,7 +1551,7 @@
       "direct_limit_num": 0,
       "direct_source": "same_as_agency",
       "direct_note": "未见渠道区分公告，默认同代销",
-      "return_1y": 4.19,
+      "return_1y": 2.02,
       "daily_chg": null,
       "scale": 1.27,
       "mgmt_fee": 0.6,
@@ -1580,7 +1580,7 @@
       "direct_limit_num": 0,
       "direct_source": "notice_diff",
       "direct_note": "关于在基金管理人直销电子交易平台暂停华夏标普500交易型开放式指数证券投资基金发起式联接基金(QDII)人民币申购业务的公告",
-      "return_1y": 2.29,
+      "return_1y": 0.24,
       "daily_chg": null,
       "scale": 3.27,
       "mgmt_fee": 0.6,
@@ -1609,7 +1609,7 @@
       "direct_limit_num": 0,
       "direct_source": "same_as_agency",
       "direct_note": "未见渠道区分公告，默认同代销",
-      "return_1y": 2.53,
+      "return_1y": 0.32,
       "daily_chg": null,
       "scale": 26.83,
       "mgmt_fee": 0.6,
@@ -1638,7 +1638,7 @@
       "direct_limit_num": 0,
       "direct_source": "same_as_agency",
       "direct_note": "未见渠道区分公告，默认同代销",
-      "return_1y": 2.81,
+      "return_1y": 0.64,
       "daily_chg": null,
       "scale": 63.48,
       "mgmt_fee": 0.6,
@@ -1667,7 +1667,7 @@
       "direct_limit_num": 0,
       "direct_source": "same_as_agency",
       "direct_note": "未见渠道区分公告，默认同代销",
-      "return_1y": 2.27,
+      "return_1y": 0.08,
       "daily_chg": null,
       "scale": 17.84,
       "mgmt_fee": 0.6,
@@ -1696,7 +1696,7 @@
       "direct_limit_num": 0,
       "direct_source": "same_as_agency",
       "direct_note": "未见渠道区分公告，默认同代销",
-      "return_1y": 3.87,
+      "return_1y": 1.71,
       "daily_chg": null,
       "scale": 0.58,
       "mgmt_fee": 0.6,
@@ -1725,7 +1725,7 @@
       "direct_limit_num": 0,
       "direct_source": "notice_diff",
       "direct_note": "关于在基金管理人直销电子交易平台暂停华夏标普500交易型开放式指数证券投资基金发起式联接基金(QDII)人民币申购业务的公告",
-      "return_1y": 1.99,
+      "return_1y": -0.07,
       "daily_chg": null,
       "scale": 1.65,
       "mgmt_fee": 0.6,
@@ -1754,7 +1754,7 @@
       "direct_limit_num": 0,
       "direct_source": "same_as_agency",
       "direct_note": "未见渠道区分公告，默认同代销",
-      "return_1y": 2.52,
+      "return_1y": 0.37,
       "daily_chg": null,
       "scale": 15.26,
       "mgmt_fee": 0.8,
@@ -1783,7 +1783,7 @@
       "direct_limit_num": 0,
       "direct_source": "same_as_agency",
       "direct_note": "未见渠道区分公告，默认同代销",
-      "return_1y": 2.45,
+      "return_1y": 0.28,
       "daily_chg": null,
       "scale": 12.43,
       "mgmt_fee": 0.6,
@@ -1812,7 +1812,7 @@
       "direct_limit_num": 0,
       "direct_source": "same_as_agency",
       "direct_note": "未见渠道区分公告，默认同代销",
-      "return_1y": 2.16,
+      "return_1y": 0.02,
       "daily_chg": null,
       "scale": 1.15,
       "mgmt_fee": 0.8,
@@ -1837,12 +1837,12 @@
       "name": "景顺长城纳斯达克科技ETF(QDII)",
       "index": "纳斯达克科技市值加权",
       "price": 2.64,
-      "nav": 1.9613,
-      "nav_date": "2026-11-19",
+      "nav": 1.8319,
+      "nav_date": "2026-11-20",
       "chg_pct": -1.57,
-      "premium": 34.6,
+      "premium": 44.11,
       "scale": 160.83,
-      "return_1y": 6.48,
+      "return_1y": 1.93,
       "mgmt_custody_fee": 1.0,
       "turnover": 17.7,
       "detail_url": "https://fund.eastmoney.com/159509.html",
@@ -2642,7 +2642,8 @@
           "2026-11-16",
           "2026-11-17",
           "2026-11-18",
-          "2026-11-19"
+          "2026-11-19",
+          "2026-11-20"
         ],
         "values": [
           1.28,
@@ -3439,12 +3440,13 @@
           43.74,
           40.78,
           41.65,
-          46.08
+          46.08,
+          46.41
         ],
         "stats": {
           "min": 15.11,
           "max": 46.89,
-          "percentile": 74
+          "percentile": 94
         }
       }
     },
@@ -3453,12 +3455,12 @@
       "name": "嘉实纳斯达克100ETF(QDII)",
       "index": "纳斯达克100",
       "price": 1.939,
-      "nav": 1.6655,
-      "nav_date": "2026-11-19",
+      "nav": 1.5723,
+      "nav_date": "2026-11-20",
       "chg_pct": -1.37,
-      "premium": 16.42,
+      "premium": 23.32,
       "scale": 133.68,
-      "return_1y": 1.75,
+      "return_1y": -1.66,
       "mgmt_custody_fee": 0.6,
       "turnover": 2.14,
       "detail_url": "https://fund.eastmoney.com/159501.html",
@@ -4295,7 +4297,8 @@
           "2026-11-16",
           "2026-11-17",
           "2026-11-18",
-          "2026-11-19"
+          "2026-11-19",
+          "2026-11-20"
         ],
         "values": [
           -1.76,
@@ -5129,12 +5132,13 @@
           21.17,
           20.71,
           20.29,
-          23.45
+          23.45,
+          25.04
         ],
         "stats": {
           "min": 7.52,
           "max": 27.42,
-          "percentile": 73
+          "percentile": 97
         }
       }
     },
@@ -5143,12 +5147,12 @@
       "name": "易方达纳斯达克100ETF(QDII)",
       "index": "纳斯达克100",
       "price": 1.92,
-      "nav": 1.6513,
-      "nav_date": "2026-11-19",
+      "nav": 1.559,
+      "nav_date": "2026-11-20",
       "chg_pct": -0.78,
-      "premium": 16.27,
+      "premium": 23.16,
       "scale": 57.05,
-      "return_1y": 1.86,
+      "return_1y": -1.56,
       "mgmt_custody_fee": 0.6,
       "turnover": 0.83,
       "detail_url": "https://fund.eastmoney.com/159696.html",
@@ -5935,7 +5939,8 @@
           "2026-11-16",
           "2026-11-17",
           "2026-11-18",
-          "2026-11-19"
+          "2026-11-19",
+          "2026-11-20"
         ],
         "values": [
           0.17,
@@ -6719,12 +6724,13 @@
           19.73,
           19.37,
           19.42,
-          22.33
+          22.33,
+          24.12
         ],
         "stats": {
           "min": 6.17,
-          "max": 23.27,
-          "percentile": 82
+          "max": 24.12,
+          "percentile": 98
         }
       }
     },
@@ -6733,12 +6739,12 @@
       "name": "国泰纳斯达克100ETF",
       "index": "纳斯达克100",
       "price": 2.05,
-      "nav": 1.773,
-      "nav_date": "2026-11-19",
+      "nav": 1.6742,
+      "nav_date": "2026-11-20",
       "chg_pct": -1.16,
-      "premium": 15.62,
+      "premium": 22.45,
       "scale": 197.66,
-      "return_1y": 1.6,
+      "return_1y": -1.81,
       "mgmt_custody_fee": 0.8,
       "turnover": 6.09,
       "detail_url": "https://fund.eastmoney.com/513100.html",
@@ -8241,7 +8247,8 @@
           "2026-11-16",
           "2026-11-17",
           "2026-11-18",
-          "2026-11-19"
+          "2026-11-19",
+          "2026-11-20"
         ],
         "values": [
           17.28,
@@ -9741,12 +9748,13 @@
           20.37,
           19.99,
           19.57,
-          22.67
+          22.67,
+          23.88
         ],
         "stats": {
           "min": 7.29,
           "max": 25.13,
-          "percentile": 70
+          "percentile": 97
         }
       }
     },
@@ -9755,12 +9763,12 @@
       "name": "广发纳斯达克100ETF",
       "index": "纳斯达克100",
       "price": 1.517,
-      "nav": 1.3253,
-      "nav_date": "2026-11-19",
+      "nav": 1.2516,
+      "nav_date": "2026-11-20",
       "chg_pct": -0.59,
-      "premium": 14.46,
+      "premium": 21.2,
       "scale": 350.53,
-      "return_1y": 1.1,
+      "return_1y": -2.28,
       "mgmt_custody_fee": 1.0,
       "turnover": 15.91,
       "detail_url": "https://fund.eastmoney.com/159941.html",
@@ -11263,7 +11271,8 @@
           "2026-11-16",
           "2026-11-17",
           "2026-11-18",
-          "2026-11-19"
+          "2026-11-19",
+          "2026-11-20"
         ],
         "values": [
           11.84,
@@ -12763,12 +12772,13 @@
           18.65,
           18.12,
           18.24,
-          21.48
+          21.48,
+          21.92
         ],
         "stats": {
           "min": 6.38,
           "max": 22.76,
-          "percentile": 73
+          "percentile": 97
         }
       }
     },
@@ -12777,12 +12787,12 @@
       "name": "招商纳斯达克100ETF(QDII)",
       "index": "纳斯达克100",
       "price": 2.191,
-      "nav": 1.9172,
-      "nav_date": "2026-11-19",
+      "nav": 1.8102,
+      "nav_date": "2026-11-20",
       "chg_pct": -1.26,
-      "premium": 14.28,
+      "premium": 21.04,
       "scale": 102.74,
-      "return_1y": 2.08,
+      "return_1y": -1.35,
       "mgmt_custody_fee": 0.65,
       "turnover": 2.3,
       "detail_url": "https://fund.eastmoney.com/159659.html",
@@ -13652,7 +13662,8 @@
           "2026-11-16",
           "2026-11-17",
           "2026-11-18",
-          "2026-11-19"
+          "2026-11-19",
+          "2026-11-20"
         ],
         "values": [
           1.24,
@@ -14519,12 +14530,13 @@
           17.99,
           17.52,
           17.72,
-          20.96
+          20.96,
+          22.58
         ],
         "stats": {
           "min": 4.79,
-          "max": 21.45,
-          "percentile": 82
+          "max": 22.58,
+          "percentile": 98
         }
       }
     },
@@ -14533,12 +14545,12 @@
       "name": "富国纳斯达克100ETF(QDII)",
       "index": "纳斯达克100",
       "price": 1.915,
-      "nav": 1.6886,
-      "nav_date": "2026-11-19",
+      "nav": 1.5942,
+      "nav_date": "2026-11-20",
       "chg_pct": -1.24,
-      "premium": 13.41,
+      "premium": 20.12,
       "scale": 28.9,
-      "return_1y": 1.75,
+      "return_1y": -1.66,
       "mgmt_custody_fee": 0.6,
       "turnover": 1.55,
       "detail_url": "https://fund.eastmoney.com/513870.html",
@@ -15282,7 +15294,8 @@
           "2026-11-16",
           "2026-11-17",
           "2026-11-18",
-          "2026-11-19"
+          "2026-11-19",
+          "2026-11-20"
         ],
         "values": [
           -1.43,
@@ -16023,12 +16036,13 @@
           16.97,
           16.68,
           16.85,
-          20.22
+          20.22,
+          21.63
         ],
         "stats": {
           "min": 5.05,
-          "max": 21.37,
-          "percentile": 82
+          "max": 21.63,
+          "percentile": 97
         }
       }
     },
@@ -16037,12 +16051,12 @@
       "name": "华夏纳斯达克100ETF(QDII)",
       "index": "纳斯达克100",
       "price": 2.492,
-      "nav": 2.1985,
-      "nav_date": "2026-11-19",
+      "nav": 2.0785,
+      "nav_date": "2026-11-20",
       "chg_pct": -1.23,
-      "premium": 13.35,
+      "premium": 19.89,
       "scale": 139.14,
-      "return_1y": 0.55,
+      "return_1y": -2.72,
       "mgmt_custody_fee": 0.8,
       "turnover": 5.26,
       "detail_url": "https://fund.eastmoney.com/513300.html",
@@ -17512,7 +17526,8 @@
           "2026-11-16",
           "2026-11-17",
           "2026-11-18",
-          "2026-11-19"
+          "2026-11-19",
+          "2026-11-20"
         ],
         "values": [
           -0.6,
@@ -18979,12 +18994,13 @@
           17.33,
           16.41,
           16.9,
-          20.31
+          20.31,
+          21.39
         ],
         "stats": {
           "min": 5.13,
-          "max": 20.34,
-          "percentile": 81
+          "max": 21.39,
+          "percentile": 97
         }
       }
     },
@@ -18993,12 +19009,12 @@
       "name": "汇添富纳斯达克100ETF(QDII)",
       "index": "纳斯达克100",
       "price": 2.182,
-      "nav": 1.9372,
-      "nav_date": "2026-11-19",
+      "nav": 1.8288,
+      "nav_date": "2026-11-20",
       "chg_pct": -1.13,
-      "premium": 12.64,
+      "premium": 19.31,
       "scale": 57.74,
-      "return_1y": 1.68,
+      "return_1y": -1.73,
       "mgmt_custody_fee": 0.65,
       "turnover": 1.84,
       "detail_url": "https://fund.eastmoney.com/159660.html",
@@ -19874,7 +19890,8 @@
           "2026-11-16",
           "2026-11-17",
           "2026-11-18",
-          "2026-11-19"
+          "2026-11-19",
+          "2026-11-20"
         ],
         "values": [
           -0.3,
@@ -20747,12 +20764,13 @@
           16.65,
           15.99,
           16.39,
-          19.76
+          19.76,
+          20.68
         ],
         "stats": {
           "min": 4.43,
           "max": 20.8,
-          "percentile": 79
+          "percentile": 97
         }
       }
     },
@@ -20761,12 +20779,12 @@
       "name": "博时纳斯达克100ETF(QDII)",
       "index": "纳斯达克100",
       "price": 2.241,
-      "nav": 1.99,
-      "nav_date": "2026-11-19",
+      "nav": 1.8789,
+      "nav_date": "2026-11-20",
       "chg_pct": -1.41,
-      "premium": 12.61,
+      "premium": 19.27,
       "scale": 50.48,
-      "return_1y": 1.67,
+      "return_1y": -1.73,
       "mgmt_custody_fee": 0.65,
       "turnover": 2.15,
       "detail_url": "https://fund.eastmoney.com/513390.html",
@@ -21630,7 +21648,8 @@
           "2026-11-16",
           "2026-11-17",
           "2026-11-18",
-          "2026-11-19"
+          "2026-11-19",
+          "2026-11-20"
         ],
         "values": [
           -0.66,
@@ -22491,12 +22510,13 @@
           16.6,
           16.04,
           16.46,
-          19.8
+          19.8,
+          20.98
         ],
         "stats": {
           "min": 4.48,
-          "max": 20.55,
-          "percentile": 83
+          "max": 20.98,
+          "percentile": 97
         }
       }
     },
@@ -22505,12 +22525,12 @@
       "name": "华安纳斯达克100ETF(QDII)",
       "index": "纳斯达克100",
       "price": 2.256,
-      "nav": 2.0142,
-      "nav_date": "2026-11-19",
+      "nav": 1.9018,
+      "nav_date": "2026-11-20",
       "chg_pct": -1.14,
-      "premium": 12.0,
+      "premium": 18.62,
       "scale": 118.08,
-      "return_1y": 1.64,
+      "return_1y": -1.75,
       "mgmt_custody_fee": 0.8,
       "turnover": 4.78,
       "detail_url": "https://fund.eastmoney.com/159632.html",
@@ -23556,7 +23576,8 @@
           "2026-11-16",
           "2026-11-17",
           "2026-11-18",
-          "2026-11-19"
+          "2026-11-19",
+          "2026-11-20"
         ],
         "values": [
           -3.41,
@@ -24599,12 +24620,13 @@
           15.97,
           15.37,
           16.08,
-          19.7
+          19.7,
+          19.99
         ],
         "stats": {
           "min": 4.4,
-          "max": 19.7,
-          "percentile": 81
+          "max": 19.99,
+          "percentile": 97
         }
       }
     },
@@ -24613,12 +24635,12 @@
       "name": "华泰柏瑞纳斯达克100ETF",
       "index": "纳斯达克100",
       "price": 2.26,
-      "nav": 2.0364,
-      "nav_date": "2026-11-19",
+      "nav": 1.9233,
+      "nav_date": "2026-11-20",
       "chg_pct": -1.09,
-      "premium": 10.98,
+      "premium": 17.51,
       "scale": 52.06,
-      "return_1y": 1.31,
+      "return_1y": -2.05,
       "mgmt_custody_fee": 1.0,
       "turnover": 2.68,
       "detail_url": "https://fund.eastmoney.com/513110.html",
@@ -25513,7 +25535,8 @@
           "2026-11-16",
           "2026-11-17",
           "2026-11-18",
-          "2026-11-19"
+          "2026-11-19",
+          "2026-11-20"
         ],
         "values": [
           -1.01,
@@ -26405,12 +26428,13 @@
           15.25,
           14.56,
           14.97,
-          18.35
+          18.35,
+          18.81
         ],
         "stats": {
           "min": 4.24,
           "max": 18.87,
-          "percentile": 77
+          "percentile": 97
         }
       }
     },
@@ -26419,12 +26443,12 @@
       "name": "大成纳斯达克100ETF(QDII)",
       "index": "纳斯达克100",
       "price": 1.637,
-      "nav": 1.4758,
-      "nav_date": "2026-11-19",
+      "nav": 1.3934,
+      "nav_date": "2026-11-20",
       "chg_pct": -1.09,
-      "premium": 10.92,
+      "premium": 17.48,
       "scale": 82.47,
-      "return_1y": 0.96,
+      "return_1y": -2.41,
       "mgmt_custody_fee": 1.0,
       "turnover": 4.39,
       "detail_url": "https://fund.eastmoney.com/159513.html",
@@ -27231,7 +27255,8 @@
           "2026-11-16",
           "2026-11-17",
           "2026-11-18",
-          "2026-11-19"
+          "2026-11-19",
+          "2026-11-20"
         ],
         "values": [
           -1.34,
@@ -28035,12 +28060,13 @@
           15.54,
           14.79,
           15.2,
-          18.85
+          18.85,
+          18.77
         ],
         "stats": {
           "min": 4.23,
           "max": 18.86,
-          "percentile": 77
+          "percentile": 97
         }
       }
     },
@@ -28049,12 +28075,12 @@
       "name": "博时标普500ETF",
       "index": "标普500",
       "price": 2.455,
-      "nav": 2.2782,
-      "nav_date": "2026-11-19",
+      "nav": 2.1938,
+      "nav_date": "2026-11-20",
       "chg_pct": -0.77,
-      "premium": 7.76,
+      "premium": 11.91,
       "scale": 251.81,
-      "return_1y": 2.37,
+      "return_1y": 0.09,
       "mgmt_custody_fee": 0.8,
       "turnover": 5.28,
       "detail_url": "https://fund.eastmoney.com/513500.html",
@@ -29545,7 +29571,8 @@
           "2026-11-16",
           "2026-11-17",
           "2026-11-18",
-          "2026-11-19"
+          "2026-11-19",
+          "2026-11-20"
         ],
         "values": [
           2.32,
@@ -31033,12 +31060,13 @@
           10.53,
           10.42,
           10.43,
-          12.81
+          12.81,
+          12.77
         ],
         "stats": {
-          "min": 3.6,
+          "min": 3.72,
           "max": 13.26,
-          "percentile": 31
+          "percentile": 97
         }
       }
     },
@@ -31047,12 +31075,12 @@
       "name": "国泰标普500ETF(QDII)",
       "index": "标普500",
       "price": 1.918,
-      "nav": 1.7872,
-      "nav_date": "2026-11-19",
+      "nav": 1.7213,
+      "nav_date": "2026-11-20",
       "chg_pct": -0.52,
-      "premium": 7.32,
+      "premium": 11.43,
       "scale": 9.78,
-      "return_1y": 2.39,
+      "return_1y": 0.13,
       "mgmt_custody_fee": 0.75,
       "turnover": 0.37,
       "detail_url": "https://fund.eastmoney.com/159612.html",
@@ -32148,7 +32176,8 @@
           "2026-11-16",
           "2026-11-17",
           "2026-11-18",
-          "2026-11-19"
+          "2026-11-19",
+          "2026-11-20"
         ],
         "values": [
           -0.95,
@@ -33241,12 +33270,13 @@
           9.89,
           9.86,
           10.12,
-          12.35
+          12.35,
+          12.01
         ],
         "stats": {
           "min": 3.79,
           "max": 12.61,
-          "percentile": 53
+          "percentile": 97
         }
       }
     },
@@ -33255,12 +33285,12 @@
       "name": "南方标普500ETF(QDII)",
       "index": "标普500",
       "price": 1.837,
-      "nav": 1.7356,
-      "nav_date": "2026-11-19",
+      "nav": 1.6715,
+      "nav_date": "2026-11-20",
       "chg_pct": -0.54,
-      "premium": 5.84,
+      "premium": 9.9,
       "scale": 87.11,
-      "return_1y": 2.43,
+      "return_1y": 0.15,
       "mgmt_custody_fee": 0.75,
       "turnover": 7.73,
       "detail_url": "https://fund.eastmoney.com/513650.html",
@@ -34144,7 +34174,8 @@
           "2026-11-16",
           "2026-11-17",
           "2026-11-18",
-          "2026-11-19"
+          "2026-11-19",
+          "2026-11-20"
         ],
         "values": [
           0.59,
@@ -35025,12 +35056,13 @@
           8.92,
           8.71,
           9.26,
-          11.26
+          11.26,
+          10.5
         ],
         "stats": {
           "min": 2.68,
           "max": 12.15,
-          "percentile": 24
+          "percentile": 97
         }
       }
     }
@@ -35040,8 +35072,8 @@
       "rank": 1,
       "code": "006373",
       "name": "国富全球科技互联混合(QDII)人民币A",
-      "return_1y": 32.16,
-      "nav_date": "2026-11-19",
+      "return_1y": 28.57,
+      "nav_date": "2026-11-20",
       "scale": 55.31,
       "limit_text": "100 元",
       "url": "https://fundf10.eastmoney.com/jjgg_006373_5.html"
@@ -35050,41 +35082,41 @@
       "rank": 2,
       "code": "012920",
       "name": "易方达全球成长精选混合(QDII)人民币A",
-      "return_1y": 26.92,
-      "nav_date": "2026-11-19",
+      "return_1y": 26.67,
+      "nav_date": "2026-11-20",
       "scale": 40.19,
       "limit_text": "10,000 元",
       "url": "https://fundf10.eastmoney.com/jjgg_012920_5.html"
     },
     {
       "rank": 3,
-      "code": "457001",
-      "name": "国富亚洲机会股票(QDII)A",
-      "return_1y": 25.12,
-      "nav_date": "2026-11-19",
-      "scale": 12.16,
+      "code": "017730",
+      "name": "嘉实全球产业升级股票发起式(QDII)A",
+      "return_1y": 19.78,
+      "nav_date": "2026-11-20",
+      "scale": 33.14,
       "limit_text": "1,000 元",
-      "url": "https://fundf10.eastmoney.com/jjgg_457001_5.html"
+      "url": "https://fundf10.eastmoney.com/jjgg_017730_5.html"
     },
     {
       "rank": 4,
-      "code": "539002",
-      "name": "建信新兴市场混合(QDII)A",
-      "return_1y": 24.98,
-      "nav_date": "2026-11-19",
-      "scale": 35.06,
-      "limit_text": "100 元",
-      "url": "https://fundf10.eastmoney.com/jjgg_539002_5.html"
-    },
-    {
-      "rank": 5,
       "code": "002891",
       "name": "华夏移动互联混合人民币",
-      "return_1y": 20.19,
-      "nav_date": "2026-11-19",
+      "return_1y": 18.16,
+      "nav_date": "2026-11-20",
       "scale": 33.18,
       "limit_text": "100 元",
       "url": "https://fundf10.eastmoney.com/jjgg_002891_5.html"
+    },
+    {
+      "rank": 5,
+      "code": "018229",
+      "name": "易方达全球优质企业混合(QDII)A(人民币份额)",
+      "return_1y": 16.78,
+      "nav_date": "2026-11-20",
+      "scale": 30.34,
+      "limit_text": "50,000 元",
+      "url": "https://fundf10.eastmoney.com/jjgg_018229_5.html"
     }
   ]
 }
