@@ -1065,6 +1065,10 @@
           <svg viewBox="0 0 24 24"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/></svg>
           <span>通行密钥一键登录</span>
         </button>
+        <a href="/api/auth/oauth" class="btn-passkey" style="margin-top:10px;text-decoration:none;">
+          <img src="https://auth.youranzi.de/logo-mark.svg?color=%2318181b&size=16" width="16" height="16" alt="YOURANZI.DE" style="display:block;">
+          <span>使用 YOURANZI.DE 统一账号登录</span>
+        </a>
       </div>
       <div id="authMsg" class="auth-msg"></div>
     </div>
@@ -2116,6 +2120,16 @@
         if (ec) renderEtfPremChart(ec, "etfPremChart", "etfPremStats", "etfPrem");
       }
     }
+
+    // 处理 YOURANZI.DE 统一认证回调 Token
+    (function handleOAuthHash() {
+      const h = window.location.hash || "";
+      if (h.startsWith("#oauth_token=")) {
+        const tok = decodeURIComponent(h.slice("#oauth_token=".length));
+        if (tok) localStorage.setItem(TOKEN_KEY, tok);
+        history.replaceState(null, "", window.location.pathname + "#home");
+      }
+    })();
 
     // ===== 鉴权与通行密钥 (WebAuthn) =====
     function showAuthMsg(t, type = "error") {
