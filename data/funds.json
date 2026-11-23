@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-23 16:43:05",
+  "updated_at": "2026-11-23 17:22:11",
   "nasdaq": [
     {
       "code": "021000",
@@ -9766,7 +9766,6 @@
       "detail_url": "https://fund.eastmoney.com/159941.html",
       "premium_history": {
         "dates": [
-          "2020-09-10",
           "2020-09-11",
           "2020-09-14",
           "2020-09-15",
@@ -11267,7 +11266,6 @@
           "2026-11-19"
         ],
         "values": [
-          13.84,
           11.84,
           12.38,
           12.19,
@@ -28062,7 +28060,6 @@
       "detail_url": "https://fund.eastmoney.com/513500.html",
       "premium_history": {
         "dates": [
-          "2020-09-09",
           "2020-09-10",
           "2020-09-11",
           "2020-09-14",
@@ -29551,7 +29548,6 @@
           "2026-11-19"
         ],
         "values": [
-          -0.85,
           2.32,
           1.17,
           0.05,
@@ -35082,13 +35078,13 @@
     },
     {
       "rank": 5,
-      "code": "017730",
-      "name": "嘉实全球产业升级股票发起式(QDII)A",
-      "return_1y": 23.38,
+      "code": "002891",
+      "name": "华夏移动互联混合人民币",
+      "return_1y": 20.19,
       "nav_date": "2026-11-19",
-      "scale": 33.14,
-      "limit_text": "1,000 元",
-      "url": "https://fundf10.eastmoney.com/jjgg_017730_5.html"
+      "scale": 33.18,
+      "limit_text": "100 元",
+      "url": "https://fundf10.eastmoney.com/jjgg_002891_5.html"
     }
   ]
 }
