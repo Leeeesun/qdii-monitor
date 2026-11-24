@@ -85,28 +85,28 @@ export async function onRequestPost({ request, env }) {
       return Response.json({ ok: true, msg: `已推送 Bark：${changes.length} 只基金额度变动` });
     }
 
-    // 2. 场内高溢价检查
+// 2. 场内高溢价检查（读取 data.etfs 数组中的 premium 字段）
     if (taskId === "qdii-push-premium") {
       const threshold = Number(settings.premiumThreshold ?? 3);
       const res = await fetch(`${origin}/data/funds.json?t=${Date.now()}`);
       if (!res.ok) throw new Error(`读取 funds.json 失败 (${res.status})`);
       const data = await res.json();
-      const funds = Array.isArray(data) ? data : (data.funds || data.list || []);
+      const etfs = Array.isArray(data) ? data : (data.etfs || data.funds || data.list || []);
 
       const alerts = [];
-      for (const f of funds) {
+      for (const f of etfs) {
         const p = Number(f.premium ?? f.premiumRate ?? f.discount_rt);
         if (!Number.isNaN(p) && p >= threshold) {
-          alerts.push(`${f.name || f.code}: 溢价 ${p.toFixed(2)}%`);
+          alerts.push(`${f.name || f.code} (${f.code || ""}): 溢价 ${p.toFixed(2)}%`);
         }
       }
 
       if (!alerts.length) {
-        return Response.json({ ok: true, msg: `无溢价 ≥ ${threshold}% 的基金，未推送` });
+        return Response.json({ ok: true, msg: `无溢价 ≥ ${threshold}% 的场内 ETF，未推送` });
       }
 
       await sendBark(settings, `QDII 场内高溢价提醒 (≥${threshold}%)`, alerts.slice(0, 12).join("\n"));
-      return Response.json({ ok: true, msg: `已推送 Bark：${alerts.length} 只高溢价基金` });
+      return Response.json({ ok: true, msg: `已推送 Bark：${alerts.length} 只高溢价 ETF` });
     }
 
     // 3. 美股收盘播报
