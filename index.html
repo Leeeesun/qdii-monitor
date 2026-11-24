@@ -2126,7 +2126,7 @@
       const h = window.location.hash || "";
       if (h.startsWith("#oauth_token=")) {
         const tok = decodeURIComponent(h.slice("#oauth_token=".length));
-        if (tok) localStorage.setItem(TOKEN_KEY, tok);
+        if (tok) { localStorage.setItem(TOKEN_KEY, tok); localStorage.setItem("yrz_login_via", "sso"); }
         history.replaceState(null, "", window.location.pathname + "#home");
       } else if (h.startsWith("#oauth_error=")) {
         const errCode = decodeURIComponent(h.slice("#oauth_error=".length));
@@ -2191,7 +2191,7 @@
         const res = await fetch("/api/auth", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
         const data = await res.json();
         if (!res.ok || !data.ok) showAuthMsg(data.message || "验证失败");
-        else { localStorage.setItem(TOKEN_KEY, data.token); enterApp(data.user); }
+        else { localStorage.setItem(TOKEN_KEY, data.token); localStorage.setItem("yrz_login_via", "local"); enterApp(data.user); }
       } catch { showAuthMsg("无法连接鉴权接口"); }
       finally { btn.disabled = false; }
     });
@@ -2229,7 +2229,7 @@
         });
         const verData = await verRes.json();
         if (!verRes.ok || !verData.ok) showAuthMsg(verData.message || "通行密钥验证失败");
-        else { localStorage.setItem(TOKEN_KEY, verData.token); enterApp(verData.user); }
+        else { localStorage.setItem(TOKEN_KEY, verData.token); localStorage.setItem("yrz_login_via", "local"); enterApp(verData.user); }
       } catch (e) {
         if (e.name !== "NotAllowedError") showAuthMsg(e.message || "通行密钥登录已取消或失败");
       } finally { btn.disabled = false; }
@@ -2924,8 +2924,10 @@
 
     document.getElementById("logoutBtn").addEventListener("click", () => {
       closeUserMenu();
+      const via = localStorage.getItem("yrz_login_via") || "sso";
+      localStorage.removeItem("yrz_login_via");
       localStorage.removeItem(TOKEN_KEY);
-      window.location.href = "https://auth.youranzi.de/logout";
+      window.location.href = "https://auth.youranzi.de/logout?via=" + encodeURIComponent(via) + "&redirect=" + encodeURIComponent(window.location.origin + "/");
     });
 
     async function checkSession() {
