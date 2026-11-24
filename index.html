@@ -2911,8 +2911,7 @@
     document.getElementById("logoutBtn").addEventListener("click", () => {
       closeUserMenu();
       localStorage.removeItem(TOKEN_KEY);
-      document.getElementById("appShell").classList.add("hidden");
-      document.getElementById("authScreen").classList.remove("hidden");
+      window.location.href = "https://auth.youranzi.de/logout";
     });
 
     async function checkSession() {
