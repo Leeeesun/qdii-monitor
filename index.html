@@ -2121,13 +2121,27 @@
       }
     }
 
-    // 处理 YOURANZI.DE 统一认证回调 Token
+    // 处理 YOURANZI.DE 统一认证回调 Token 与错误提示
     (function handleOAuthHash() {
       const h = window.location.hash || "";
       if (h.startsWith("#oauth_token=")) {
         const tok = decodeURIComponent(h.slice("#oauth_token=".length));
         if (tok) localStorage.setItem(TOKEN_KEY, tok);
         history.replaceState(null, "", window.location.pathname + "#home");
+      } else if (h.startsWith("#oauth_error=")) {
+        const errCode = decodeURIComponent(h.slice("#oauth_error=".length));
+        const errMap = {
+          missing_secret: "未在 Cloudflare Pages 配置 OAUTH_CLIENT_SECRET 环境变量",
+          invalid_state: "登录状态校验失败（Cookie 丢失或过期），请重新点击登录",
+          token_failed: "换取令牌失败，请核对 OAUTH_CLIENT_SECRET 与回调地址",
+          token_error: "连接统一认证中心换取令牌异常",
+          empty_token: "统一认证中心未返回有效令牌",
+          user_failed: "获取统一认证用户信息失败",
+          unauthorized_user: "该账号无权登录管理后台",
+          access_denied: "已取消统一认证授权"
+        };
+        history.replaceState(null, "", window.location.pathname);
+        setTimeout(() => showAuthMsg(errMap[errCode] || ("统一认证登录失败：" + errCode), "error"), 0);
       }
     })();
 

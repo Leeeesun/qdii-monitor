@@ -32,7 +32,8 @@ function redirectErr(origin, code) {
     status: 302,
     headers: {
       Location: `${origin}/#oauth_error=${encodeURIComponent(code)}`,
-      "Set-Cookie": "qdii_oauth_state=; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=0"
+      "Set-Cookie": "qdii_oauth_state=; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=0",
+      "Cache-Control": "no-store, no-cache, must-revalidate"
     }
   });
 }
@@ -98,7 +99,8 @@ export async function onRequestGet(context) {
     status: 302,
     headers: {
       Location: `${url.origin}/#oauth_token=${encodeURIComponent(token)}`,
-      "Set-Cookie": "qdii_oauth_state=; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=0"
+      "Set-Cookie": "qdii_oauth_state=; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=0",
+      "Cache-Control": "no-store, no-cache, must-revalidate"
     }
   });
 }

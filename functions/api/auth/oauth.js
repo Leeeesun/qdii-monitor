@@ -19,7 +19,8 @@ export async function onRequestGet(context) {
     status: 302,
     headers: {
       Location: target.toString(),
-      "Set-Cookie": `qdii_oauth_state=${state}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=600`
+      "Set-Cookie": `qdii_oauth_state=${state}; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=600`,
+      "Cache-Control": "no-store, no-cache, must-revalidate"
     }
   });
 }
