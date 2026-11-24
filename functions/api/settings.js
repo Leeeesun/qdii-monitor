@@ -65,11 +65,11 @@ async function upsertHubTask(env, taskId, payload) {
 }
 
 export async function onRequestGet({ env }) {
-  if (!env.QDII_AUTH) {
-    return Response.json({ ok: false, message: "未绑定 QDII_AUTH" }, { status: 500 });
+  if (!env.AUTH_KV) {
+    return Response.json({ ok: false, message: "未绑定 AUTH_KV" }, { status: 500 });
   }
 
-  const raw = await env.QDII_AUTH.get("push_settings");
+  const raw = await env.AUTH_KV.get("push_settings");
   const local = raw ? JSON.parse(raw) : {
     barkUrl: "",
     barkKey: "",
@@ -108,8 +108,8 @@ export async function onRequestGet({ env }) {
 }
 
 export async function onRequestPost({ request, env }) {
-  if (!env.QDII_AUTH) {
-    return Response.json({ ok: false, message: "未绑定 QDII_AUTH" }, { status: 500 });
+  if (!env.AUTH_KV) {
+    return Response.json({ ok: false, message: "未绑定 AUTH_KV" }, { status: 500 });
   }
   if (!env.INTERNAL_SECRET) {
     return Response.json({ ok: false, message: "未配置 INTERNAL_SECRET" }, { status: 500 });
@@ -120,8 +120,8 @@ export async function onRequestPost({ request, env }) {
   const cronUrl = `${origin}/api/cron`;
   const authHeaderJson = JSON.stringify({ Authorization: `Bearer ${env.INTERNAL_SECRET}` });
 
-  // 1. 业务配置写入 QDII_AUTH
-  await env.QDII_AUTH.put("push_settings", JSON.stringify(body));
+  // 1. 业务配置写入 AUTH_KV
+  await env.AUTH_KV.put("push_settings", JSON.stringify(body));
 
   // 2. 定时规则与开关同步到 cron.youranzi.de
   const syncList = [
