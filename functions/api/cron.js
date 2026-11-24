@@ -49,25 +49,37 @@ export async function onRequestPost({ request, env }) {
   const origin = new URL(request.url).origin;
 
   try {
-    // 1. 额度变化检查
+    // 1. 额度变化检查（读取 data.nasdaq + data.sp500 中的 agency_limit_text / direct_limit_text）
     if (taskId === "qdii-push-quota") {
+      if (settings.quotaEnabled === false) {
+        return Response.json({ ok: true, msg: "额度变化提醒已关闭，跳过" });
+      }
       const res = await fetch(`${origin}/data/funds.json?t=${Date.now()}`);
       if (!res.ok) throw new Error(`读取 funds.json 失败 (${res.status})`);
       const data = await res.json();
-      const funds = Array.isArray(data) ? data : (data.funds || data.list || []);
+      const offFunds = Array.isArray(data)
+        ? data
+        : [
+            ...(Array.isArray(data.nasdaq) ? data.nasdaq.map(x => ({ ...x, _pool: "纳指" })) : []),
+            ...(Array.isArray(data.sp500) ? data.sp500.map(x => ({ ...x, _pool: "标普" })) : []),
+            ...(Array.isArray(data.funds) ? data.funds : []),
+            ...(Array.isArray(data.list) ? data.list : [])
+          ];
 
       const prevRaw = await env.AUTH_KV.get("snapshot_quota");
       const prevMap = prevRaw ? JSON.parse(prevRaw) : null;
       const currMap = {};
       const changes = [];
 
-      for (const f of funds) {
+      for (const f of offFunds) {
         const code = f.code || f.id || f.name;
-        const quota = String(f.quota ?? f.limit ?? f.status ?? "");
+        const agencyQ = String(f.agency_limit_text ?? f.quota ?? f.limit ?? f.status ?? "");
+        const directQ = String(f.direct_limit_text ?? "");
+        const quotaSig = `${agencyQ} | ${directQ}`;
         if (!code) continue;
-        currMap[code] = quota;
-        if (prevMap && code in prevMap && prevMap[code] !== quota) {
-          changes.push(`${f.name || code}: ${prevMap[code] || "无"} → ${quota || "无"}`);
+        currMap[code] = quotaSig;
+        if (prevMap && code in prevMap && prevMap[code] !== quotaSig) {
+          changes.push(`${f.name || code} (${code}): ${prevMap[code]} → ${quotaSig}`);
         }
       }
 
@@ -85,8 +97,11 @@ export async function onRequestPost({ request, env }) {
       return Response.json({ ok: true, msg: `已推送 Bark：${changes.length} 只基金额度变动` });
     }
 
-// 2. 场内高溢价检查（读取 data.etfs 数组中的 premium 字段）
+    // 2. 场内高溢价检查（读取 data.etfs 数组中的 premium 字段）
     if (taskId === "qdii-push-premium") {
+      if (settings.premiumEnabled === false) {
+        return Response.json({ ok: true, msg: "场内高溢价提醒已关闭，跳过" });
+      }
       const threshold = Number(settings.premiumThreshold ?? 3);
       const res = await fetch(`${origin}/data/funds.json?t=${Date.now()}`);
       if (!res.ok) throw new Error(`读取 funds.json 失败 (${res.status})`);
@@ -109,13 +124,41 @@ export async function onRequestPost({ request, env }) {
       return Response.json({ ok: true, msg: `已推送 Bark：${alerts.length} 只高溢价 ETF` });
     }
 
-    // 3. 美股收盘播报
+    // 3. 美股收盘播报（从 market.json 的 summary / sentiment / commentary 拼装可读摘要）
     if (taskId === "qdii-push-market") {
+      if (settings.marketEnabled === false) {
+        return Response.json({ ok: true, msg: "美股收盘播报已关闭，跳过" });
+      }
       const res = await fetch(`${origin}/data/market.json?t=${Date.now()}`);
       if (!res.ok) throw new Error(`读取 market.json 失败 (${res.status})`);
       const m = await res.json();
-      const summary = m.summary || m.text || `标普/纳指数据已更新 (${m.date || m.updatedAt || "今日"})`;
-      await sendBark(settings, "美股大盘与情绪日报", String(summary).slice(0, 400));
+      const ndx = m.summary?.ndx;
+      const spx = m.summary?.spx;
+      const vix = m.summary?.vix;
+      const fg = m.summary?.fear_greed;
+      const lightLabel = m.sentiment?.overall_label || "";
+      const headline = m.commentary?.headline || "";
+
+      const parts = [];
+      if (m.trade_date) parts.push(`交易日: ${m.trade_date}`);
+      if (ndx?.close != null) {
+        const chg = ndx.chg_pct != null ? ` (${ndx.chg_pct > 0 ? "+" : ""}${Number(ndx.chg_pct).toFixed(2)}%)` : "";
+        parts.push(`纳指100: ${ndx.close}${chg}`);
+      }
+      if (spx?.close != null) {
+        const chg = spx.chg_pct != null ? ` (${spx.chg_pct > 0 ? "+" : ""}${Number(spx.chg_pct).toFixed(2)}%)` : "";
+        parts.push(`标普500: ${spx.close}${chg}`);
+      }
+      if (vix?.close != null) parts.push(`VIX: ${vix.close}`);
+      if (fg?.score != null) parts.push(`恐慌贪婪: ${fg.score}`);
+      if (lightLabel) parts.push(`信号: ${lightLabel}`);
+      if (headline) parts.push(`摘要: ${headline}`);
+
+      const summaryText = parts.length
+        ? parts.join(" · ")
+        : (typeof m.summary === "string" ? m.summary : (m.text || `标普/纳指数据已更新 (${m.trade_date || m.date || "今日"})`));
+
+      await sendBark(settings, "美股大盘与情绪日报", String(summaryText).slice(0, 450));
       return Response.json({ ok: true, msg: "已推送 Bark：美股收盘日报" });
     }
 
