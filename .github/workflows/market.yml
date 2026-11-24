@@ -1,9 +1,9 @@
 name: Update US Market & Sentiment
 
 on:
-  schedule:
+  #schedule:
     # 周二至周六 北京时间 06:30（美股周一至周五收盘后）
-    - cron: '30 22 * * 1-5'
+    #- cron: '30 22 * * 1-5'
   workflow_dispatch:
 
 permissions:
