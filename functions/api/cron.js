@@ -35,13 +35,13 @@ export async function onRequestPost({ request, env }) {
   if (!secret || auth !== `Bearer ${secret}`) {
     return Response.json({ ok: false, msg: "Unauthorized" }, { status: 401 });
   }
-  if (!env.QDII_AUTH) {
-    return Response.json({ ok: false, msg: "未绑定 QDII_AUTH" }, { status: 500 });
+  if (!env.AUTH_KV) {
+    return Response.json({ ok: false, msg: "未绑定 AUTH_KV" }, { status: 500 });
   }
 
   const payload = await request.json().catch(() => ({}));
   const taskId = payload.taskId || "qdii-push-quota";
-  const rawSettings = await env.QDII_AUTH.get("push_settings");
+  const rawSettings = await env.AUTH_KV.get("push_settings");
   if (!rawSettings) {
     return Response.json({ ok: true, msg: "尚未在网页端保存推送配置，跳过" });
   }
@@ -56,7 +56,7 @@ export async function onRequestPost({ request, env }) {
       const data = await res.json();
       const funds = Array.isArray(data) ? data : (data.funds || data.list || []);
 
-      const prevRaw = await env.QDII_AUTH.get("snapshot_quota");
+      const prevRaw = await env.AUTH_KV.get("snapshot_quota");
       const prevMap = prevRaw ? JSON.parse(prevRaw) : null;
       const currMap = {};
       const changes = [];
@@ -71,7 +71,7 @@ export async function onRequestPost({ request, env }) {
         }
       }
 
-      await env.QDII_AUTH.put("snapshot_quota", JSON.stringify(currMap));
+      await env.AUTH_KV.put("snapshot_quota", JSON.stringify(currMap));
 
       if (!prevMap) {
         return Response.json({ ok: true, msg: `首次初始化额度快照（共 ${Object.keys(currMap).length} 只基金），下次起监测变动` });
