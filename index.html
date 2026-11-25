@@ -450,6 +450,63 @@
       opacity: 1;
       transform: translateY(0);
     }
+    /* 备注气泡：长备注不直接写进表格，点 ⓘ 弹出查看 */
+    .note-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 16px;
+      height: 16px;
+      margin-left: 4px;
+      padding: 0;
+      border: 1px solid var(--border-strong);
+      border-radius: 999px;
+      background: transparent;
+      color: var(--text-3);
+      font-size: 11px;
+      line-height: 1;
+      cursor: pointer;
+      vertical-align: 1px;
+    }
+    .note-btn:hover { color: var(--text); border-color: var(--text-3); }
+    .note-popover {
+      position: fixed;
+      z-index: 230;
+      width: 300px;
+      max-width: calc(100vw - 24px);
+      background: var(--surface);
+      border: 1px solid var(--border-strong);
+      border-radius: 12px;
+      box-shadow: var(--shadow-md);
+      padding: 12px 14px;
+      opacity: 0;
+      transform: translateY(4px);
+      transition: opacity 0.14s ease, transform 0.14s ease;
+      font-size: 12.5px;
+      color: var(--text);
+      pointer-events: none;
+    }
+    .note-popover.show { opacity: 1; transform: translateY(0); pointer-events: auto; }
+    .np-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      font-weight: 700;
+      padding-bottom: 6px;
+      margin-bottom: 6px;
+      border-bottom: 1px solid var(--border);
+    }
+    .np-close {
+      border: none;
+      background: transparent;
+      color: var(--text-3);
+      font-size: 18px;
+      line-height: 1;
+      cursor: pointer;
+      padding: 0 2px;
+    }
+    .np-body { line-height: 1.6; overflow-wrap: anywhere; }
     .nhc-head {
       display: flex;
       align-items: center;
@@ -1966,6 +2023,7 @@
   </div>
   <div id="toastStack" class="toast-stack" aria-live="polite"></div>
   <div id="noticeHoverCard" class="notice-hover-card" role="tooltip" aria-hidden="true"></div>
+  <div id="notePopover" class="note-popover" role="dialog" aria-hidden="true"></div>
     <div id="compareModal" class="modal-backdrop hidden">
     <div class="modal-box">
       <div class="modal-head"><div class="card-title">基金横向对比</div><button id="closeCompareBtn" class="modal-close-btn" type="button" aria-label="关闭" title="关闭"><svg viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div>
@@ -3425,7 +3483,7 @@
       if (!item) return;
 
       const directSub = item.direct_source === "manual"
-        ? `已校准·${item.direct_note || ""}`
+        ? "已校准"
         : (item.direct_source === "notice_diff" ? "渠道有差异" : "同代销");
       const statusText = item.agency_status || (item.agency_limit_num === 0 ? "暂停申购" : "开放申购");
       const statusTag = item.agency_limit_num === 0
@@ -3439,7 +3497,9 @@
       const schedHtml = item.notice_schedule
         ? `<div class="nhc-row"><span class="nhc-lbl">执行排期</span><span class="nhc-val" style="color:var(--warn);">${item.notice_schedule}</span></div>`
         : "";
-      const noteHtml = schedHtml + (item.direct_note
+      const noteHtml = schedHtml + (item.agency_note
+        ? `<div class="nhc-row"><span class="nhc-lbl">代销备注</span><span class="nhc-val">${item.agency_note}</span></div>`
+        : "") + (item.direct_note
         ? `<div class="nhc-row"><span class="nhc-lbl">渠道备注</span><span class="nhc-val">${item.direct_note}</span></div>`
         : "");
 
@@ -3474,6 +3534,45 @@
       noticeHoverCard.classList.remove("show");
       noticeHoverCard.setAttribute("aria-hidden", "true");
     }
+
+    // ===== 备注气泡：表格里只留短标签，长备注点 ⓘ 弹出查看 =====
+    const escAttr = s => String(s ?? "").replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    const noteBtnHtml = (title, text) => text
+      ? `<button class="note-btn" type="button" data-note-title="${escAttr(title)}" data-note-text="${escAttr(text)}" title="查看${title}">ⓘ</button>`
+      : "";
+    const notePopover = document.getElementById("notePopover");
+    function hideNotePopover() {
+      if (!notePopover) return;
+      notePopover.classList.remove("show");
+      notePopover.setAttribute("aria-hidden", "true");
+    }
+    function showNotePopover(anchor, title, text) {
+      if (!notePopover || !anchor) return;
+      notePopover.innerHTML = `<div class="np-head"><span></span><button class="np-close" type="button" aria-label="关闭">×</button></div><div class="np-body"></div>`;
+      notePopover.querySelector(".np-head span").textContent = title;
+      notePopover.querySelector(".np-body").textContent = text;
+      notePopover.classList.add("show");
+      notePopover.setAttribute("aria-hidden", "false");
+      const rect = anchor.getBoundingClientRect();
+      const popW = Math.min(300, window.innerWidth - 24);
+      const left = Math.min(Math.max(12, rect.left), window.innerWidth - popW - 12);
+      let top = rect.bottom + 6;
+      const popH = notePopover.offsetHeight || 120;
+      if (top + popH > window.innerHeight - 8) top = Math.max(8, rect.top - popH - 6);
+      notePopover.style.left = `${Math.round(left)}px`;
+      notePopover.style.top = `${Math.round(top)}px`;
+    }
+    document.addEventListener("click", (e) => {
+      const btn = e.target.closest && e.target.closest(".note-btn");
+      if (btn) { e.stopPropagation(); showNotePopover(btn, btn.dataset.noteTitle || "备注", btn.dataset.noteText || ""); return; }
+      if (e.target.closest && e.target.closest(".note-popover")) {
+        if (e.target.closest(".np-close")) hideNotePopover();
+        return;
+      }
+      hideNotePopover();
+    });
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") hideNotePopover(); });
+    window.addEventListener("scroll", hideNotePopover, true);
 
     document.addEventListener("mouseover", (e) => {
       const link = e.target.closest && e.target.closest(".notice-link");
@@ -4148,7 +4247,10 @@
       const tbody = document.getElementById(`${sec}Body`);
       tbody.innerHTML = items.length ? items.map(item => {
         const isFav = state.favs.has(item.code), isCmp = state.compare.some(x => x.code === item.code);
-        const directSub = item.direct_source === "manual" ? `已校准·${item.direct_note}` : (item.direct_source === "notice_diff" ? "渠道有差异" : "同代销");
+        const directLabel = item.direct_source === "manual" ? "已校准" : (item.direct_source === "notice_diff" ? "渠道有差异" : "同代销");
+        const directNoteBtn = noteBtnHtml("直销备注", item.direct_note);
+        const agencyLabel = item.agency_limit_num === null ? "无代销" : item.status;
+        const agencyNoteBtn = noteBtnHtml("代销备注", item.agency_note);
         const cCopyBtn = item.c_code && item.c_code !== "--"
           ? `<button class="copy-code-btn" data-copy="${item.c_code}" type="button" title="点击复制C类代码">C: ${item.c_code}</button>`
           : "";
@@ -4171,8 +4273,8 @@
           </td>
           <td class="col-mobile-quota">
             <div class="mobile-quota-stack">
-              <div class="mobile-quota-line"><span class="mobile-quota-lbl">代销</span>${limitBadge(item.agency_limit_text, item.agency_limit_num, "agency")}</div>
-              <div class="mobile-quota-line"><span class="mobile-quota-lbl">直销</span>${limitBadge(item.direct_limit_text, item.direct_limit_num, item.direct_source)}</div>
+              <div class="mobile-quota-line"><span class="mobile-quota-lbl">代销</span>${limitBadge(item.agency_limit_text, item.agency_limit_num, "agency")}${agencyNoteBtn}</div>
+              <div class="mobile-quota-line"><span class="mobile-quota-lbl">直销</span>${limitBadge(item.direct_limit_text, item.direct_limit_num, item.direct_source)}${directNoteBtn}</div>
             </div>
           </td>
           <td class="col-scale num">${item.scale != null ? item.scale.toFixed(2) : "--"}</td>
@@ -4180,8 +4282,8 @@
           <td class="col-daily num">${fmtSigned(item.daily_chg)}</td>
           <td class="col-opfee num"><strong>${fmtPct(item.mgmt_custody_fee)}</strong><span class="sub-line">管${fmtPct(item.mgmt_fee)}+托${fmtPct(item.custody_fee)}</span></td>
           <td class="col-1ycost num"><strong>${fmtPct(item.first_year_cost)}</strong><span class="sub-line">申${fmtPct(item.purchase_fee)}·服${fmtPct(item.service_fee)}</span></td>
-          <td class="col-agency num">${limitBadge(item.agency_limit_text, item.agency_limit_num, "agency")}<span class="sub-line">${item.status}</span></td>
-          <td class="col-direct num">${limitBadge(item.direct_limit_text, item.direct_limit_num, item.direct_source)}<span class="sub-line">${directSub}</span></td>
+          <td class="col-agency num">${limitBadge(item.agency_limit_text, item.agency_limit_num, "agency")}<span class="sub-line">${agencyLabel}${agencyNoteBtn}</span></td>
+          <td class="col-direct num">${limitBadge(item.direct_limit_text, item.direct_limit_num, item.direct_source)}<span class="sub-line">${directLabel}${directNoteBtn}</span></td>
           <td class="col-notice num" style="white-space:nowrap;">${
             item.notice_date
               ? `<a class="notice-link" href="${item.notice_url || `https://fundf10.eastmoney.com/jjgg_${item.code}_5.html`}" target="_blank" rel="noopener" data-n-code="${item.code}" data-n-sec="${sec}">${item.notice_date}<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>${item.notice_schedule ? `<span class="sub-line" style="color:var(--warn);">${item.notice_schedule}</span>` : ""}`

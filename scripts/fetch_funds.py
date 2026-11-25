@@ -44,6 +44,7 @@ HEADERS = {
 DEFAULT_BARK_URL = "https://bark.youranzi.de/3cdh5mj7wiRryZWuPAf84u"
 CACHE_FILE = "data/fees_cache.json"
 OVERRIDE_FILE = "data/direct_overrides.json"
+AGENCY_OVERRIDE_FILE = "data/agency_overrides.json"
 OUTPUT_FILE = "data/funds.json"
 CACHE_TTL_DAYS = 7
 
@@ -605,6 +606,7 @@ def main():
     prev_limits = fees_cache.get("__last_limits__", {})
     normal_limits = fees_cache.get("__normal_limits__", {})
     direct_overrides = load_json(OVERRIDE_FILE, {})
+    agency_overrides = load_json(AGENCY_OVERRIDE_FILE, {})
 
     purchase_df = fetch_with_retry(ak.fund_purchase_em)
     rank_df = fetch_with_retry(ak.fund_open_fund_rank_em, symbol="全部")
@@ -736,13 +738,27 @@ def main():
                 if fee_info.get("purchase_fee_orig", 0) == 0:
                     fee_info["purchase_fee_orig"] = round(fallback_fee * 10, 2)
 
+        # 代销渠道覆盖：某些份额根本没有代销渠道（如 021000 南方纳指 I 类，
+        # 实测仅直销），天天基金给的数其实是直销限额，不能当作代销额度。
+        # limit_num 为 null 表示该渠道不存在，代销显示为“—”。
+        # 覆盖在排期/暂停逻辑之后应用，所以暂停判断仍按天天基金的原始值走，
+        # 且 normal_limits 里存的仍是原始值，下次恢复不受影响。
+        agency_overridden = code in agency_overrides
+        agency_num_raw, agency_text_raw = agency_num, agency_text
+        agency_note = None
+        if agency_overridden:
+            ov_a = agency_overrides[code]
+            agency_num = ov_a.get("limit_num")  # None = 无此渠道
+            agency_text = ov_a.get("limit_text") or "—"
+            agency_note = ov_a.get("note")
+
         # 直销优先级：公告分渠道解析 > 手动覆盖 > 默认同代销。
         # 手动覆盖只作兜底：公告能解析出分渠道限额时以公告为准，
         # 这样覆盖值过期后不会一直挡住新的公告数；公告解析不出时
         # （如天弘 D 类）才用覆盖值。
         ch = notice.get("channel_limits") or {}
         ch_direct, ch_default, ch_direct_any = ch.get("direct"), ch.get("default"), ch.get("direct_any")
-        if agency_num == 0 and not ch_direct:
+        if (agency_num == 0 or agency_num_raw == 0) and not ch_direct:
             # 暂停：代销暂停时直销同为暂停，不再输出“渠道有差异(见公告)”
             direct_num, direct_text = 0, "暂停申购"
             direct_source, direct_note = "same_as_agency", "代销暂停，直销同为暂停"
@@ -760,8 +776,14 @@ def main():
             direct_num, direct_text = ch_default, f"{ch_default:,} 元"
             direct_source, direct_note = "notice_diff", notice["title"]
         else:
-            direct_num, direct_text = agency_num, agency_text
-            direct_source, direct_note = "same_as_agency", "未见渠道区分公告，默认同代销"
+            if agency_num is None:
+                # 代销渠道不存在：天天基金的单个数其实是直销限额，
+                # 直销直接用原始值，不写“同代销”
+                direct_num, direct_text = agency_num_raw, agency_text_raw
+                direct_source, direct_note = "manual", agency_note or "该份额无代销渠道，限额为直销限额"
+            else:
+                direct_num, direct_text = agency_num, agency_text
+                direct_source, direct_note = "same_as_agency", "未见渠道区分公告，默认同代销"
 
         cur_pair = {"agency": agency_text, "direct": direct_text}
         new_limits[code] = cur_pair
@@ -788,6 +810,7 @@ def main():
         record = {
             "code": code, "name": name, "share_class": share_class, "status": status_str,
             "agency_limit_text": agency_text, "agency_limit_num": agency_num,
+            "agency_note": agency_note,
             "direct_limit_text": direct_text, "direct_limit_num": direct_num,
             "direct_source": direct_source, "direct_note": direct_note,
             "return_1y": y1_val, "daily_chg": daily_chg, "scale": scale_val,
@@ -803,7 +826,7 @@ def main():
         }
         (nasdaq_list if category == "nasdaq" else sp500_list).append(record)
 
-    sort_fn = lambda x: (-(0.5 if x["agency_limit_num"] == -1 else x["agency_limit_num"]), x["first_year_cost"])
+    sort_fn = lambda x: (-(0.5 if x["agency_limit_num"] in (-1, None) else x["agency_limit_num"]), x["first_year_cost"])
     nasdaq_list.sort(key=sort_fn)
     sp500_list.sort(key=sort_fn)
 
