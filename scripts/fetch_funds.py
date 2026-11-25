@@ -194,6 +194,71 @@ def extract_limit_from_text(text, share_class=""):
     return None
 
 
+def _amount_in_segment(seg):
+    """取分句里的第一个人民币限额（优先带“不超过/调整为/仍为/高于”等动词的那个）。"""
+    m = re.search(
+        r"(?:不超过|不得超过|上限为|调整为|调整至|限制为|限定为|限额为|设定为|仍为|高于)"
+        r"(?:人民币)?([\d,]+(?:\.\d+)?)(万|千)?元", seg)
+    if m:
+        return parse_cn_amount(m.group(1), m.group(2))
+    m = re.search(r"([\d,]+(?:\.\d+)?)(万|千)?元", seg)
+    if m:
+        return parse_cn_amount(m.group(1), m.group(2))
+    return None
+
+
+def extract_channel_limits(text, share_class=""):
+    """从限额公告正文里按渠道分段解析限额。
+
+    返回 {"direct": 直销限额|None, "agency": 代销限额|None,
+           "default": 不分渠道的通用限额|None,
+           "direct_any": 正文里出现的任一直销限额|None}。
+    只有正文明确写了“直销渠道/代销机构”区分时 direct/agency 才有值；
+    不分渠道的公告只会得到 default，调用方此时应沿用“同代销”的老口径，
+    而不是把 default 当成直销数去覆盖代销数。
+    分句若明确只写了别的份额（如“A类或C类”），不对本份额生效。
+    """
+    out = {"direct": None, "agency": None, "default": None, "direct_any": None}
+    if not text:
+        return out
+    clean = re.sub(r"\s+", "", text)
+    for clause in re.split(r"[。；]", clean):
+        if not clause:
+            continue
+        has_direct = "直销" in clause
+        has_agency = ("代销" in clause) or ("非直销" in clause)
+        amt = _amount_in_segment(clause)
+        if has_direct and amt is not None and out["direct_any"] is None:
+            out["direct_any"] = amt
+        classes = set(re.findall(r"([ACDEFI])类", clause))
+        if share_class and classes and share_class not in classes:
+            continue
+        if has_direct and has_agency:
+            # 同一句里两种渠道都出现：按关键词位置切开，各取各的数
+            idx_d = clause.find("直销")
+            idx_a = max(clause.find("代销"), clause.find("非直销"))
+            if idx_d < idx_a:
+                d_amt = _amount_in_segment(clause[idx_d:idx_a])
+                a_amt = _amount_in_segment(clause[idx_a:])
+            else:
+                a_amt = _amount_in_segment(clause[idx_a:idx_d])
+                d_amt = _amount_in_segment(clause[idx_d:])
+            if d_amt is not None and out["direct"] is None:
+                out["direct"] = d_amt
+            if a_amt is not None and out["agency"] is None:
+                out["agency"] = a_amt
+        elif has_direct:
+            if amt is not None and out["direct"] is None:
+                out["direct"] = amt
+        elif has_agency:
+            if amt is not None and out["agency"] is None:
+                out["agency"] = amt
+        elif amt is not None and out["default"] is None:
+            if re.search(r"(?:不超过|不得超过|限制|限额|调整|高于)", clause):
+                out["default"] = amt
+    return out
+
+
 def fetch_notice_content(art_code, notices_cache):
     if not art_code:
         return ""
@@ -226,19 +291,24 @@ def fetch_latest_limit_notice(code, share_class, notices_cache, need_body=False)
                 if any(k in title for k in LIMIT_TITLE_KWS):
                     art_code = item.get("ID", "")
                     pub_date = str(item.get("PUBLISHDATE", ""))[:10]
-                    has_diff = ("直销" in title or "代销" in title or "非直销" in title)
                     need_schedule = any(k in title for k in ("暂停", "节假日", "恢复", "休市"))
-                    parsed_limit = None
-                    body = ""
-                    if need_body or has_diff or need_schedule:
-                        body = fetch_notice_content(art_code, notices_cache)
-                        parsed_limit = extract_limit_from_text(body, share_class)
+                    # 限额公告的正文必拉：渠道区分（直销 vs 代销）只写在正文里，
+                    # 标题里几乎从不出现，只看标题会把直销默认成代销。
+                    body = fetch_notice_content(art_code, notices_cache)
+                    parsed_limit = extract_limit_from_text(body, share_class)
+                    channel_limits = extract_channel_limits(body, share_class)
+                    has_diff = (
+                        "直销" in title or "代销" in title or "非直销" in title
+                        or channel_limits["direct"] is not None
+                        or channel_limits["agency"] is not None
+                    )
                     sched = extract_schedule_from_text(body, title, pub_date)
                     return {
                         "title": title,
                         "date": pub_date,
                         "has_channel_diff": has_diff,
                         "parsed_limit": parsed_limit,
+                        "channel_limits": channel_limits,
                         "effective_date": sched["effective_date"],
                         "resume_date": sched["resume_date"],
                         "no_further_notice": sched["no_further_notice"],
@@ -250,6 +320,7 @@ def fetch_latest_limit_notice(code, share_class, notices_cache, need_body=False)
             pass
     return {
         "title": "", "date": "", "has_channel_diff": False, "parsed_limit": None,
+        "channel_limits": {"direct": None, "agency": None, "default": None, "direct_any": None},
         "effective_date": "", "resume_date": "", "no_further_notice": False, "is_holiday_suspend": False
     }
 
@@ -582,9 +653,16 @@ def main():
         notice = fetch_latest_limit_notice(code, share_class, notices_cache, need_body=need_notice_body)
 
         if need_notice_body:
-            if notice["parsed_limit"] == 999999999:
+            # 天天未代销时才用公告补代销数；公告里那个单个数可能是直销数
+            # （如大成纳指表格里的 100 元就是直销），绝不能直接拿来当作代销。
+            ch = notice.get("channel_limits") or {}
+            if ch.get("agency"):
+                agency_num = ch["agency"]
+                agency_text, status_str = f"{agency_num:,} 元", "其他平台可买(据公告)"
+            elif notice["parsed_limit"] == 999999999:
                 agency_num, agency_text, status_str = 999999999, "不限额", "其他平台可买(据公告)"
-            elif notice["parsed_limit"]:
+            elif notice["parsed_limit"] and not ch.get("direct"):
+                # 公告不分渠道，单个数就是通用限额，才能当作代销
                 agency_num = notice["parsed_limit"]
                 agency_text, status_str = f"{agency_num:,} 元", "其他平台可买(据公告)"
             else:
@@ -658,15 +736,28 @@ def main():
                 if fee_info.get("purchase_fee_orig", 0) == 0:
                     fee_info["purchase_fee_orig"] = round(fallback_fee * 10, 2)
 
-        if code in direct_overrides:
+        # 直销优先级：公告分渠道解析 > 手动覆盖 > 默认同代销。
+        # 手动覆盖只作兜底：公告能解析出分渠道限额时以公告为准，
+        # 这样覆盖值过期后不会一直挡住新的公告数；公告解析不出时
+        # （如天弘 D 类）才用覆盖值。
+        ch = notice.get("channel_limits") or {}
+        ch_direct, ch_default, ch_direct_any = ch.get("direct"), ch.get("default"), ch.get("direct_any")
+        if agency_num == 0 and not ch_direct:
+            # 暂停：代销暂停时直销同为暂停，不再输出“渠道有差异(见公告)”
+            direct_num, direct_text = 0, "暂停申购"
+            direct_source, direct_note = "same_as_agency", "代销暂停，直销同为暂停"
+        elif ch_direct:
+            direct_num = ch_direct
+            direct_text = "不限额(见公告)" if direct_num == 999999999 else f"{direct_num:,} 元"
+            direct_source, direct_note = "notice_diff", notice["title"]
+        elif code in direct_overrides:
             ov = direct_overrides[code]
             direct_num, direct_text = ov["limit_num"], ov["limit_text"]
             direct_source, direct_note = "manual", ov.get("note", "已手动校准")
-        elif notice["has_channel_diff"]:
-            direct_num = notice["parsed_limit"] if notice["parsed_limit"] else agency_num
-            direct_text = "不限额(见公告)" if direct_num == 999999999 else (
-                f"{direct_num:,} 元(见公告)" if notice["parsed_limit"] else "渠道有差异(见公告)"
-            )
+        elif ch_direct is None and ch_default is not None and ch_direct_any is not None:
+            # 公告分了渠道，但直销条款只列了别的份额（如建信直销 50 元只写 A/C，
+            # D 类不在其中）：本份额直销用公告里的通用限额（如建信 D 类 10 元）
+            direct_num, direct_text = ch_default, f"{ch_default:,} 元"
             direct_source, direct_note = "notice_diff", notice["title"]
         else:
             direct_num, direct_text = agency_num, agency_text
