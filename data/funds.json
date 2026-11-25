@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-11-25 00:30:37",
+  "updated_at": "2026-11-25 09:30:36",
   "nasdaq": [
     {
       "code": "021000",
@@ -1754,7 +1754,7 @@
       "direct_limit_num": 0,
       "direct_source": "same_as_agency",
       "direct_note": "未见渠道区分公告，默认同代销",
-      "return_1y": null,
+      "return_1y": 3.92,
       "daily_chg": null,
       "scale": 15.26,
       "mgmt_fee": 0.8,
@@ -1839,12 +1839,12 @@
       "price": 2.788,
       "nav": 1.9781,
       "nav_date": "2026-11-23",
-      "chg_pct": 5.61,
+      "chg_pct": 0.0,
       "premium": 40.94,
       "scale": 160.83,
       "return_1y": 9.32,
       "mgmt_custody_fee": 1.0,
-      "turnover": 15.79,
+      "turnover": 0.0,
       "detail_url": "https://fund.eastmoney.com/159509.html",
       "premium_history": {
         "dates": [
@@ -3459,12 +3459,12 @@
       "price": 2.013,
       "nav": 1.6796,
       "nav_date": "2026-11-23",
-      "chg_pct": 3.82,
+      "chg_pct": 0.0,
       "premium": 19.85,
       "scale": 133.68,
       "return_1y": 4.28,
       "mgmt_custody_fee": 0.6,
-      "turnover": 1.25,
+      "turnover": 0.0,
       "detail_url": "https://fund.eastmoney.com/159501.html",
       "premium_history": {
         "dates": [
@@ -5153,12 +5153,12 @@
       "price": 1.988,
       "nav": 1.6654,
       "nav_date": "2026-11-23",
-      "chg_pct": 3.54,
+      "chg_pct": 0.0,
       "premium": 19.37,
       "scale": 57.05,
       "return_1y": 4.39,
       "mgmt_custody_fee": 0.6,
-      "turnover": 0.66,
+      "turnover": 0.0,
       "detail_url": "https://fund.eastmoney.com/159696.html",
       "premium_history": {
         "dates": [
@@ -6747,12 +6747,12 @@
       "price": 2.131,
       "nav": 1.788,
       "nav_date": "2026-11-23",
-      "chg_pct": 3.95,
+      "chg_pct": 0.0,
       "premium": 19.18,
       "scale": 197.66,
       "return_1y": 4.14,
       "mgmt_custody_fee": 0.8,
-      "turnover": 4.66,
+      "turnover": 0.0,
       "detail_url": "https://fund.eastmoney.com/513100.html",
       "premium_history": {
         "dates": [
@@ -9771,12 +9771,12 @@
       "price": 2.26,
       "nav": 1.9335,
       "nav_date": "2026-11-23",
-      "chg_pct": 3.15,
+      "chg_pct": 0.0,
       "premium": 16.89,
       "scale": 102.74,
       "return_1y": 4.61,
       "mgmt_custody_fee": 0.65,
-      "turnover": 1.84,
+      "turnover": 0.0,
       "detail_url": "https://fund.eastmoney.com/159659.html",
       "premium_history": {
         "dates": [
@@ -11531,12 +11531,12 @@
       "price": 1.56,
       "nav": 1.3361,
       "nav_date": "2026-11-23",
-      "chg_pct": 2.83,
+      "chg_pct": 0.0,
       "premium": 16.76,
       "scale": 350.53,
       "return_1y": 3.57,
       "mgmt_custody_fee": 1.0,
-      "turnover": 11.58,
+      "turnover": 0.0,
       "detail_url": "https://fund.eastmoney.com/159941.html",
       "premium_history": {
         "dates": [
@@ -14555,12 +14555,12 @@
       "price": 1.982,
       "nav": 1.703,
       "nav_date": "2026-11-23",
-      "chg_pct": 3.5,
+      "chg_pct": 0.0,
       "premium": 16.38,
       "scale": 28.9,
       "return_1y": 4.29,
       "mgmt_custody_fee": 0.6,
-      "turnover": 1.06,
+      "turnover": 0.0,
       "detail_url": "https://fund.eastmoney.com/513870.html",
       "premium_history": {
         "dates": [
@@ -16063,12 +16063,12 @@
       "price": 2.58,
       "nav": 2.2176,
       "nav_date": "2026-11-23",
-      "chg_pct": 3.53,
+      "chg_pct": 0.0,
       "premium": 16.34,
       "scale": 139.14,
       "return_1y": 3.04,
       "mgmt_custody_fee": 0.8,
-      "turnover": 5.14,
+      "turnover": 0.0,
       "detail_url": "https://fund.eastmoney.com/513300.html",
       "premium_history": {
         "dates": [
@@ -19023,12 +19023,12 @@
       "price": 2.321,
       "nav": 2.0069,
       "nav_date": "2026-11-23",
-      "chg_pct": 3.57,
+      "chg_pct": 0.0,
       "premium": 15.65,
       "scale": 50.48,
       "return_1y": 4.21,
       "mgmt_custody_fee": 0.65,
-      "turnover": 1.24,
+      "turnover": 0.0,
       "detail_url": "https://fund.eastmoney.com/513390.html",
       "premium_history": {
         "dates": [
@@ -20771,12 +20771,12 @@
       "price": 2.255,
       "nav": 1.9537,
       "nav_date": "2026-11-23",
-      "chg_pct": 3.35,
+      "chg_pct": 0.0,
       "premium": 15.42,
       "scale": 57.74,
       "return_1y": 4.23,
       "mgmt_custody_fee": 0.65,
-      "turnover": 2.46,
+      "turnover": 0.0,
       "detail_url": "https://fund.eastmoney.com/159660.html",
       "premium_history": {
         "dates": [
@@ -22543,12 +22543,12 @@
       "price": 2.332,
       "nav": 2.0313,
       "nav_date": "2026-11-23",
-      "chg_pct": 3.37,
+      "chg_pct": 0.0,
       "premium": 14.8,
       "scale": 118.08,
       "return_1y": 4.17,
       "mgmt_custody_fee": 0.8,
-      "turnover": 3.61,
+      "turnover": 0.0,
       "detail_url": "https://fund.eastmoney.com/159632.html",
       "premium_history": {
         "dates": [
@@ -24655,12 +24655,12 @@
       "price": 1.693,
       "nav": 1.4879,
       "nav_date": "2026-11-23",
-      "chg_pct": 3.42,
+      "chg_pct": 0.0,
       "premium": 13.78,
       "scale": 82.47,
       "return_1y": 3.46,
       "mgmt_custody_fee": 1.0,
-      "turnover": 3.39,
+      "turnover": 0.0,
       "detail_url": "https://fund.eastmoney.com/159513.html",
       "premium_history": {
         "dates": [
@@ -26289,12 +26289,12 @@
       "price": 2.334,
       "nav": 2.0535,
       "nav_date": "2026-11-23",
-      "chg_pct": 3.27,
+      "chg_pct": 0.0,
       "premium": 13.66,
       "scale": 52.06,
       "return_1y": 3.83,
       "mgmt_custody_fee": 1.0,
-      "turnover": 2.91,
+      "turnover": 0.0,
       "detail_url": "https://fund.eastmoney.com/513110.html",
       "premium_history": {
         "dates": [
@@ -28099,12 +28099,12 @@
       "price": 2.528,
       "nav": 2.2973,
       "nav_date": "2026-11-23",
-      "chg_pct": 2.97,
+      "chg_pct": 0.0,
       "premium": 10.04,
       "scale": 251.81,
       "return_1y": 3.81,
       "mgmt_custody_fee": 0.8,
-      "turnover": 2.83,
+      "turnover": 0.0,
       "detail_url": "https://fund.eastmoney.com/513500.html",
       "premium_history": {
         "dates": [
@@ -31096,15 +31096,15 @@
       "code": "159612",
       "name": "国泰标普500ETF(QDII)",
       "index": "标普500",
-      "price": 1.968,
+      "price": 1.949,
       "nav": 1.8021,
       "nav_date": "2026-11-23",
-      "chg_pct": 2.61,
-      "premium": 9.21,
+      "chg_pct": -0.97,
+      "premium": 8.15,
       "scale": 9.78,
       "return_1y": 3.84,
       "mgmt_custody_fee": 0.75,
-      "turnover": 0.27,
+      "turnover": 0.01,
       "detail_url": "https://fund.eastmoney.com/159612.html",
       "premium_history": {
         "dates": [
@@ -33300,7 +33300,7 @@
         "stats": {
           "min": 3.79,
           "max": 12.61,
-          "percentile": 90
+          "percentile": 73
         }
       }
     },
@@ -33308,15 +33308,15 @@
       "code": "513650",
       "name": "南方标普500ETF(QDII)",
       "index": "标普500",
-      "price": 1.889,
+      "price": 1.864,
       "nav": 1.7502,
       "nav_date": "2026-11-23",
-      "chg_pct": 2.83,
-      "premium": 7.93,
+      "chg_pct": -1.32,
+      "premium": 6.5,
       "scale": 87.11,
       "return_1y": 3.88,
       "mgmt_custody_fee": 0.75,
-      "turnover": 8.16,
+      "turnover": 0.28,
       "detail_url": "https://fund.eastmoney.com/513650.html",
       "premium_history": {
         "dates": [
@@ -35088,7 +35088,7 @@
         "stats": {
           "min": 2.82,
           "max": 12.15,
-          "percentile": 67
+          "percentile": 34
         }
       }
     }
