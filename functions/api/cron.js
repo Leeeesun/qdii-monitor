@@ -93,10 +93,11 @@ export async function onRequestPost({ request, env }) {
         }
         const name = f.name || code;
         const show = (v) => (v === "" ? "—" : v);
-        if (prevAgency !== agencyQ) {
+        // 按显示值比对："" 与 "—" 显示出来一样，不算变化，避免出现 "— -> —" 的废话
+        if (show(prevAgency) !== show(agencyQ)) {
           changes.push(`${name}(${code}) 代销：${show(prevAgency)} -> ${show(agencyQ)}`);
         }
-        if (prevDirect !== directQ) {
+        if (show(prevDirect) !== show(directQ)) {
           changes.push(`${name}(${code}) 直销：${show(prevDirect)} -> ${show(directQ)}`);
         }
       }
