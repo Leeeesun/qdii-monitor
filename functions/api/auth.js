@@ -56,17 +56,28 @@ async function signToken(payload, secret) {
   return `${body}.${toHex(sig)}`;
 }
 
+function hexToBytes(hex) {
+  if (typeof hex !== "string" || hex.length % 2 !== 0 || !/^[0-9a-fA-F]*$/.test(hex)) return null;
+  const out = new Uint8Array(hex.length / 2);
+  for (let i = 0; i < out.length; i++) out[i] = parseInt(hex.slice(i * 2, i * 2 + 2), 16);
+  return out;
+}
+
 async function verifyToken(token, secret) {
   if (!token || !token.includes(".")) return null;
   const [body, sig] = token.split(".");
+  const sigBytes = hexToBytes(sig);
+  if (!sigBytes) return null;
   const key = await crypto.subtle.importKey(
     "raw", encoder.encode(secret), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]
   );
-  const expected = toHex(await crypto.subtle.sign("HMAC", key, encoder.encode(body)));
-  if (sig !== expected) return null;
+  const expected = await crypto.subtle.sign("HMAC", key, encoder.encode(body));
+  // 恒定时间比较签名，避免时序侧信道
+  if (!bytesEqual(sigBytes, new Uint8Array(expected))) return null;
   try {
     const payload = JSON.parse(fromBase64Url(body));
-    if (payload.exp && Date.now() > payload.exp) return null;
+    // 必须带 exp 且未过期（无 exp 的 token 一律拒绝）
+    if (!payload.exp || typeof payload.exp !== "number" || Date.now() > payload.exp) return null;
     return payload;
   } catch {
     return null;
@@ -115,7 +126,9 @@ function isSuperAdmin(username, env) {
 }
 
 async function getAuthedUser(request, env) {
-  const secret = env.JWT_SECRET || "qdii-monitor-default-secret-change-me";
+  // 未配置 JWT_SECRET 时直接拒绝鉴权，绝不用硬编码默认值（fail closed）
+  const secret = env.JWT_SECRET || "";
+  if (!secret) return null;
   const auth = request.headers.get("Authorization") || "";
   const token = auth.startsWith("Bearer ") ? auth.slice(7).trim() : "";
   const user = await verifyToken(token, secret);
@@ -166,7 +179,11 @@ export async function onRequestGet(context) {
 
 export async function onRequestPost(context) {
   const { request, env } = context;
-  const secret = env.JWT_SECRET || "qdii-monitor-default-secret-change-me";
+  // 未配置 JWT_SECRET 时直接 500，拒绝签发任何 token（fail closed）
+  const secret = env.JWT_SECRET || "";
+  if (!secret) {
+    return jsonRes({ ok: false, message: "未配置 JWT_SECRET，拒绝签发 token" }, 500);
+  }
 
   if (!env.AUTH_KV) {
     return jsonRes({ ok: false, message: "尚未在 Cloudflare 后台绑定 AUTH_KV 数据库" }, 500);

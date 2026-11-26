@@ -22,6 +22,82 @@ const TASK_DEFS = {
   }
 };
 
+const encoder = new TextEncoder();
+
+function bytesToBase64Url(bytes) {
+  let bin = "";
+  const arr = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+  for (let i = 0; i < arr.length; i++) bin += String.fromCharCode(arr[i]);
+  return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
+function base64UrlToBytes(b64) {
+  const pad = b64.replace(/-/g, "+").replace(/_/g, "/") + "=".repeat((4 - (b64.length % 4)) % 4);
+  const bin = atob(pad);
+  const bytes = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  return bytes;
+}
+
+function fromBase64Url(b64) {
+  return new TextDecoder().decode(base64UrlToBytes(b64));
+}
+
+function hexToBytes(hex) {
+  if (typeof hex !== "string" || hex.length % 2 !== 0 || !/^[0-9a-fA-F]*$/.test(hex)) return null;
+  const out = new Uint8Array(hex.length / 2);
+  for (let i = 0; i < out.length; i++) out[i] = parseInt(hex.slice(i * 2, i * 2 + 2), 16);
+  return out;
+}
+
+function bytesEqual(a, b) {
+  if (a.length !== b.length) return false;
+  for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return false;
+  return true;
+}
+
+async function verifyToken(token, secret) {
+  if (!token || !token.includes(".")) return null;
+  const [body, sig] = token.split(".");
+  const sigBytes = hexToBytes(sig);
+  if (!sigBytes) return null;
+  const key = await crypto.subtle.importKey(
+    "raw", encoder.encode(secret), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]
+  );
+  const expected = await crypto.subtle.sign("HMAC", key, encoder.encode(body));
+  if (!bytesEqual(sigBytes, new Uint8Array(expected))) return null;
+  try {
+    const payload = JSON.parse(fromBase64Url(body));
+    if (!payload.exp || typeof payload.exp !== "number" || Date.now() > payload.exp) return null;
+    return payload;
+  } catch {
+    return null;
+  }
+}
+
+function isSuperAdmin(username, env) {
+  const u = String(username || "").trim().toLowerCase();
+  if (!u) return false;
+  const extra = String(env.ADMIN_USERS || "lesun")
+    .split(/[,，\s]+/)
+    .map(s => s.trim().toLowerCase())
+    .filter(Boolean);
+  return u === "lesun" || extra.includes(u);
+}
+
+// 推送配置涉及 Bark 密钥与调度中心任务，必须是已登录的管理员才能读写。
+// 未配置 JWT_SECRET 时直接拒绝（fail closed），绝不用硬编码默认值。
+async function getAuthedAdmin(request, env) {
+  const secret = env.JWT_SECRET || "";
+  if (!secret) return null;
+  const auth = request.headers.get("Authorization") || "";
+  const token = auth.startsWith("Bearer ") ? auth.slice(7).trim() : "";
+  const user = await verifyToken(token, secret);
+  if (!user) return null;
+  if (!isSuperAdmin(user.username, env)) return null;
+  return user;
+}
+
 function parseTimeStr(str, fallbackH, fallbackM) {
   const m = String(str || "").match(/^(\d{1,2}):(\d{2})$/);
   if (!m) return { hour: fallbackH, minute: fallbackM };
@@ -64,7 +140,11 @@ async function upsertHubTask(env, taskId, payload) {
   return res.json();
 }
 
-export async function onRequestGet({ env }) {
+export async function onRequestGet({ request, env }) {
+  const admin = await getAuthedAdmin(request, env);
+  if (!admin) {
+    return Response.json({ ok: false, message: "未登录或无管理员权限" }, { status: 401 });
+  }
   if (!env.AUTH_KV) {
     return Response.json({ ok: false, message: "未绑定 AUTH_KV" }, { status: 500 });
   }
@@ -108,6 +188,10 @@ export async function onRequestGet({ env }) {
 }
 
 export async function onRequestPost({ request, env }) {
+  const admin = await getAuthedAdmin(request, env);
+  if (!admin) {
+    return Response.json({ ok: false, message: "未登录或无管理员权限" }, { status: 401 });
+  }
   if (!env.AUTH_KV) {
     return Response.json({ ok: false, message: "未绑定 AUTH_KV" }, { status: 500 });
   }

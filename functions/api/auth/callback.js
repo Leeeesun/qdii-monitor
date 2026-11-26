@@ -90,7 +90,9 @@ export async function onRequestGet(context) {
     return redirectErr(url.origin, "unauthorized_user");
   }
 
-  const secret = env.JWT_SECRET || "qdii-monitor-default-secret-change-me";
+  // 未配置 JWT_SECRET 时拒绝签发 token（fail closed），不回退到硬编码默认值
+  const secret = env.JWT_SECRET || "";
+  if (!secret) return redirectErr(url.origin, "missing_jwt_secret");
   const exp = Date.now() + 30 * 24 * 60 * 60 * 1000;
   const user = { username: "Lesun", role: "admin", exp };
   const token = await signToken(user, secret);
