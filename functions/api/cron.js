@@ -71,15 +71,33 @@ export async function onRequestPost({ request, env }) {
       const currMap = {};
       const changes = [];
 
+      // 分渠道比对：只报变了的渠道，并标明直销/代销
       for (const f of offFunds) {
         const code = f.code || f.id || f.name;
         const agencyQ = String(f.agency_limit_text ?? f.quota ?? f.limit ?? f.status ?? "");
         const directQ = String(f.direct_limit_text ?? "");
-        const quotaSig = `${agencyQ} | ${directQ}`;
         if (!code) continue;
-        currMap[code] = quotaSig;
-        if (prevMap && code in prevMap && prevMap[code] !== quotaSig) {
-          changes.push(`${f.name || code} (${code}): ${prevMap[code]} → ${quotaSig}`);
+        currMap[code] = { agency: agencyQ, direct: directQ };
+        if (!prevMap || !(code in prevMap)) continue;
+        const prev = prevMap[code];
+        // 兼容旧版快照（旧版是 "代销 | 直销" 字符串）
+        let prevAgency = "";
+        let prevDirect = "";
+        if (typeof prev === "string") {
+          const parts = prev.split(" | ");
+          prevAgency = parts[0] ?? "";
+          prevDirect = parts[1] ?? "";
+        } else if (prev && typeof prev === "object") {
+          prevAgency = String(prev.agency ?? "");
+          prevDirect = String(prev.direct ?? "");
+        }
+        const name = f.name || code;
+        const show = (v) => (v === "" ? "—" : v);
+        if (prevAgency !== agencyQ) {
+          changes.push(`${name}(${code}) 代销：${show(prevAgency)} -> ${show(agencyQ)}`);
+        }
+        if (prevDirect !== directQ) {
+          changes.push(`${name}(${code}) 直销：${show(prevDirect)} -> ${show(directQ)}`);
         }
       }
 
@@ -92,9 +110,10 @@ export async function onRequestPost({ request, env }) {
         return Response.json({ ok: true, msg: "本次检查无额度变化，未推送" });
       }
 
-      const content = changes.slice(0, 10).join("\n") + (changes.length > 10 ? `\n...等共 ${changes.length} 只` : "");
-      await sendBark(settings, `QDII 额度变动 (${changes.length}只)`, content);
-      return Response.json({ ok: true, msg: `已推送 Bark：${changes.length} 只基金额度变动` });
+      const details = changes.slice(0, 12).join("\n") + (changes.length > 12 ? `\n...另有 ${changes.length - 12} 项变化，请打开监控台查看` : "");
+      const content = `检测到 ${changes.length} 项额度变动：\n${details}`;
+      await sendBark(settings, `QDII 限额变化提醒（${changes.length}项）`, content);
+      return Response.json({ ok: true, msg: `已推送 Bark：${changes.length} 项额度变动` });
     }
 
     // 2. 场内高溢价检查（读取 data.etfs 数组中的 premium 字段）
