@@ -1,48 +1,18 @@
 {
-  "updated_at": "2026-11-26 00:30:39",
+  "updated_at": "2026-11-26 09:30:40",
   "nasdaq": [
-    {
-      "code": "022525",
-      "name": "天弘纳斯达克100指数发起(QDII)D",
-      "share_class": "D",
-      "status": "其他平台可买(据公告)",
-      "agency_limit_text": "100 元",
-      "agency_limit_num": 100,
-      "agency_note": null,
-      "direct_limit_text": "—",
-      "direct_limit_num": -1,
-      "direct_source": "manual",
-      "direct_note": "按2026-11-25截图口径：D类100元为东财金融/腾讯理财通代销限额，直销栏为—；东财公告库未见D类11月恢复公告，待核实",
-      "return_1y": -0.49,
-      "daily_chg": null,
-      "scale": 1.62,
-      "mgmt_fee": 0.5,
-      "custody_fee": 0.1,
-      "mgmt_custody_fee": 0.6,
-      "purchase_fee": 0.0,
-      "purchase_fee_orig": 0.0,
-      "service_fee": 0.2,
-      "first_year_cost": 0.8,
-      "nav_date": "",
-      "notice_title": "天弘基金管理有限公司关于天弘纳斯达克100指数型发起式证券投资基金(QDII)A类基金份额、C类基金份额暂停申购及定期定额投资业务的公告",
-      "notice_date": "2026-09-18",
-      "effective_date": "2026-09-21",
-      "resume_date": "",
-      "notice_schedule": "",
-      "notice_url": "https://fundf10.eastmoney.com/jjgg_022525_5.html"
-    },
     {
       "code": "021000",
       "name": "南方纳斯达克100指数发起(QDII)I",
       "share_class": "I",
-      "status": "其他平台可买(据公告)",
+      "status": "暂停申购",
       "agency_limit_text": "—",
       "agency_limit_num": null,
       "agency_note": "实测：I类份额无代销渠道，仅通过直销渠道销售；天天基金的200元为直销限额",
-      "direct_limit_text": "200 元",
-      "direct_limit_num": 200,
-      "direct_source": "manual",
-      "direct_note": "I类份额仅直销渠道销售，直销限额200元",
+      "direct_limit_text": "暂停申购",
+      "direct_limit_num": 0,
+      "direct_source": "same_as_agency",
+      "direct_note": "代销暂停，直销同为暂停",
       "return_1y": -0.47,
       "daily_chg": null,
       "scale": 40.79,
@@ -540,6 +510,36 @@
       "resume_date": "",
       "notice_schedule": "",
       "notice_url": "https://fundf10.eastmoney.com/jjgg_018044_5.html"
+    },
+    {
+      "code": "022525",
+      "name": "天弘纳斯达克100指数发起(QDII)D",
+      "share_class": "D",
+      "status": "暂停申购",
+      "agency_limit_text": "暂停申购",
+      "agency_limit_num": 0,
+      "agency_note": null,
+      "direct_limit_text": "暂停申购",
+      "direct_limit_num": 0,
+      "direct_source": "same_as_agency",
+      "direct_note": "代销暂停，直销同为暂停",
+      "return_1y": -0.49,
+      "daily_chg": null,
+      "scale": 1.62,
+      "mgmt_fee": 0.5,
+      "custody_fee": 0.1,
+      "mgmt_custody_fee": 0.6,
+      "purchase_fee": 0.0,
+      "purchase_fee_orig": 0.0,
+      "service_fee": 0.2,
+      "first_year_cost": 0.8,
+      "nav_date": "",
+      "notice_title": "天弘基金管理有限公司关于天弘纳斯达克100指数型发起式证券投资基金(QDII)A类基金份额、C类基金份额暂停申购及定期定额投资业务的公告",
+      "notice_date": "2026-09-18",
+      "effective_date": "2026-09-21",
+      "resume_date": "",
+      "notice_schedule": "",
+      "notice_url": "https://fundf10.eastmoney.com/jjgg_022525_5.html"
     },
     {
       "code": "024237",
@@ -1410,7 +1410,7 @@
       "notice_date": "2026-09-01",
       "effective_date": "2026-09-02",
       "resume_date": "2026-09-02",
-      "notice_schedule": "",
+      "notice_schedule": "09-02 已自动恢复原额度",
       "notice_url": "https://fundf10.eastmoney.com/jjgg_022523_5.html"
     },
     {
@@ -1902,12 +1902,12 @@
       "price": 2.651,
       "nav": 1.926,
       "nav_date": "2026-11-24",
-      "chg_pct": -4.91,
+      "chg_pct": 0.0,
       "premium": 37.64,
       "scale": 160.83,
       "return_1y": 2.82,
       "mgmt_custody_fee": 1.0,
-      "turnover": 8.56,
+      "turnover": 0.0,
       "detail_url": "https://fund.eastmoney.com/159509.html",
       "premium_history": {
         "dates": [
@@ -3524,12 +3524,12 @@
       "price": 1.939,
       "nav": 1.6459,
       "nav_date": "2026-11-24",
-      "chg_pct": -3.68,
+      "chg_pct": 0.0,
       "premium": 17.81,
       "scale": 133.68,
       "return_1y": -0.37,
       "mgmt_custody_fee": 0.6,
-      "turnover": 1.2,
+      "turnover": 0.0,
       "detail_url": "https://fund.eastmoney.com/159501.html",
       "premium_history": {
         "dates": [
@@ -5220,12 +5220,12 @@
       "price": 1.911,
       "nav": 1.632,
       "nav_date": "2026-11-24",
-      "chg_pct": -3.87,
+      "chg_pct": 0.0,
       "premium": 17.1,
       "scale": 57.05,
       "return_1y": -0.26,
       "mgmt_custody_fee": 0.6,
-      "turnover": 0.42,
+      "turnover": 0.0,
       "detail_url": "https://fund.eastmoney.com/159696.html",
       "premium_history": {
         "dates": [
@@ -6816,12 +6816,12 @@
       "price": 2.049,
       "nav": 1.7522,
       "nav_date": "2026-11-24",
-      "chg_pct": -3.85,
+      "chg_pct": 0.0,
       "premium": 16.94,
       "scale": 197.66,
       "return_1y": -0.5,
       "mgmt_custody_fee": 0.8,
-      "turnover": 2.88,
+      "turnover": 0.0,
       "detail_url": "https://fund.eastmoney.com/513100.html",
       "premium_history": {
         "dates": [
@@ -9840,12 +9840,12 @@
       "price": 2.181,
       "nav": 1.8948,
       "nav_date": "2026-11-24",
-      "chg_pct": -3.5,
+      "chg_pct": 0.0,
       "premium": 15.1,
       "scale": 102.74,
       "return_1y": -0.03,
       "mgmt_custody_fee": 0.65,
-      "turnover": 1.12,
+      "turnover": 0.0,
       "detail_url": "https://fund.eastmoney.com/159659.html",
       "premium_history": {
         "dates": [
@@ -11602,12 +11602,12 @@
       "price": 1.909,
       "nav": 1.6688,
       "nav_date": "2026-11-24",
-      "chg_pct": -3.68,
+      "chg_pct": 0.0,
       "premium": 14.39,
       "scale": 28.9,
       "return_1y": -0.36,
       "mgmt_custody_fee": 0.6,
-      "turnover": 0.72,
+      "turnover": 0.0,
       "detail_url": "https://fund.eastmoney.com/513870.html",
       "premium_history": {
         "dates": [
@@ -13112,12 +13112,12 @@
       "price": 1.496,
       "nav": 1.3093,
       "nav_date": "2026-11-24",
-      "chg_pct": -4.1,
+      "chg_pct": 0.0,
       "premium": 14.26,
       "scale": 350.53,
       "return_1y": -1.03,
       "mgmt_custody_fee": 1.0,
-      "turnover": 8.44,
+      "turnover": 0.0,
       "detail_url": "https://fund.eastmoney.com/159941.html",
       "premium_history": {
         "dates": [
@@ -16136,12 +16136,12 @@
       "price": 2.48,
       "nav": 2.1725,
       "nav_date": "2026-11-24",
-      "chg_pct": -3.88,
+      "chg_pct": 0.0,
       "premium": 14.15,
       "scale": 139.14,
       "return_1y": -1.55,
       "mgmt_custody_fee": 0.8,
-      "turnover": 2.92,
+      "turnover": 0.0,
       "detail_url": "https://fund.eastmoney.com/513300.html",
       "premium_history": {
         "dates": [
@@ -19098,12 +19098,12 @@
       "price": 2.231,
       "nav": 1.9667,
       "nav_date": "2026-11-24",
-      "chg_pct": -3.88,
+      "chg_pct": 0.0,
       "premium": 13.44,
       "scale": 50.48,
       "return_1y": -0.44,
       "mgmt_custody_fee": 0.65,
-      "turnover": 0.78,
+      "turnover": 0.0,
       "detail_url": "https://fund.eastmoney.com/513390.html",
       "premium_history": {
         "dates": [
@@ -20848,12 +20848,12 @@
       "price": 2.17,
       "nav": 1.9145,
       "nav_date": "2026-11-24",
-      "chg_pct": -3.77,
+      "chg_pct": 0.0,
       "premium": 13.35,
       "scale": 57.74,
       "return_1y": -0.43,
       "mgmt_custody_fee": 0.65,
-      "turnover": 1.36,
+      "turnover": 0.0,
       "detail_url": "https://fund.eastmoney.com/159660.html",
       "premium_history": {
         "dates": [
@@ -22622,12 +22622,12 @@
       "price": 2.239,
       "nav": 1.9906,
       "nav_date": "2026-11-24",
-      "chg_pct": -3.99,
+      "chg_pct": 0.0,
       "premium": 12.48,
       "scale": 118.08,
       "return_1y": -0.47,
       "mgmt_custody_fee": 0.8,
-      "turnover": 2.35,
+      "turnover": 0.0,
       "detail_url": "https://fund.eastmoney.com/159632.html",
       "premium_history": {
         "dates": [
@@ -24736,12 +24736,12 @@
       "price": 1.622,
       "nav": 1.4581,
       "nav_date": "2026-11-24",
-      "chg_pct": -4.19,
+      "chg_pct": 0.0,
       "premium": 11.24,
       "scale": 82.47,
       "return_1y": -1.16,
       "mgmt_custody_fee": 1.0,
-      "turnover": 3.03,
+      "turnover": 0.0,
       "detail_url": "https://fund.eastmoney.com/159513.html",
       "premium_history": {
         "dates": [
@@ -26372,12 +26372,12 @@
       "price": 2.238,
       "nav": 2.0126,
       "nav_date": "2026-11-24",
-      "chg_pct": -4.11,
+      "chg_pct": 0.0,
       "premium": 11.2,
       "scale": 52.06,
       "return_1y": -0.77,
       "mgmt_custody_fee": 1.0,
-      "turnover": 1.96,
+      "turnover": 0.0,
       "detail_url": "https://fund.eastmoney.com/513110.html",
       "premium_history": {
         "dates": [
@@ -28181,15 +28181,15 @@
       "code": "513500",
       "name": "博时标普500ETF",
       "index": "标普500",
-      "price": 2.476,
+      "price": 2.517,
       "nav": 2.2853,
       "nav_date": "2026-11-24",
-      "chg_pct": -2.06,
-      "premium": 8.34,
+      "chg_pct": 1.66,
+      "premium": 10.14,
       "scale": 251.81,
       "return_1y": 1.74,
       "mgmt_custody_fee": 0.8,
-      "turnover": 1.65,
+      "turnover": 0.19,
       "detail_url": "https://fund.eastmoney.com/513500.html",
       "premium_history": {
         "dates": [
@@ -31173,7 +31173,7 @@
         "stats": {
           "min": 3.85,
           "max": 13.26,
-          "percentile": 34
+          "percentile": 79
         }
       }
     },
@@ -31181,15 +31181,15 @@
       "code": "159612",
       "name": "国泰标普500ETF(QDII)",
       "index": "标普500",
-      "price": 1.929,
+      "price": 1.955,
       "nav": 1.7927,
       "nav_date": "2026-11-24",
-      "chg_pct": -1.98,
-      "premium": 7.6,
+      "chg_pct": 1.35,
+      "premium": 9.05,
       "scale": 9.78,
       "return_1y": 1.77,
       "mgmt_custody_fee": 0.75,
-      "turnover": 0.14,
+      "turnover": 0.01,
       "detail_url": "https://fund.eastmoney.com/159612.html",
       "premium_history": {
         "dates": [
@@ -33387,7 +33387,7 @@
         "stats": {
           "min": 3.79,
           "max": 12.61,
-          "percentile": 61
+          "percentile": 87
         }
       }
     },
@@ -33395,15 +33395,15 @@
       "code": "513650",
       "name": "南方标普500ETF(QDII)",
       "index": "标普500",
-      "price": 1.846,
+      "price": 1.88,
       "nav": 1.7413,
       "nav_date": "2026-11-24",
-      "chg_pct": -2.28,
-      "premium": 6.01,
+      "chg_pct": 1.84,
+      "premium": 7.97,
       "scale": 87.11,
       "return_1y": 1.82,
       "mgmt_custody_fee": 0.75,
-      "turnover": 4.52,
+      "turnover": 0.38,
       "detail_url": "https://fund.eastmoney.com/513650.html",
       "premium_history": {
         "dates": [
@@ -35177,7 +35177,7 @@
         "stats": {
           "min": 2.82,
           "max": 12.15,
-          "percentile": 23
+          "percentile": 67
         }
       }
     }
