@@ -1,0 +1,7 @@
+{
+  "quota": {
+    "enabled": false,
+    "time": "09:30",
+    "template": "检测到 {count} 项额度变动：\n{details}"
+  }
+}
