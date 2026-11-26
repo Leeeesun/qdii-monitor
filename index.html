@@ -2981,7 +2981,13 @@
       const via = localStorage.getItem("yrz_login_via") || "sso";
       localStorage.removeItem("yrz_login_via");
       localStorage.removeItem(TOKEN_KEY);
-      window.location.href = "https://auth.youranzi.de/logout?via=" + encodeURIComponent(via) + "&redirect=" + encodeURIComponent(window.location.origin + "/");
+      // POST 表单直接提交登出（避免 GET 登出 CSRF；与 auth.youranzi.de 同站，
+      // SameSite=Lax 会话 Cookie 会随 POST 一起发送，无中间页）。
+      const form = document.createElement("form");
+      form.method = "POST";
+      form.action = "https://auth.youranzi.de/logout?via=" + encodeURIComponent(via) + "&redirect=" + encodeURIComponent(window.location.origin + "/");
+      document.body.appendChild(form);
+      form.submit();
     });
 
     async function checkSession() {
